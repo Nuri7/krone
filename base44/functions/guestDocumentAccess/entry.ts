@@ -1,36 +1,65 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Generates a short-lived signed URL for a guest's own document
+/**
+ * Get secure signed URL for guest document download.
+ * Enforces: user owns document OR user is admin.
+ */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { document_id } = await req.json();
-    if (!document_id) return Response.json({ error: 'document_id required' }, { status: 400 });
 
-    // Fetch document — verify ownership
-    const docs = await base44.asServiceRole.entities.GuestDocument.filter({ id: document_id });
-    if (docs.length === 0) return Response.json({ error: 'Document not found' }, { status: 404 });
+    if (!document_id) {
+      return Response.json({ error: 'Document ID required' }, { status: 400 });
+    }
 
-    const doc = docs[0];
+    // Get document
+    const documents = await base44.asServiceRole.entities.GuestDocument.filter(
+      { id: document_id },
+      undefined,
+      1
+    );
 
-    // Security: only owner or admin can access
-    const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
-    const isAdmin = ADMIN_EMAILS.includes(user.email) || user.role === 'admin';
-    if (doc.user_email !== user.email && !isAdmin) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    if (!documents || documents.length === 0) {
+      return Response.json({ error: 'Document not found' }, { status: 404 });
+    }
+
+    const document = documents[0];
+
+    // Check authorization: own email OR admin
+    const isOwner = document.user_email === user.email.toLowerCase();
+    const isAdmin = user.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      return Response.json(
+        { error: 'Access denied' },
+        { status: 403 }
+      );
     }
 
     // Generate signed URL (5 min expiry)
-    const result = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({
-      file_uri: doc.file_uri,
-      expires_in: 300,
+    const signedUrl = await base44.integrations.Core.CreateFileSignedUrl({
+      file_uri: document.file_uri,
+      expires_in: 300
     });
 
-    return Response.json({ signed_url: result.signed_url, filename: doc.original_filename });
+    return Response.json({
+      success: true,
+      signed_url: signedUrl.signed_url,
+      filename: document.original_filename,
+      expires_in_seconds: 300
+    });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('Document access error:', error.message);
+    return Response.json(
+      { error: 'Server error' },
+      { status: 500 }
+    );
   }
 });

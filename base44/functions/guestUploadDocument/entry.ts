@@ -43,11 +43,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'File type not allowed' }, { status: 415 });
     }
 
-    // Upload to private storage
+    // Upload to private storage (never public)
     const fileBuffer = await file.arrayBuffer();
-    const uploadedFile = await base44.integrations.Core.UploadPrivateFile({
-      file: fileBuffer
-    });
+    let uploadedFile;
+    try {
+      uploadedFile = await base44.integrations.Core.UploadPrivateFile({
+        file: fileBuffer
+      });
+    } catch (uploadErr) {
+      console.error('Private file upload failed:', uploadErr.message);
+      return Response.json(
+        { error: 'Failed to upload file' },
+        { status: 500 }
+      );
+    }
 
     // Create document record
     const doc = await base44.entities.GuestDocument.create({

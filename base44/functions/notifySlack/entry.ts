@@ -120,6 +120,21 @@ Deno.serve(async (req) => {
       body: JSON.stringify({ blocks }),
     });
 
+    // Log Slack attempt
+    const base44 = createClientFromRequest(req);
+    const channel = type === 'reservation' || type === 'reservation_cancelled' ? '#krone-reservations' : '#krone-ops-alerts';
+    const logStatus = slackRes.ok ? 'sent' : 'failed';
+    
+    await base44.asServiceRole.entities.SlackLog.create({
+      channel,
+      message_type: type,
+      status: logStatus,
+      sent_at: new Date().toISOString(),
+      failure_reason: !slackRes.ok ? await slackRes.text() : null,
+      related_entity_type: type.includes('reservation') ? 'Reservation' : type === 'contact' ? 'ContactInquiry' : 'GuestMessage',
+      related_ref: ref
+    }).catch(() => {});
+
     if (!slackRes.ok) {
       const text = await slackRes.text();
       console.error(`Slack error: ${slackRes.status} ${text}`);
@@ -127,7 +142,6 @@ Deno.serve(async (req) => {
     }
 
     // Update records after successful Slack send
-    const base44 = createClientFromRequest(req);
     if ((type === 'reservation' || type === 'reservation_cancelled') && ref) {
       const items = await base44.asServiceRole.entities.Reservation.filter({ reservation_ref: ref });
       if (items.length > 0) {
