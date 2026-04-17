@@ -117,26 +117,26 @@ export default function GuestAccount() {
   const newMessages = messages.filter(m => m.status === 'new').length;
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-28 lg:pb-10 px-5">
+    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-28 lg:pb-10 px-4 sm:px-5">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
-        <div className="py-10">
+        <div className="py-7 sm:py-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-2">{c.welcome}</p>
-              <h1 className="font-display text-3xl md:text-4xl font-light text-ivory leading-tight">
+              <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-1 sm:mb-2">{c.welcome}</p>
+              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-ivory leading-tight">
                 {user?.full_name || user?.email?.split('@')[0]}
               </h1>
-              <p className="text-ivory/30 text-xs font-body mt-1">{user?.email}</p>
+              <p className="text-ivory/30 text-xs font-body mt-1 truncate max-w-[200px] sm:max-w-none">{user?.email}</p>
             </div>
             <button
               onClick={() => base44.auth.logout('/')}
-              className="flex items-center gap-1.5 text-ivory/25 hover:text-ivory/60 text-xs font-body transition-colors mt-1 flex-shrink-0">
+              className="flex items-center gap-1.5 text-ivory/25 hover:text-ivory/60 text-xs font-body transition-colors mt-1 flex-shrink-0 py-2 px-3 rounded-lg border border-transparent hover:border-ivory/10">
               <LogOut className="w-3.5 h-3.5" /> {c.logout}
             </button>
           </div>
-          <p className="text-ivory/35 text-sm font-body mt-3">{c.subtitle}</p>
+          <p className="text-ivory/35 text-xs sm:text-sm font-body mt-2 sm:mt-3">{c.subtitle}</p>
         </div>
 
         {/* Admin shortcut */}
@@ -152,7 +152,7 @@ export default function GuestAccount() {
         )}
 
         {/* Quick actions */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-5 sm:mb-6">
           <Link to="/reserve"
             className="glass-card border border-[#C9A96E]/10 rounded-2xl p-5 flex items-center gap-3 hover:border-[#C9A96E]/25 transition-all group">
             <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
@@ -170,7 +170,7 @@ export default function GuestAccount() {
         </div>
 
         {/* Account sections */}
-        <div className="space-y-2 mb-8">
+        <div className="space-y-2 mb-6 sm:mb-8">
           {[
             { to: '/account/profile', icon: Settings, ...c.sections.profile },
             { to: '/account/messages', icon: MessageSquare, ...c.sections.messages, badge: newMessages > 0 ? newMessages : null },
@@ -248,21 +248,21 @@ export default function GuestAccount() {
           ) : (
             <div className="space-y-2">
               {reservations.slice(0, 6).map(r => (
-                <div key={r.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-full bg-[#1A1410] border border-[#C9A96E]/10 flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-3.5 h-3.5 text-gold/40" />
+                <div key={r.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1A1410] border border-[#C9A96E]/10 flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-gold/40" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-body text-sm text-ivory/80 font-medium">
+                      <p className="font-body text-xs sm:text-sm text-ivory/80 font-medium truncate">
                         {r.reservation_date} · {r.reservation_time}
                       </p>
-                      <p className="text-ivory/30 text-xs font-body mt-0.5">
-                        {r.party_size} {c.guests_label} · {r.reservation_ref}
+                      <p className="text-ivory/30 text-[10px] sm:text-xs font-body mt-0.5 truncate">
+                        {r.party_size} {c.guests_label} · <span className="hidden sm:inline">{r.reservation_ref}</span>
                       </p>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-body font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ${STATUS_COLORS[r.status] || 'text-ivory/30 bg-ivory/5 border-ivory/10'}`}>
+                  <span className={`text-[10px] font-body font-medium px-2 sm:px-2.5 py-1 rounded-full border flex-shrink-0 whitespace-nowrap ${STATUS_COLORS[r.status] || 'text-ivory/30 bg-ivory/5 border-ivory/10'}`}>
                     {statusMap[r.status] || r.status}
                   </span>
                 </div>

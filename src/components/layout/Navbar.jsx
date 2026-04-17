@@ -141,38 +141,42 @@ export default function Navbar() {
 
         {/* Mobile drawer */}
         {open && (
-          <div className="lg:hidden bg-[#0F0D0B] border-t border-[#C9A96E]/10">
-            <div className="px-5 py-6 space-y-1">
+          <div className="lg:hidden bg-[#0F0D0B] border-t border-[#C9A96E]/10 max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="px-5 py-5 space-y-0.5">
               {mobileLinks.map(l => (
                 <Link key={l.to} to={l.to}
-                  className={`block py-3.5 text-sm tracking-widest uppercase font-body border-b border-[#C9A96E]/08 transition-colors ${
+                  className={`flex items-center py-3.5 text-sm tracking-widest uppercase font-body border-b border-[#C9A96E]/08 transition-colors ${
                     location.pathname === l.to ? 'text-gold' : 'text-ivory/70'
                   }`}>
                   {l.label}
                 </Link>
               ))}
-              <div className="pt-5 space-y-3">
-                <Link to="/reserve"
-                  className="block w-full text-center py-3.5 btn-gold rounded-full text-xs tracking-widest uppercase font-body font-semibold">
-                  {tr('nav', 'reserve')}
-                </Link>
-                <Link to="/rooms"
-                  className="block w-full text-center py-3.5 btn-ghost-gold rounded-full text-xs tracking-widest uppercase font-body font-semibold">
-                  {tr('nav', 'book')}
-                </Link>
-              </div>
               {/* Account/Admin in mobile */}
               {isLoggedIn && (
                 <Link to={isAdmin ? '/admin' : '/account'}
-                  className="block py-3.5 text-sm tracking-widest uppercase font-body border-b border-[#C9A96E]/08 text-gold/70 transition-colors">
+                  className="flex items-center py-3.5 text-sm tracking-widest uppercase font-body border-b border-[#C9A96E]/08 text-gold/70 transition-colors">
                   {isAdmin ? '⚙ Admin' : (lang === 'de' ? 'Mein Konto' : lang === 'en' ? 'My Account' : 'Il mio account')}
                 </Link>
               )}
-              <div className="flex gap-3 pt-4">
+              <div className="pt-5 space-y-2.5">
+                <Link to="/reserve"
+                  className="block w-full text-center py-4 btn-gold rounded-2xl text-xs tracking-widest uppercase font-body font-semibold">
+                  {tr('nav', 'reserve')}
+                </Link>
+                <Link to="/rooms"
+                  className="block w-full text-center py-4 btn-ghost-gold rounded-2xl text-xs tracking-widest uppercase font-body font-semibold">
+                  {tr('nav', 'book')}
+                </Link>
+                <a href={`https://wa.me/4979054177`} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full text-center py-3 text-ivory/40 hover:text-gold text-[10px] tracking-widest uppercase font-body transition-colors">
+                  💬 WhatsApp
+                </a>
+              </div>
+              <div className="flex gap-2 pt-4 pb-2">
                 {supported.map(l => (
                   <button key={l} onClick={() => setLang(l)}
-                    className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                      lang === l ? 'border-gold text-gold' : 'border-[#C9A96E]/20 text-ivory/40'
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                      lang === l ? 'border-gold text-gold bg-gold/5' : 'border-[#C9A96E]/20 text-ivory/40'
                     }`}>
                     {FLAG[l]} <span className="uppercase">{l}</span>
                   </button>

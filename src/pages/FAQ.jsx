@@ -111,10 +111,10 @@ export default function FAQ() {
     <div className="min-h-screen bg-charcoal text-ivory pb-20 lg:pb-0">
 
       {/* Header */}
-      <div className="bg-espresso pt-24 pb-16 px-5 border-b border-[#C9A96E]/10">
+      <div className="bg-espresso pt-20 sm:pt-24 pb-10 sm:pb-16 px-5 border-b border-[#C9A96E]/10">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body mb-4">Krone Langenburg by Ammesso</p>
-          <h1 className="font-display text-5xl md:text-6xl font-light text-ivory mb-4">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-ivory mb-3 sm:mb-4">
             {lang === 'de' ? 'Häufige Fragen' : lang === 'en' ? 'Frequently Asked Questions' : 'Domande frequenti'}
           </h1>
           <p className="text-ivory/40 font-body text-sm max-w-md mx-auto">
@@ -140,7 +140,7 @@ export default function FAQ() {
         </div>
 
         {/* Still have questions */}
-        <div className="glass-card border border-[#C9A96E]/12 rounded-3xl p-8 md:p-10">
+        <div className="glass-card border border-[#C9A96E]/12 rounded-3xl p-6 sm:p-8 md:p-10">
           <div className="max-w-md mx-auto text-center">
             <p className="text-2xl mb-3">✦</p>
             <h2 className="font-display text-2xl md:text-3xl font-light text-ivory mb-3">

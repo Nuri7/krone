@@ -41,19 +41,27 @@ export default function Contact() {
   const inputClass = "w-full bg-[#1A1410] border border-[#C9A96E]/15 rounded-xl px-4 py-3 text-sm text-ivory placeholder-ivory/20 focus:outline-none focus:border-gold/40 transition-colors font-body";
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-24">
-      <div className="max-w-6xl mx-auto px-5">
+    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-5">
         {/* Header */}
-        <div className="text-center py-14">
+        <div className="text-center py-10 sm:py-14">
           <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">Krone Langenburg by Ammesso</p>
-          <h1 className="font-display text-5xl md:text-6xl font-light text-ivory mb-3">{t.title}</h1>
-          <p className="text-ivory/40 font-body">{t.sub}</p>
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-light text-ivory mb-2 sm:mb-3">{t.title}</h1>
+          <p className="text-ivory/40 font-body text-sm sm:text-base">{t.sub}</p>
+          {/* WhatsApp CTA - prominent on mobile */}
+          <a href={`https://wa.me/4979054177`} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-5 px-6 py-3 bg-[#25D366] text-[#0F0D0B] rounded-full text-xs font-body font-semibold tracking-widest uppercase shadow-md">
+            💬 {lang === 'de' ? 'Direkt auf WhatsApp schreiben' : lang === 'en' ? 'Message us on WhatsApp' : 'Scrivici su WhatsApp'}
+          </a>
+          <p className="text-ivory/25 text-[10px] font-body mt-2">
+            {lang === 'de' ? '· Antwort meist in unter 2 Stunden ·' : lang === 'en' ? '· Usually responds within 2 hours ·' : '· Di solito risponde entro 2 ore ·'}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-10">
           {/* Info */}
-          <div className="lg:col-span-2 space-y-5">
-            <div className="glass-card rounded-2xl p-6 border border-[#C9A96E]/10">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-5">
+            <div className="glass-card rounded-2xl p-5 sm:p-6 border border-[#C9A96E]/10">
               <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body mb-5">{t.addr_title}</h2>
               <ul className="space-y-4 text-sm font-body">
                 <li className="flex gap-3 text-ivory/60">
@@ -112,13 +120,13 @@ export default function Contact() {
           {/* Form */}
           <div className="lg:col-span-3">
             {done ? (
-              <div className="glass-card rounded-2xl p-12 text-center border border-[#C9A96E]/10 h-full flex flex-col items-center justify-center">
+              <div className="glass-card rounded-2xl p-8 sm:p-12 text-center border border-[#C9A96E]/10 h-full flex flex-col items-center justify-center">
                 <CheckCircle className="w-12 h-12 text-gold mb-4" />
                 <h2 className="font-display text-2xl font-light text-ivory mb-2">{t.success}</h2>
                 <p className="text-ivory/40 text-sm font-body">{s.email_info}</p>
               </div>
             ) : (
-              <div className="glass-card rounded-2xl p-7 border border-[#C9A96E]/10">
+              <div className="glass-card rounded-2xl p-5 sm:p-7 border border-[#C9A96E]/10">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-2">{t.inquiry_type}</label>

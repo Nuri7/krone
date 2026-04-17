@@ -162,19 +162,20 @@ export default function Admin() {
     <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-16">
       <div className="max-w-6xl mx-auto px-5">
         {/* Header */}
-        <div className="flex items-center justify-between py-8">
+        <div className="flex items-center justify-between py-6 sm:py-8">
           <div>
             <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-1">Admin</p>
-            <h1 className="font-display text-4xl font-light text-ivory">Dashboard</h1>
-            <p className="text-ivory/30 text-xs font-body mt-1">{user?.email}</p>
+            <h1 className="font-display text-3xl sm:text-4xl font-light text-ivory">Dashboard</h1>
+            <p className="text-ivory/30 text-xs font-body mt-1 truncate max-w-[180px] sm:max-w-none">{user?.email}</p>
           </div>
-          <button onClick={loadAll} className="flex items-center gap-2 px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-ivory text-xs font-body transition-colors">
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Aktualisieren
+          <button onClick={loadAll} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-ivory text-xs font-body transition-colors flex-shrink-0">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Aktualisieren</span>
           </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-6 sm:mb-8">
           <StatCard icon={UtensilsCrossed} label="Heute" value={stats.today} color="text-gold" />
           <StatCard icon={Clock} label="Ausstehend" value={stats.pending} color="text-gold/70" />
           <StatCard icon={CheckCircle} label="Bestätigt" value={stats.confirmed} color="text-emerald-400" />
@@ -195,13 +196,13 @@ export default function Admin() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-espresso rounded-xl p-1 mb-6 border border-[#C9A96E]/10">
+        <div className="flex gap-0.5 sm:gap-1 bg-espresso rounded-xl p-1 mb-6 border border-[#C9A96E]/10 overflow-x-auto no-scrollbar">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-body tracking-widest uppercase transition-all ${tab === t.id ? 'bg-gold text-charcoal font-semibold' : 'text-ivory/40 hover:text-ivory'}`}>
-              <t.icon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t.label}</span>
-              {t.count > 0 && <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${tab === t.id ? 'bg-charcoal/20 text-charcoal' : 'bg-gold/20 text-gold'}`}>{t.count}</span>}
+              className={`flex-shrink-0 flex items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-3 rounded-lg text-[10px] sm:text-xs font-body tracking-widest uppercase transition-all whitespace-nowrap ${tab === t.id ? 'bg-gold text-charcoal font-semibold' : 'text-ivory/40 hover:text-ivory'}`}>
+              <t.icon className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="hidden xs:inline sm:inline">{t.label}</span>
+              {t.count > 0 && <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold flex-shrink-0 ${tab === t.id ? 'bg-charcoal/20 text-charcoal' : 'bg-gold/20 text-gold'}`}>{t.count}</span>}
             </button>
           ))}
         </div>

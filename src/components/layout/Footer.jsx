@@ -8,9 +8,9 @@ export default function Footer() {
   const s = SITE_DEFAULTS;
 
   return (
-    <footer className="bg-[#0A0805] border-t border-[#C9A96E]/10">
+    <footer className="bg-[#0A0805] border-t border-[#C9A96E]/10 mb-[72px] lg:mb-0">
       {/* Top section */}
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16 pb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-12 sm:pt-16 pb-8 sm:pb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
         {/* Brand */}
         <div className="lg:col-span-1">
           <p className="font-display text-xl font-light text-ivory tracking-[0.1em] uppercase mb-0.5">Krone Langenburg</p>

@@ -188,20 +188,20 @@ export default function Rooms() {
       )}
 
       {/* Hero Header */}
-      <div className={`text-center px-5 ${returnState ? 'pt-8' : 'pt-28'} pb-16`}>
+      <div className={`text-center px-5 ${returnState ? 'pt-8' : 'pt-24 sm:pt-28'} pb-10 sm:pb-16`}>
         <div className="flex items-center justify-center gap-3 mb-5">
           <div className="h-px w-8 bg-gold/40" />
           <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body">{t.eyebrow}</p>
           <div className="h-px w-8 bg-gold/40" />
         </div>
-        <h1 className="font-display text-5xl md:text-7xl font-light text-ivory mb-4 leading-[1.0]">{t.title}</h1>
-        <p className="text-ivory/40 font-body max-w-md mx-auto">{t.subtitle}</p>
+        <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-light text-ivory mb-3 sm:mb-4 leading-[1.0]">{t.title}</h1>
+        <p className="text-ivory/40 font-body text-sm max-w-md mx-auto">{t.subtitle}</p>
       </div>
 
       <div className="max-w-6xl mx-auto px-5">
 
         {/* Trust strip */}
-        <div className="border border-gold/20 bg-gold/5 rounded-2xl p-5 mb-12 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+        <div className="border border-gold/20 bg-gold/5 rounded-2xl p-4 sm:p-5 mb-8 sm:mb-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center sm:text-left">
           <div className="flex items-center justify-center sm:justify-start gap-3">
             <Star className="w-4 h-4 text-gold fill-gold/20 flex-shrink-0" />
             <div>
@@ -229,7 +229,7 @@ export default function Rooms() {
                 className="glass-card border border-[#C9A96E]/10 rounded-3xl overflow-hidden">
                 <div className={`grid grid-cols-1 lg:grid-cols-2 ${isReversed ? 'lg:grid-flow-dense' : ''}`}>
                   {/* Image */}
-                  <div className={`relative h-72 lg:h-auto min-h-[320px] overflow-hidden group ${isReversed ? 'lg:col-start-2' : ''}`}>
+                  <div className={`relative h-56 sm:h-72 lg:h-auto lg:min-h-[320px] overflow-hidden group ${isReversed ? 'lg:col-start-2' : ''}`}>
                     <img src={r.image} alt={lang === 'de' ? r.key_de : lang === 'en' ? r.key_en : r.key_it}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-charcoal/20" />
@@ -242,7 +242,7 @@ export default function Rooms() {
                   </div>
 
                   {/* Content */}
-                  <div className={`p-8 md:p-10 flex flex-col justify-center ${isReversed ? 'lg:col-start-1' : ''}`}>
+                  <div className={`p-5 sm:p-8 md:p-10 flex flex-col justify-center ${isReversed ? 'lg:col-start-1' : ''}`}>
                     <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">
                       {idx === 2 ? '✦ Suite' : idx === 0 ? 'Einzelzimmer' : 'Doppelzimmer'}
                     </p>
@@ -298,9 +298,9 @@ export default function Rooms() {
         </div>
 
         {/* All-room amenities */}
-        <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-8 mb-10">
-          <h3 className="text-ivory/30 text-[10px] tracking-[0.35em] uppercase font-body mb-5 text-center">{t.amenities_title}</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-center">
+        <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-5 sm:p-8 mb-8 sm:mb-10">
+          <h3 className="text-ivory/30 text-[10px] tracking-[0.35em] uppercase font-body mb-4 sm:mb-5 text-center">{t.amenities_title}</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3 text-center">
             {amenitiesList.map((a, i) => (
               <div key={i} className="flex flex-col items-center gap-2">
                 <div className="w-9 h-9 rounded-full border border-[#C9A96E]/15 flex items-center justify-center">
@@ -316,7 +316,7 @@ export default function Rooms() {
         </div>
 
         {/* Main CTA */}
-        <div className="glass-card border border-[#C9A96E]/15 rounded-3xl p-8 md:p-12 text-center mb-10">
+        <div className="glass-card border border-[#C9A96E]/15 rounded-3xl p-6 sm:p-8 md:p-12 text-center mb-8 sm:mb-10">
           <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-4">{t.beds24_note}</p>
           <h2 className="font-display text-3xl md:text-4xl font-light text-ivory mb-4">{t.open_beds}</h2>
           <p className="text-ivory/40 font-body text-sm mb-8 max-w-sm mx-auto">
@@ -370,7 +370,7 @@ export default function Rooms() {
           <iframe
             src={beds24EmbedUrl}
             title="Beds24 Secure Booking"
-            className="flex-1 w-full border-0 bg-white"
+            className="flex-1 w-full border-0 bg-white min-h-[60vh]"
             allow="payment"
           />
         </div>

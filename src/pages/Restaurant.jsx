@@ -88,15 +88,15 @@ export default function Restaurant() {
     <div className="min-h-screen bg-charcoal text-ivory pb-20 lg:pb-0">
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <div className="relative h-[70vh] min-h-[480px] overflow-hidden">
+      <div className="relative h-[65vh] sm:h-[70vh] min-h-[400px] sm:min-h-[480px] overflow-hidden">
         <img src={IMG_RESTAURANT} alt="Kulinarium by Ammesso" className="w-full h-full object-cover" loading="eager" />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/60 via-charcoal/20 to-charcoal" />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal/40 via-transparent to-charcoal/40" />
         <div className="absolute inset-0 flex items-end pb-12 px-5">
           <div className="max-w-4xl mx-auto w-full">
             <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">{c.label}</p>
-            <h1 className="font-display text-4xl md:text-6xl font-light text-ivory mb-6 leading-tight">{c.title}</h1>
-            <p className="text-ivory/60 font-body leading-relaxed max-w-xl mb-7">{c.intro}</p>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-light text-ivory mb-4 sm:mb-6 leading-tight">{c.title}</h1>
+            <p className="text-ivory/60 font-body leading-relaxed max-w-xl mb-5 sm:mb-7 text-sm sm:text-base">{c.intro}</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/reserve"
                 className="flex items-center justify-center gap-2 px-6 py-3.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow w-full sm:w-auto">
@@ -192,9 +192,9 @@ export default function Restaurant() {
       </section>
 
       {/* ── CHEF ─────────────────────────────────────────────── */}
-      <section className="py-16 px-5">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="relative rounded-2xl overflow-hidden h-[420px] shadow-premium">
+      <section className="py-12 sm:py-16 px-4 sm:px-5">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
+          <div className="relative rounded-2xl overflow-hidden h-72 sm:h-[420px] shadow-premium">
             <img src={IMG_CHEF} alt="Chef Omar Ammesso" className="w-full h-full object-cover object-top" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
@@ -221,19 +221,19 @@ export default function Restaurant() {
       </section>
 
       {/* ── TRUST / FINAL CTA ────────────────────────────────── */}
-      <section className="bg-espresso py-14 px-5 text-center border-t border-[#C9A96E]/10">
+      <section className="bg-espresso py-12 sm:py-14 px-4 sm:px-5 text-center border-t border-[#C9A96E]/10">
         <div className="flex justify-center gap-1 mb-4">
-          {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-gold text-gold" />)}
+          {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 sm:w-4 h-3.5 sm:h-4 fill-gold text-gold" />)}
         </div>
-        <h2 className="font-display text-3xl md:text-4xl font-light text-ivory mb-6">{c.trust_title}</h2>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-ivory mb-5 sm:mb-6">{c.trust_title}</h2>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center max-w-sm sm:max-w-none mx-auto">
           <Link to="/reserve"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
             <UtensilsCrossed className="w-3.5 h-3.5" />
             {c.cta_reserve}
           </Link>
           <a href={`tel:${s.phone}`}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
             {s.phone}
           </a>
         </div>

@@ -142,14 +142,14 @@ export default function Weddings() {
     <div className="min-h-screen bg-charcoal text-ivory pb-20 lg:pb-0">
 
       {/* Hero */}
-      <div className="relative h-[65vh] min-h-[440px] overflow-hidden">
+      <div className="relative h-[55vh] sm:h-[65vh] min-h-[360px] sm:min-h-[440px] overflow-hidden">
         <img src={IMAGES.hero} alt="Weddings at Krone Langenburg" className="w-full h-full object-cover" loading="eager" />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/65 via-charcoal/30 to-charcoal" />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal/40 via-transparent to-charcoal/40" />
         <div className="absolute inset-0 flex items-end pb-14 px-5">
           <div className="max-w-4xl mx-auto w-full">
-            <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body mb-4">{c.eyebrow}</p>
-            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-light text-ivory leading-[1.0] whitespace-pre-line">{c.title}</h1>
+            <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body mb-3 sm:mb-4">{c.eyebrow}</p>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-light text-ivory leading-[1.0] whitespace-pre-line">{c.title}</h1>
           </div>
         </div>
       </div>
@@ -172,10 +172,10 @@ export default function Weddings() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-5">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="py-14 sm:py-20 px-4 sm:px-5">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {c.features.map((f, i) => (
-            <div key={i} className="glass-card border border-[#C9A96E]/10 rounded-2xl p-8 flex gap-5">
+            <div key={i} className="glass-card border border-[#C9A96E]/10 rounded-2xl p-5 sm:p-8 flex gap-4 sm:gap-5">
               <span className="text-3xl flex-shrink-0 mt-1">{f.icon}</span>
               <div>
                 <h3 className="font-display text-xl font-light text-ivory mb-3">{f.title}</h3>
@@ -199,11 +199,11 @@ export default function Weddings() {
       </section>
 
       {/* Form */}
-      <section className="py-20 px-5 bg-espresso">
+      <section className="py-14 sm:py-20 px-4 sm:px-5 bg-espresso">
         <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-4">{c.eyebrow}</p>
-            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-4">{c.form_title}</h2>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-ivory mb-3 sm:mb-4">{c.form_title}</h2>
             <p className="text-ivory/40 font-body text-sm">{c.form_sub}</p>
           </div>
 
@@ -225,7 +225,7 @@ export default function Weddings() {
               </div>
             </div>
           ) : (
-            <div className="glass-card rounded-3xl p-8 md:p-10 border border-[#C9A96E]/10">
+            <div className="glass-card rounded-3xl p-5 sm:p-8 md:p-10 border border-[#C9A96E]/10">
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Event type */}
                 <div>

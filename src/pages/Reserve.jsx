@@ -160,29 +160,29 @@ function TimeGrid({ slots, usedCapacity, guests, selected, onSelect, lang }) {
           <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
             {lang === 'de' ? '🌞 Mittagessen · 12:00–14:30' : lang === 'en' ? '🌞 Lunch · 12:00–14:30' : '🌞 Pranzo · 12:00–14:30'}
           </p>
-          <div className="grid grid-cols-5 gap-2">
-            {lunchSlots.map(s => <SlotBtn key={s} slot={s} />)}
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
+              {lunchSlots.map(s => <SlotBtn key={s} slot={s} />)}
+            </div>
           </div>
-        </div>
-      )}
-      {dinnerSlots.length > 0 && (
-        <div>
-          <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
-            {lang === 'de' ? '🌙 Abendessen · 17:30–22:00' : lang === 'en' ? '🌙 Dinner · 17:30–22:00' : '🌙 Cena · 17:30–22:00'}
-          </p>
-          <div className="grid grid-cols-5 gap-2">
-            {dinnerSlots.map(s => <SlotBtn key={s} slot={s} />)}
+          )}
+          {dinnerSlots.length > 0 && (
+          <div>
+            <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
+              {lang === 'de' ? '🌙 Abendessen · 17:30–22:00' : lang === 'en' ? '🌙 Dinner · 17:30–22:00' : '🌙 Cena · 17:30–22:00'}
+            </p>
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
+              {dinnerSlots.map(s => <SlotBtn key={s} slot={s} />)}
+            </div>
           </div>
-        </div>
-      )}
-      {sundaySlots.length > 0 && (
-        <div>
-          <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
-            {lang === 'de' ? '☀️ Sonntag · 12:00–20:00' : lang === 'en' ? '☀️ Sunday · 12:00–20:00' : '☀️ Domenica · 12:00–20:00'}
-          </p>
-          <div className="grid grid-cols-5 gap-2">
-            {sundaySlots.map(s => <SlotBtn key={s} slot={s} />)}
-          </div>
+          )}
+          {sundaySlots.length > 0 && (
+          <div>
+            <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
+              {lang === 'de' ? '☀️ Sonntag · 12:00–20:00' : lang === 'en' ? '☀️ Sunday · 12:00–20:00' : '☀️ Domenica · 12:00–20:00'}
+            </p>
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
+              {sundaySlots.map(s => <SlotBtn key={s} slot={s} />)}
+            </div>
         </div>
       )}
     </div>
@@ -260,8 +260,8 @@ export default function Reserve() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center px-5 pt-20 pb-16">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center px-4 sm:px-5 pt-16 sm:pt-20 pb-24 sm:pb-16">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-10 text-center">
           <div className="w-20 h-20 bg-[#C9A96E]/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-[#C9A96E]" />
           </div>
@@ -305,7 +305,7 @@ export default function Reserve() {
       <div className="max-w-5xl mx-auto px-5 -mt-2 lg:-mt-4">
 
         {/* Step indicator */}
-        <div className="flex items-center justify-center gap-0 mb-10 mt-8">
+        <div className="flex items-center justify-center gap-0 mb-8 sm:mb-10 mt-6 sm:mt-8">
           {steps.map((label, i) => {
             const s = i + 1;
             const active = step === s;
@@ -313,12 +313,12 @@ export default function Reserve() {
             return (
               <div key={s} className="flex items-center">
                 <div className="flex flex-col items-center">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold font-body border-2 transition-all ${done ? 'bg-[#C9A96E] border-[#C9A96E] text-white' : active ? 'bg-white border-[#C9A96E] text-[#8B6914] shadow-md' : 'bg-white border-stone-200 text-stone-400'}`}>
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-semibold font-body border-2 transition-all ${done ? 'bg-[#C9A96E] border-[#C9A96E] text-white' : active ? 'bg-white border-[#C9A96E] text-[#8B6914] shadow-md' : 'bg-white border-stone-200 text-stone-400'}`}>
                     {done ? '✓' : s}
                   </div>
-                  <span className={`text-[10px] font-body mt-1.5 tracking-wider uppercase ${active ? 'text-[#8B6914] font-semibold' : 'text-stone-400'}`}>{label}</span>
+                  <span className={`text-[9px] sm:text-[10px] font-body mt-1 sm:mt-1.5 tracking-wider uppercase max-w-[60px] text-center leading-tight ${active ? 'text-[#8B6914] font-semibold' : 'text-stone-400'}`}>{label}</span>
                 </div>
-                {i < steps.length - 1 && <div className={`w-16 sm:w-24 h-px mx-2 mb-5 ${done ? 'bg-[#C9A96E]' : 'bg-stone-200'}`} />}
+                {i < steps.length - 1 && <div className={`w-10 sm:w-16 md:w-24 h-px mx-1.5 sm:mx-2 mb-5 sm:mb-6 ${done ? 'bg-[#C9A96E]' : 'bg-stone-200'}`} />}
               </div>
             );
           })}
@@ -326,28 +326,28 @@ export default function Reserve() {
 
         {/* ── STEP 1: Date + Guests ── */}
         {step === 1 && (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
             {/* Calendar */}
             <div className="lg:col-span-3">
               <MiniCalendar selected={date} onSelect={handleDateSelect} lang={lang} />
             </div>
 
             {/* Right panel: guests + date summary */}
-            <div className="lg:col-span-2 flex flex-col gap-4">
+            <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
               {/* Guest count */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-5">{c.guests_label}</p>
+              <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6">
+                <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-4 sm:mb-5">{c.guests_label}</p>
                 <div className="flex items-center justify-between gap-4">
                   <button onClick={() => setGuests(g => Math.max(1, g - 1))}
-                    className="w-12 h-12 rounded-full border-2 border-stone-200 text-stone-500 hover:border-[#C9A96E]/50 hover:text-[#8B6914] transition-all text-2xl font-light flex items-center justify-center">
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-stone-200 text-stone-500 hover:border-[#C9A96E]/50 hover:text-[#8B6914] transition-all text-2xl font-light flex items-center justify-center flex-shrink-0">
                     −
                   </button>
                   <div className="text-center">
-                    <span className="font-display text-5xl font-light text-stone-800">{guests}</span>
+                    <span className="font-display text-5xl sm:text-6xl font-light text-stone-800">{guests}</span>
                     <p className="text-stone-400 text-xs font-body mt-1">{lang === 'de' ? 'Personen' : lang === 'en' ? 'Persons' : 'Persone'}</p>
                   </div>
                   <button onClick={() => setGuests(g => Math.min(10, g + 1))}
-                    className="w-12 h-12 rounded-full border-2 border-stone-200 text-stone-500 hover:border-[#C9A96E]/50 hover:text-[#8B6914] transition-all text-2xl font-light flex items-center justify-center">
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-stone-200 text-stone-500 hover:border-[#C9A96E]/50 hover:text-[#8B6914] transition-all text-2xl font-light flex items-center justify-center flex-shrink-0">
                     +
                   </button>
                 </div>
@@ -486,6 +486,9 @@ export default function Reserve() {
                     : <><UtensilsCrossed className="w-4 h-4" /> {c.confirm}</>
                   }
                 </button>
+                <div className="flex items-center justify-center gap-4 text-[10px] font-body text-stone-400">
+                  <span className="flex items-center gap-1">✓ {lang === 'de' ? 'Sofortige Bestätigung per E-Mail' : lang === 'en' ? 'Instant email confirmation' : 'Conferma immediata via email'}</span>
+                </div>
               </form>
             </div>
           </div>
