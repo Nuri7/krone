@@ -54,6 +54,8 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [selectedRes, setSelectedRes] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const [expandedDocId, setExpandedDocId] = useState(null);
+  const [docNotes, setDocNotes] = useState({});
   const [stats, setStats] = useState({ today: 0, pending: 0, confirmed: 0, contacts: 0, intents: 0, docs: 0, msgs: 0 });
 
   useEffect(() => {
@@ -329,13 +331,13 @@ export default function Admin() {
               <div className="text-center py-16 text-ivory/30 font-body text-sm">Keine Dokumente</div>
             ) : (
               guestDocs.map(doc => {
-                const [expanded, setExpanded] = useState(false);
-                const [notes, setNotes] = useState(doc.internal_notes || '');
+                const expanded = expandedDocId === doc.id;
+                const notes = docNotes[doc.id] || doc.internal_notes || '';
                 return (
                   <div key={doc.id} className={`glass-card border rounded-xl p-4 transition-all ${expanded ? 'border-gold/25' : 'border-[#C9A96E]/08 hover:border-[#C9A96E]/20'}`}>
                     {/* Header */}
                     <div className="flex items-start gap-3 flex-wrap">
-                      <button onClick={() => setExpanded(!expanded)} className="flex-1 text-left min-w-0">
+                      <button onClick={() => setExpandedDocId(expanded ? null : doc.id)} className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <span className="font-body text-sm text-ivory">{doc.original_filename}</span>
                           <StatusBadge status={doc.status} />
@@ -360,7 +362,7 @@ export default function Admin() {
                           <label className="text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-2 block">Interne Notizen</label>
                           <textarea
                             value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
+                            onChange={(e) => setDocNotes(prev => ({ ...prev, [doc.id]: e.target.value }))}
                             placeholder="Notizen für das Team..."
                             className={inputCls + ' resize-none h-20'}
                           />
@@ -372,7 +374,7 @@ export default function Admin() {
                             <button onClick={async () => {
                               await base44.entities.GuestDocument.update(doc.id, { status: 'under_review', reviewed_by: user?.email, reviewed_at: new Date().toISOString(), internal_notes: notes });
                               setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'under_review', internal_notes: notes } : d));
-                              setExpanded(false);
+                              setExpandedDocId(null);
                             }} className="flex-1 py-2 bg-gold/10 border border-gold/20 text-gold text-[10px] rounded-lg font-body hover:bg-gold/20 transition-colors tracking-widest uppercase">
                               ⧖ In Prüfung
                             </button>
@@ -382,14 +384,14 @@ export default function Admin() {
                               <button onClick={async () => {
                                 await base44.entities.GuestDocument.update(doc.id, { status: 'approved', reviewed_by: user?.email, reviewed_at: new Date().toISOString(), internal_notes: notes });
                                 setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'approved', internal_notes: notes } : d));
-                                setExpanded(false);
+                                setExpandedDocId(null);
                               }} className="flex-1 py-2 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body hover:bg-emerald-900/60 transition-colors tracking-widest uppercase">
                                 ✓ Genehmigen
                               </button>
                               <button onClick={async () => {
                                 await base44.entities.GuestDocument.update(doc.id, { status: 'rejected', reviewed_by: user?.email, reviewed_at: new Date().toISOString(), internal_notes: notes });
                                 setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'rejected', internal_notes: notes } : d));
-                                setExpanded(false);
+                                setExpandedDocId(null);
                               }} className="flex-1 py-2 bg-red-950/40 border border-red-900/30 text-red-400 text-[10px] rounded-lg font-body hover:bg-red-950/60 transition-colors tracking-widest uppercase">
                                 ✕ Ablehnen
                               </button>
