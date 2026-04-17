@@ -4,18 +4,31 @@
   "properties": {
     "key": {
       "type": "string",
-      "description": "Unique settings key, e.g. 'global'"
+      "description": "Unique setting key (e.g. 'global', 'brand', 'operations')"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "branding",
+        "operations",
+        "legal",
+        "integration",
+        "feature_flags"
+      ]
     },
     "hotel_name": {
       "type": "string"
     },
-    "tagline_de": {
+    "hotel_tagline_de": {
       "type": "string"
     },
-    "tagline_en": {
+    "hotel_tagline_en": {
       "type": "string"
     },
-    "tagline_it": {
+    "hotel_tagline_it": {
+      "type": "string"
+    },
+    "restaurant_name": {
       "type": "string"
     },
     "address_street": {
@@ -30,7 +43,13 @@
     "address_country": {
       "type": "string"
     },
+    "address_country_code": {
+      "type": "string"
+    },
     "phone": {
+      "type": "string"
+    },
+    "phone_whatsapp": {
       "type": "string"
     },
     "email_info": {
@@ -39,39 +58,27 @@
     "email_reservations": {
       "type": "string"
     },
-    "beds24_prop_id": {
+    "email_events": {
       "type": "string"
+    },
+    "beds24_prop_id": {
+      "type": "string",
+      "description": "Property ID from Beds24"
     },
     "beds24_booking_url": {
-      "type": "string"
+      "type": "string",
+      "description": "Full Beds24 booking URL"
     },
-    "restaurant_capacity": {
+    "restaurant_max_capacity": {
+      "type": "number",
+      "description": "Maximum restaurant seats (120)"
+    },
+    "restaurant_currency": {
+      "type": "string",
+      "description": "ISO currency code (EUR)"
+    },
+    "breakfast_price_per_person": {
       "type": "number"
-    },
-    "restaurant_closed_days": {
-      "type": "array",
-      "items": {
-        "type": "number"
-      },
-      "description": "0=Sunday, 1=Monday, etc."
-    },
-    "restaurant_lunch_start": {
-      "type": "string"
-    },
-    "restaurant_lunch_end": {
-      "type": "string"
-    },
-    "restaurant_dinner_start": {
-      "type": "string"
-    },
-    "restaurant_dinner_end": {
-      "type": "string"
-    },
-    "restaurant_sunday_start": {
-      "type": "string"
-    },
-    "restaurant_sunday_end": {
-      "type": "string"
     },
     "social_instagram": {
       "type": "string"
@@ -82,21 +89,50 @@
     "social_tripadvisor": {
       "type": "string"
     },
-    "whatsapp_number": {
-      "type": "string"
+    "slack_webhook_url_env_key": {
+      "type": "string",
+      "description": "Key to retrieve Slack webhook from Base44 Secrets"
     },
-    "breakfast_price": {
-      "type": "number"
+    "canonical_timezone": {
+      "type": "string",
+      "description": "Canonical timezone for all timestamps (Europe/Berlin)"
     },
-    "migration_conflicts": {
+    "super_admin_emails": {
       "type": "array",
       "items": {
-        "type": "object"
+        "type": "string"
       },
-      "description": "Detected conflicts from old site migration"
+      "description": "Email allowlist for auto-admin-on-first-login"
+    },
+    "is_live": {
+      "type": "boolean",
+      "default": true,
+      "description": "Is the site live and accepting reservations?"
+    },
+    "maintenance_mode": {
+      "type": "boolean",
+      "default": false
+    },
+    "maintenance_message_de": {
+      "type": "string"
+    },
+    "maintenance_message_en": {
+      "type": "string"
+    },
+    "maintenance_message_it": {
+      "type": "string"
+    },
+    "last_verified_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_verified_by": {
+      "type": "string",
+      "description": "Email of admin who last verified settings"
     }
   },
   "required": [
-    "key"
+    "key",
+    "category"
   ]
 }

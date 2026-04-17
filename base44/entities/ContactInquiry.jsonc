@@ -7,10 +7,10 @@
       "enum": [
         "general",
         "wedding",
-        "group",
+        "group_event",
         "business",
-        "event",
-        "press"
+        "press",
+        "partnership"
       ],
       "default": "general"
     },
@@ -39,6 +39,9 @@
     "company": {
       "type": "string"
     },
+    "subject": {
+      "type": "string"
+    },
     "message": {
       "type": "string"
     },
@@ -51,7 +54,16 @@
       ],
       "default": "de"
     },
-    "email_sent": {
+    "preferred_date": {
+      "type": "string",
+      "format": "date",
+      "description": "For event inquiries"
+    },
+    "guest_count": {
+      "type": "number",
+      "description": "For group/event inquiries"
+    },
+    "email_notification_sent": {
       "type": "boolean",
       "default": false
     },
@@ -62,14 +74,17 @@
     "internal_notes": {
       "type": "string"
     },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of staff assigned"
+    },
     "replied_at": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
-    "preferred_date": {
-      "type": "string"
-    },
-    "guest_count": {
-      "type": "number"
+    "closed_at": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [

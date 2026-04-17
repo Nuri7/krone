@@ -1,0 +1,86 @@
+{
+  "name": "HotelBookingSyncIssue",
+  "type": "object",
+  "properties": {
+    "issue_type": {
+      "type": "string",
+      "enum": [
+        "missing_booking_ref",
+        "rate_mismatch",
+        "date_mismatch",
+        "guest_mismatch",
+        "api_failure",
+        "timeout",
+        "duplicate_detection",
+        "stale_pending",
+        "sync_timeout",
+        "manual_review_needed"
+      ],
+      "description": "Category of sync issue"
+    },
+    "intent_id": {
+      "type": "string",
+      "description": "Link to HotelBookingIntent"
+    },
+    "intent_ref": {
+      "type": "string"
+    },
+    "related_booking_ref": {
+      "type": "string",
+      "description": "Beds24 booking ref if available"
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "default": "warning"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "acknowledged",
+        "investigating",
+        "resolved",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "resolution_notes": {
+      "type": "string"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolved_by": {
+      "type": "string",
+      "description": "Email of admin who resolved"
+    },
+    "retry_count": {
+      "type": "number",
+      "default": 0
+    },
+    "last_retry_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "slack_notified": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "issue_type"
+  ]
+}

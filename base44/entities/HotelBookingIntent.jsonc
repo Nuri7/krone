@@ -1,0 +1,140 @@
+{
+  "name": "HotelBookingIntent",
+  "type": "object",
+  "properties": {
+    "intent_ref": {
+      "type": "string",
+      "description": "Unique reference (INTENT-YYYYMMDD-XXXXX)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "initiated",
+        "redirected_to_beds24",
+        "returned_pending",
+        "returned_confirmed",
+        "returned_cancelled",
+        "synced_confirmed",
+        "synced_pending",
+        "sync_failed",
+        "needs_review",
+        "archived"
+      ],
+      "default": "initiated"
+    },
+    "check_in": {
+      "type": "string",
+      "format": "date"
+    },
+    "check_out": {
+      "type": "string",
+      "format": "date"
+    },
+    "guests_adults": {
+      "type": "number"
+    },
+    "guests_children": {
+      "type": "number"
+    },
+    "room_category_interest": {
+      "type": "string",
+      "description": "Room type guest was interested in"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
+    },
+    "source_page": {
+      "type": "string",
+      "description": "Page where booking intent was initiated"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "guest_email": {
+      "type": "string"
+    },
+    "guest_first_name": {
+      "type": "string"
+    },
+    "guest_last_name": {
+      "type": "string"
+    },
+    "guest_phone": {
+      "type": "string"
+    },
+    "guest_profile_id": {
+      "type": "string"
+    },
+    "beds24_booking_url_used": {
+      "type": "string",
+      "description": "Full URL with language/params that guest was sent to"
+    },
+    "beds24_booking_ref": {
+      "type": "string",
+      "description": "Booking reference returned from Beds24 if available"
+    },
+    "redirected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "returned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When guest came back from Beds24"
+    },
+    "return_status": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "pending",
+        "cancelled",
+        "unknown"
+      ],
+      "description": "Status indicated in return URL"
+    },
+    "booking_mirror_id": {
+      "type": "string",
+      "description": "Link to HotelBookingMirror record if synced"
+    },
+    "sync_attempted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sync_status": {
+      "type": "string",
+      "enum": [
+        "not_synced",
+        "syncing",
+        "synced",
+        "failed",
+        "manual_review_needed"
+      ],
+      "default": "not_synced"
+    },
+    "sync_notes": {
+      "type": "string"
+    },
+    "manual_review_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "slack_notified": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "intent_ref",
+    "check_in",
+    "check_out"
+  ]
+}

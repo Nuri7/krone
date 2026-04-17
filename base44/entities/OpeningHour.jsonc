@@ -1,0 +1,83 @@
+{
+  "name": "OpeningHour",
+  "type": "object",
+  "properties": {
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "restaurant",
+        "hotel"
+      ],
+      "description": "Which facility does this apply to?"
+    },
+    "day_of_week": {
+      "type": "number",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "description": "0=Sunday, 1=Monday, ..., 6=Saturday"
+    },
+    "is_closed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is this day fully closed?"
+    },
+    "opening_time": {
+      "type": "string",
+      "pattern": "^\\d{2}:\\d{2}$",
+      "description": "HH:MM format in canonical timezone"
+    },
+    "closing_time": {
+      "type": "string",
+      "pattern": "^\\d{2}:\\d{2}$",
+      "description": "HH:MM format in canonical timezone"
+    },
+    "service_windows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "pattern": "^\\d{2}:\\d{2}$"
+          },
+          "end": {
+            "type": "string",
+            "pattern": "^\\d{2}:\\d{2}$"
+          },
+          "is_bookable": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "description": "e.g. lunch 12:00-14:30, dinner 17:30-22:00"
+    },
+    "notes_de": {
+      "type": "string"
+    },
+    "notes_en": {
+      "type": "string"
+    },
+    "notes_it": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "entity_type",
+    "day_of_week"
+  ]
+}

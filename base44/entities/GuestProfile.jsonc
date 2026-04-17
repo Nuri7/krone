@@ -4,7 +4,7 @@
   "properties": {
     "user_email": {
       "type": "string",
-      "description": "Linked user email (auth identity)"
+      "description": "Linked Base44 User email"
     },
     "first_name": {
       "type": "string"
@@ -14,6 +14,15 @@
     },
     "phone": {
       "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
     },
     "address_street": {
       "type": "string"
@@ -27,19 +36,27 @@
     "address_country": {
       "type": "string"
     },
-    "language": {
-      "type": "string",
-      "enum": [
-        "de",
-        "en",
-        "it"
-      ],
-      "default": "de"
+    "billing_address_same_as_shipping": {
+      "type": "boolean",
+      "default": true
     },
-    "dietary_notes": {
+    "billing_address_street": {
       "type": "string"
     },
-    "preferences": {
+    "billing_address_city": {
+      "type": "string"
+    },
+    "billing_address_zip": {
+      "type": "string"
+    },
+    "billing_address_country": {
+      "type": "string"
+    },
+    "dietary_restrictions": {
+      "type": "string",
+      "description": "Allergies, vegetarian, etc"
+    },
+    "special_preferences": {
       "type": "string",
       "description": "Free-text guest preferences"
     },
@@ -47,12 +64,51 @@
       "type": "boolean",
       "default": false
     },
+    "marketing_consent": {
+      "type": "boolean",
+      "default": false
+    },
+    "marketing_consent_date": {
+      "type": "string",
+      "format": "date-time"
+    },
     "gdpr_consent": {
       "type": "boolean",
       "default": false
     },
     "gdpr_consent_date": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
+    },
+    "total_reservations": {
+      "type": "number",
+      "default": 0,
+      "description": "Denormalized count for analytics"
+    },
+    "total_bookings": {
+      "type": "number",
+      "default": 0
+    },
+    "is_vip": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string",
+      "description": "Staff notes about this guest"
+    },
+    "account_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "suspended"
+      ],
+      "default": "active"
+    },
+    "last_activity_at": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [

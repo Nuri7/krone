@@ -1,0 +1,73 @@
+{
+  "name": "AdminAuditEntry",
+  "type": "object",
+  "properties": {
+    "admin_email": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "create",
+        "update",
+        "delete",
+        "status_change",
+        "approve",
+        "reject",
+        "assign",
+        "resolve",
+        "manual_sync",
+        "configuration_change",
+        "export",
+        "import"
+      ],
+      "description": "Type of action performed"
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "RestaurantReservation",
+        "HotelBookingIntent",
+        "GuestProfile",
+        "GuestDocument",
+        "GuestMessage",
+        "ContactInquiry",
+        "SiteSettings",
+        "OpeningHour"
+      ],
+      "description": "Which entity was affected"
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "entity_ref": {
+      "type": "string",
+      "description": "e.g. reservation_ref, intent_ref"
+    },
+    "old_value": {
+      "type": "string",
+      "description": "JSON-serialized previous state (for critical fields)"
+    },
+    "new_value": {
+      "type": "string",
+      "description": "JSON-serialized new state"
+    },
+    "change_summary": {
+      "type": "string",
+      "description": "Human-readable summary of change"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "performed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "admin_email",
+    "action",
+    "entity_type",
+    "entity_id"
+  ]
+}

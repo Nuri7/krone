@@ -5,11 +5,15 @@
     "user_email": {
       "type": "string"
     },
+    "guest_profile_id": {
+      "type": "string"
+    },
     "category": {
       "type": "string",
       "enum": [
         "id_document",
-        "invoice_data",
+        "passport",
+        "invoice_address",
         "event_attachment",
         "verification",
         "special_request",
@@ -29,7 +33,7 @@
     },
     "file_uri": {
       "type": "string",
-      "description": "Private storage URI (never expose publicly)"
+      "description": "Private storage URI (never expose in URLs directly)"
     },
     "original_filename": {
       "type": "string"
@@ -41,19 +45,39 @@
       "type": "string"
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "description": "Guest-provided description"
     },
     "internal_notes": {
-      "type": "string"
+      "type": "string",
+      "description": "Staff review notes"
     },
     "reviewed_by": {
-      "type": "string"
+      "type": "string",
+      "description": "Email of admin who reviewed"
     },
     "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rejection_reason": {
       "type": "string"
     },
     "related_reservation_ref": {
-      "type": "string"
+      "type": "string",
+      "description": "Link to restaurant reservation if applicable"
+    },
+    "related_booking_intent_id": {
+      "type": "string",
+      "description": "Link to hotel booking intent if applicable"
+    },
+    "email_notification_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "slack_notified": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

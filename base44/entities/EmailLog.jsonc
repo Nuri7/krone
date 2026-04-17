@@ -1,0 +1,88 @@
+{
+  "name": "EmailLog",
+  "type": "object",
+  "properties": {
+    "recipient": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "template": {
+      "type": "string",
+      "enum": [
+        "reservation_confirmation",
+        "reservation_cancelled",
+        "guest_welcome",
+        "password_reset",
+        "guest_document_received",
+        "event_inquiry_received",
+        "contact_confirmation",
+        "new_reservation_admin",
+        "cancellation_alert_admin",
+        "guest_document_alert_admin",
+        "guest_message_alert_admin",
+        "event_lead_alert_admin",
+        "sync_failure_alert"
+      ],
+      "description": "Email template used"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "failed",
+        "bounced",
+        "unsubscribed"
+      ],
+      "default": "sent"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "failure_reason": {
+      "type": "string"
+    },
+    "related_entity_type": {
+      "type": "string",
+      "enum": [
+        "RestaurantReservation",
+        "GuestProfile",
+        "ContactInquiry",
+        "GuestDocument",
+        "GuestMessage",
+        "HotelBookingIntent",
+        "User"
+      ]
+    },
+    "related_entity_id": {
+      "type": "string"
+    },
+    "related_ref": {
+      "type": "string",
+      "description": "e.g. reservation_ref, intent_ref"
+    },
+    "retry_count": {
+      "type": "number",
+      "default": 0
+    },
+    "last_retry_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "recipient",
+    "subject",
+    "template"
+  ]
+}

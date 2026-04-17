@@ -5,47 +5,32 @@
     "user_email": {
       "type": "string"
     },
+    "guest_profile_id": {
+      "type": "string"
+    },
     "guest_name": {
       "type": "string"
     },
-    "request_type": {
+    "subject": {
+      "type": "string"
+    },
+    "message_type": {
       "type": "string",
       "enum": [
-        "general",
+        "general_question",
         "arrival_time",
         "invoice_address",
         "room_preference",
         "extra_bed",
         "group_followup",
-        "dietary",
+        "dietary_request",
         "document_note",
-        "other"
+        "event_inquiry",
+        "special_request"
       ],
-      "default": "general"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "new",
-        "in_progress",
-        "resolved",
-        "closed"
-      ],
-      "default": "new"
-    },
-    "subject": {
-      "type": "string"
+      "default": "general_question"
     },
     "body": {
-      "type": "string"
-    },
-    "staff_reply": {
-      "type": "string"
-    },
-    "internal_notes": {
-      "type": "string"
-    },
-    "related_reservation_ref": {
       "type": "string"
     },
     "language": {
@@ -57,11 +42,57 @@
       ],
       "default": "de"
     },
-    "resolved_at": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "resolved",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "high",
+        "urgent"
+      ],
+      "default": "normal"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of staff member assigned"
+    },
+    "staff_reply": {
       "type": "string"
     },
-    "replied_at": {
+    "staff_internal_notes": {
       "type": "string"
+    },
+    "related_reservation_ref": {
+      "type": "string",
+      "description": "Link to restaurant reservation if applicable"
+    },
+    "related_booking_intent_id": {
+      "type": "string"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "replied_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "email_notification_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "slack_notified": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
