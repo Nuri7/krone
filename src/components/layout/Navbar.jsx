@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { useLang } from '@/lib/useLang';
+import { base44 } from '@/api/base44Client';
+
+const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
 
 const FLAG = { de: '🇩🇪', en: '🇬🇧', it: '🇮🇹' };
 
@@ -10,7 +13,14 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    base44.auth.me().then(u => {
+      if (u && (ADMIN_EMAILS.includes(u.email) || u.role === 'admin')) setIsAdmin(true);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -31,6 +41,8 @@ export default function Navbar() {
     { to: '/story', label: tr('nav', 'story') },
     { to: '/contact', label: tr('nav', 'contact') },
   ];
+
+
 
   return (
     <>
@@ -86,6 +98,14 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+
+              {/* Admin shortcut */}
+              {isAdmin && (
+                <Link to="/admin" title="Admin Dashboard"
+                  className="hidden md:flex w-8 h-8 items-center justify-center text-ivory/30 hover:text-gold transition-colors">
+                  <LayoutDashboard className="w-4 h-4" />
+                </Link>
+              )}
 
               {/* Reserve CTA */}
               <Link to="/reserve"

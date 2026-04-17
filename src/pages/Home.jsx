@@ -162,7 +162,9 @@ export default function Home() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="section-divider mb-8" />
             <p className="font-display text-2xl md:text-3xl lg:text-4xl font-light text-ivory leading-relaxed italic">
-              &ldquo;Wo Heimat schmeckt — echt, herzlich, hausgemacht.&rdquo;
+              {lang === 'de' && <>&ldquo;Wo Heimat schmeckt — echt, herzlich, hausgemacht.&rdquo;</>}
+              {lang === 'en' && <>&ldquo;Where home tastes real — genuine, warm, handcrafted.&rdquo;</>}
+              {lang === 'it' && <>&ldquo;Dove il gusto è di casa — autentico, caloroso, artigianale.&rdquo;</>}
             </p>
             <div className="section-divider mt-8" />
           </div>

@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import { useLang } from '@/lib/useLang';
 import { Link } from 'react-router-dom';
+import { UtensilsCrossed } from 'lucide-react';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function PriceTag({ price }) {
-  return <span className="font-semibold text-amber-700 whitespace-nowrap">{price.toFixed(1).replace('.', ',')} €</span>;
+  return <span className="font-semibold text-gold whitespace-nowrap tabular-nums">{price.toFixed(1).replace('.', ',')} €</span>;
 }
 
 function MultiPriceItem({ item, lang }) {
   const name = lang === 'de' ? item.name_de : lang === 'en' ? item.name_en : item.name_it;
   const desc = lang === 'de' ? item.desc_de : lang === 'en' ? item.desc_en : item.desc_it;
   return (
-    <div className="py-4 border-b border-stone-100 last:border-0">
-      <h3 className="font-medium text-stone-800 text-sm leading-snug mb-1">{name}</h3>
-      {desc && <p className="text-stone-500 text-xs leading-relaxed mb-2">{desc}</p>}
-      <div className="space-y-1">
+    <div className="py-4 border-b border-[#C9A96E]/08 last:border-0">
+      <h3 className="font-display text-base text-ivory font-light leading-snug mb-1">{name}</h3>
+      {desc && <p className="text-ivory/45 text-xs leading-relaxed mb-2 font-body">{desc}</p>}
+      <div className="space-y-1.5 mt-2">
         {item.variants.map((v, i) => (
-          <div key={i} className="flex justify-between items-center text-xs">
-            <span className="text-stone-500">{lang === 'de' ? v.label_de : lang === 'en' ? v.label_en : v.label_it}</span>
+          <div key={i} className="flex justify-between items-center text-xs font-body">
+            <span className="text-ivory/40">{lang === 'de' ? v.label_de : lang === 'en' ? v.label_en : v.label_it}</span>
             <PriceTag price={v.price} />
           </div>
         ))}
@@ -32,19 +33,18 @@ function MenuItem({ item, lang }) {
   const name = lang === 'de' ? item.name_de : lang === 'en' ? item.name_en : item.name_it;
   const desc = lang === 'de' ? item.desc_de : lang === 'en' ? item.desc_en : item.desc_it;
 
-  // Special case: two-option item (e.g. Mediterrane Potatos)
   if (item.option_de) {
     return (
-      <div className="py-4 border-b border-stone-100 last:border-0">
-        <h3 className="font-medium text-stone-800 text-sm leading-snug mb-2">{name}</h3>
-        {desc && <p className="text-stone-500 text-xs leading-relaxed mb-2">{desc}</p>}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs">
-            <span className="text-stone-500">{lang === 'de' ? 'Ohne Parmesan-Creme' : lang === 'en' ? 'Without Parmesan cream' : 'Senza crema di Parmigiano'}</span>
+      <div className="py-4 border-b border-[#C9A96E]/08 last:border-0">
+        <h3 className="font-display text-base text-ivory font-light leading-snug mb-2">{name}</h3>
+        {desc && <p className="text-ivory/45 text-xs leading-relaxed mb-2 font-body">{desc}</p>}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs font-body">
+            <span className="text-ivory/40">{lang === 'de' ? 'Ohne Parmesan-Creme' : lang === 'en' ? 'Without Parmesan cream' : 'Senza crema di Parmigiano'}</span>
             <PriceTag price={item.price} />
           </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-stone-500">{lang === 'de' ? item.option_de : lang === 'en' ? item.option_en : item.option_it}</span>
+          <div className="flex justify-between text-xs font-body">
+            <span className="text-ivory/40">{lang === 'de' ? item.option_de : lang === 'en' ? item.option_en : item.option_it}</span>
             <PriceTag price={item.price_with} />
           </div>
         </div>
@@ -53,11 +53,11 @@ function MenuItem({ item, lang }) {
   }
 
   return (
-    <div className="py-4 border-b border-stone-100 last:border-0">
+    <div className="py-4 border-b border-[#C9A96E]/08 last:border-0">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-stone-800 text-sm leading-snug">{name}</h3>
-          {desc && <p className="text-stone-500 text-xs mt-1 leading-relaxed">{desc}</p>}
+          <h3 className="font-display text-base text-ivory font-light leading-snug">{name}</h3>
+          {desc && <p className="text-ivory/45 text-xs mt-1 leading-relaxed font-body">{desc}</p>}
         </div>
         <PriceTag price={item.price} />
       </div>
@@ -68,8 +68,10 @@ function MenuItem({ item, lang }) {
 function Section({ title, items, lang }) {
   return (
     <div className="mb-10">
-      <h2 className="text-xs uppercase tracking-widest font-semibold text-amber-600 mb-3 pb-2 border-b-2 border-amber-100">
+      <h2 className="text-[10px] uppercase tracking-[0.35em] font-body font-semibold text-gold mb-3 pb-3 border-b border-gold/25 flex items-center gap-2">
+        <span className="flex-1 h-px bg-gradient-to-r from-gold/20 to-transparent hidden sm:block" />
         {title}
+        <span className="flex-1 h-px bg-gradient-to-l from-gold/20 to-transparent hidden sm:block" />
       </h2>
       {items.map((item, i) => <MenuItem key={i} item={item} lang={lang} />)}
     </div>
@@ -154,23 +156,11 @@ const DRINKS = {
   ],
 };
 
-// ─── Section labels ───────────────────────────────────────────────────────────
 const SECTION_LABELS = {
-  de: {
-    starters: 'Vorspeisen', mains: 'Hauptgerichte', meat_fish: 'Fleisch & Fisch', sides: 'Beilagen', desserts: 'Krönender Abschluss',
-    aperitifs: 'Aperitifs', white_wine: 'Weißwein', red_wine: 'Rotwein', beer: 'Bier', soft: 'Alkoholfreie Getränke', digestifs: 'Nach dem Essen',
-  },
-  en: {
-    starters: 'Starters', mains: 'Main Courses', meat_fish: 'Meat & Fish', sides: 'Sides', desserts: 'Sweet Finale',
-    aperitifs: 'Aperitifs', white_wine: 'White Wine', red_wine: 'Red Wine', beer: 'Beer', soft: 'Soft Drinks', digestifs: 'After Dinner',
-  },
-  it: {
-    starters: 'Antipasti', mains: 'Primi & Secondi', meat_fish: 'Carne & Pesce', sides: 'Contorni', desserts: 'Dolci',
-    aperitifs: 'Aperitivi', white_wine: 'Vino Bianco', red_wine: 'Vino Rosso', beer: 'Birra', soft: 'Analcolici', digestifs: 'Digestivi',
-  },
+  de: { starters: 'Vorspeisen', mains: 'Hauptgerichte', meat_fish: 'Fleisch & Fisch', sides: 'Beilagen', desserts: 'Krönender Abschluss', aperitifs: 'Aperitifs', white_wine: 'Weißwein', red_wine: 'Rotwein', beer: 'Bier', soft: 'Alkoholfreie Getränke', digestifs: 'Nach dem Essen' },
+  en: { starters: 'Starters', mains: 'Main Courses', meat_fish: 'Meat & Fish', sides: 'Sides', desserts: 'Sweet Finale', aperitifs: 'Aperitifs', white_wine: 'White Wine', red_wine: 'Red Wine', beer: 'Beer', soft: 'Soft Drinks', digestifs: 'After Dinner' },
+  it: { starters: 'Antipasti', mains: 'Primi & Secondi', meat_fish: 'Carne & Pesce', sides: 'Contorni', desserts: 'Dolci', aperitifs: 'Aperitivi', white_wine: 'Vino Bianco', red_wine: 'Vino Rosso', beer: 'Birra', soft: 'Analcolici', digestifs: 'Digestivi' },
 };
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function MenuPage() {
   const { lang } = useLang();
@@ -183,31 +173,31 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24">
+    <div className="min-h-screen bg-charcoal text-ivory pb-28 lg:pb-8">
       {/* Header */}
-      <div className="bg-stone-900 text-white pt-24 pb-10 px-4 text-center">
-        <p className="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-2">Kulinarium by Ammesso</p>
-        <h1 className="text-4xl font-light mb-2">
+      <div className="bg-espresso pt-24 pb-10 px-5 text-center border-b border-[#C9A96E]/10">
+        <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body font-medium mb-2">Kulinarium by Ammesso</p>
+        <h1 className="font-display text-4xl md:text-5xl font-light text-ivory mb-2">
           {lang === 'de' ? 'Speisekarte' : lang === 'en' ? 'Menu' : 'Menu'}
         </h1>
-        <p className="text-stone-400 text-sm">
+        <p className="text-ivory/40 text-sm font-body">
           {lang === 'de' ? 'Unser Essen ist mit Liebe gemacht' : lang === 'en' ? 'Our food is made with love' : 'Il nostro cibo è fatto con amore'}
         </p>
       </div>
 
       {/* Sticky tabs */}
-      <div className="sticky top-16 z-30 bg-white border-b border-stone-100 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 flex">
+      <div className="sticky top-16 md:top-20 z-30 bg-[#0F0D0B]/95 backdrop-blur-md border-b border-[#C9A96E]/10">
+        <div className="max-w-2xl mx-auto px-5 flex">
           {['food', 'drinks'].map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 py-4 text-sm font-semibold transition-colors border-b-2 ${tab === t ? 'border-amber-600 text-amber-700' : 'border-transparent text-stone-500 hover:text-stone-700'}`}>
+              className={`flex-1 py-4 text-xs font-body font-semibold tracking-[0.2em] uppercase transition-all border-b-2 ${tab === t ? 'border-gold text-gold' : 'border-transparent text-ivory/40 hover:text-ivory/70'}`}>
               {tabLabel(t)}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto px-5 py-8">
         {tab === 'food' && (
           <>
             <Section title={L.starters} items={FOOD.starters} lang={lang} />
@@ -228,8 +218,8 @@ export default function MenuPage() {
           </>
         )}
 
-        {/* Allergen + VAT note */}
-        <div className="mt-6 text-xs text-stone-400 text-center leading-relaxed space-y-1">
+        {/* Legal note */}
+        <div className="mt-8 glass-card border border-[#C9A96E]/08 rounded-xl p-5 text-xs text-ivory/30 text-center leading-relaxed space-y-1 font-body">
           <p>
             {lang === 'de' && 'Alle Preise inkl. MwSt. Bei Allergien oder Unverträglichkeiten sprechen Sie bitte unser Personal an.'}
             {lang === 'en' && 'All prices include VAT. Please inform our staff of any allergies or intolerances.'}
@@ -244,7 +234,8 @@ export default function MenuPage() {
 
         <div className="mt-8 text-center">
           <Link to="/reserve"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-colors text-sm">
+            className="inline-flex items-center gap-2 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
+            <UtensilsCrossed className="w-3.5 h-3.5" />
             {lang === 'de' ? 'Tisch reservieren' : lang === 'en' ? 'Reserve a Table' : 'Prenota un tavolo'}
           </Link>
         </div>

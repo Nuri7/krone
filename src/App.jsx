@@ -18,6 +18,7 @@ import Contact from './pages/Contact';
 import Legal from './pages/Legal';
 import BookingReturn from './pages/BookingReturn';
 import Weddings from './pages/Weddings';
+import Admin from './pages/Admin';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
         <Route path="/privacy" element={<Legal />} />
         <Route path="/booking-return" element={<BookingReturn />} />
         <Route path="/weddings" element={<Weddings />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
