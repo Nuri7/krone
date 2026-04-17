@@ -24,6 +24,7 @@ import GuestAccount from './pages/GuestAccount';
 import GuestProfile from './pages/GuestProfile';
 import GuestDocuments from './pages/GuestDocuments';
 import GuestMessages from './pages/GuestMessages';
+import Gallery from './pages/Gallery';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -69,6 +70,7 @@ const AuthenticatedApp = () => {
         <Route path="/account/profile" element={<GuestProfile />} />
         <Route path="/account/documents" element={<GuestDocuments />} />
         <Route path="/account/messages" element={<GuestMessages />} />
+        <Route path="/gallery" element={<Gallery />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

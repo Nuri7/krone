@@ -88,6 +88,7 @@ export default function Footer() {
               { to: '/rooms', de: 'Zimmer & Suiten', en: 'Rooms & Suites', it: 'Camere & Suite' },
               { to: '/reserve', de: 'Tisch reservieren', en: 'Reserve a Table', it: 'Prenota' },
               { to: '/weddings', de: 'Hochzeiten & Events', en: 'Weddings & Events', it: 'Matrimoni & Eventi' },
+              { to: '/gallery', de: 'Galerie', en: 'Gallery', it: 'Galleria' },
               { to: '/story', de: 'Unsere Geschichte', en: 'Our Story', it: 'La nostra storia' },
               { to: '/faq', de: 'FAQ', en: 'FAQ', it: 'FAQ' },
               { to: '/contact', de: 'Kontakt', en: 'Contact', it: 'Contatti' },

@@ -1,173 +1,364 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/useLang';
+import { base44 } from '@/api/base44Client';
 import { SITE_DEFAULTS, ROOMS } from '@/lib/siteData';
-import { Star, Coffee, ChevronRight, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { Star, Coffee, ChevronRight, CheckCircle, AlertCircle, ExternalLink, Wifi, Bath, Wind, MapPin, ArrowRight, BedDouble, Users } from 'lucide-react';
 
-const BEDS24_BASE = SITE_DEFAULTS.beds24_booking_url;
+const AMENITIES = {
+  de: ['Kostenloses WLAN', 'Klimaanlage', 'Eigenes Bad', 'Premium-Bettwäsche', 'Arbeitsbereich', 'Stadtblick'],
+  en: ['Free WiFi', 'Air Conditioning', 'Private Bathroom', 'Premium Bedding', 'Work Desk', 'City View'],
+  it: ['WiFi gratuito', 'Aria condizionata', 'Bagno privato', 'Biancheria premium', 'Scrivania', 'Vista città'],
+};
+
+const ROOM_DETAILS = {
+  deluxe_single: {
+    size_m2: 18,
+    max_guests: 1,
+    bed: { de: 'Einzelbett', en: 'Single bed', it: 'Letto singolo' },
+    features: {
+      de: ['Ruhige Lage', 'Modernes Bad', 'Schreibtisch', 'Stadtblick', 'Minikühlschrank'],
+      en: ['Quiet location', 'Modern bathroom', 'Work desk', 'City view', 'Mini fridge'],
+      it: ['Posizione tranquilla', 'Bagno moderno', 'Scrivania', 'Vista città', 'Mini frigo'],
+    },
+  },
+  deluxe_double: {
+    size_m2: 26,
+    max_guests: 2,
+    bed: { de: 'Doppelbett (180×200)', en: 'Double bed (180×200)', it: 'Letto matrimoniale (180×200)' },
+    features: {
+      de: ['Panoramafenster', 'Regendusche', 'Schreibtisch', 'Langenburg-Blick', 'Minibar'],
+      en: ['Panoramic window', 'Rain shower', 'Work desk', 'Langenburg view', 'Minibar'],
+      it: ['Finestra panoramica', 'Doccia a pioggia', 'Scrivania', 'Vista Langenburg', 'Minibar'],
+    },
+  },
+  king_suite: {
+    size_m2: 42,
+    max_guests: 2,
+    bed: { de: 'King-Size-Bett (200×200)', en: 'King-size bed (200×200)', it: 'Letto king size (200×200)' },
+    features: {
+      de: ['Separater Wohnbereich', 'Freistehende Badewanne', 'Premium-Minibar', 'Loungebereich', 'Exklusiver Blick'],
+      en: ['Separate living area', 'Freestanding bathtub', 'Premium minibar', 'Lounge area', 'Exclusive view'],
+      it: ['Soggiorno separato', 'Vasca freestanding', 'Minibar premium', 'Area lounge', 'Vista esclusiva'],
+    },
+  },
+};
 
 export default function Rooms() {
-  const { tr, lang } = useLang();
+  const { lang } = useLang();
   const [showBooking, setShowBooking] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [savingIntent, setSavingIntent] = useState(false);
   const params = new URLSearchParams(window.location.search);
   const returnState = params.get('return');
   const intentRef = params.get('ref');
 
-  // Build the Beds24 embed URL with language
-  const beds24EmbedUrl = `${BEDS24_BASE}&lang=${lang}&iframe=1`;
+  const beds24Base = SITE_DEFAULTS.beds24_booking_url;
 
-  const c = {
+  async function handleBookNow(roomId = null) {
+    setSavingIntent(true);
+    const ref = `INT-${Date.now().toString(36).toUpperCase()}`;
+    const p = new URLSearchParams();
+    if (lang !== 'de') p.set('lang', lang);
+    const beds24Url = `${beds24Base}&${p.toString()}`;
+    // Save booking intent before redirect — non-blocking
+    base44.entities.BookingIntent.create({
+      intent_ref: ref,
+      status: 'redirected',
+      language: lang,
+      source_page: 'rooms',
+      room_interest: roomId || '',
+      beds24_url_used: beds24Url,
+      redirected_at: new Date().toISOString(),
+    }).catch(() => {});
+    base44.functions.invoke('notifySlack', {
+      type: 'booking_intent',
+      ref,
+      name: '',
+      check_in: '',
+      check_out: '',
+      guests: '',
+    }).catch(() => {});
+    setSavingIntent(false);
+    setShowBooking(true);
+    setSelectedRoom(roomId);
+  }
+
+  const beds24EmbedUrl = `${beds24Base}&lang=${lang}&iframe=1`;
+
+  const C = {
     de: {
+      eyebrow: 'Unterkunft',
       title: 'Zimmer & Suiten',
-      subtitle: 'Komfortabel übernachten in Langenburg',
+      subtitle: 'Stilvolles Übernachten im historischen Herzen Hohenlohes.',
       book_direct: 'Direktbucher-Preise garantiert',
       no_commission: 'Keine Buchungsgebühren',
-      breakfast: 'Frühstück optional (€14 p.P.)',
+      breakfast: 'Frühstück optional · €14 p.P.',
       book_now: 'Jetzt buchen',
       book_close: 'Schließen',
-      group_title: 'Hochzeiten & Gruppen',
-      group_text: 'Für Hochzeiten und Gruppen erstellen wir gerne ein individuelles Angebot.',
-      returning_confirmed: 'Ihre Buchung wurde bestätigt!',
-      returning_pending: 'Ihre Buchung wird bearbeitet. Bei Fragen kontaktieren Sie uns bitte.',
+      group_title: 'Hochzeiten & Gruppenaufenthalte',
+      group_text: 'Für Hochzeiten, Firmenevents und Gruppenreisen erstellen wir individuelle Angebote mit Raumkontingenten.',
+      returning_confirmed: 'Ihre Buchung wurde bestätigt — wir freuen uns auf Ihren Besuch!',
+      returning_pending: 'Ihre Buchung wird bearbeitet. Bei Fragen stehen wir gerne zur Verfügung.',
       open_beds: 'Verfügbarkeit & Preise prüfen',
+      amenities_title: 'Alle Zimmer beinhalten',
+      size: 'Größe',
+      max: 'Max. Gäste',
+      bed_label: 'Bett',
+      features_label: 'Ausstattung',
+      from: 'Ab',
+      per_night: 'pro Nacht',
+      details: 'Details & Buchen',
+      beds24_note: 'Sichere Buchung via Beds24 · Sofortige Bestätigung',
     },
     en: {
+      eyebrow: 'Accommodation',
       title: 'Rooms & Suites',
-      subtitle: 'Comfortable stays in Langenburg',
+      subtitle: 'Stylish stays in the historic heart of Hohenlohe.',
       book_direct: 'Best Direct Booking Rates',
       no_commission: 'No booking fees',
-      breakfast: 'Breakfast available (€14 p.p.)',
+      breakfast: 'Breakfast optional · €14 p.p.',
       book_now: 'Book Now',
       book_close: 'Close',
-      group_title: 'Weddings & Groups',
-      group_text: 'For weddings and groups we are happy to create an individual offer.',
-      returning_confirmed: 'Your booking has been confirmed!',
+      group_title: 'Weddings & Group Stays',
+      group_text: 'For weddings, corporate events and group travel we create individual offers with room contingents.',
+      returning_confirmed: 'Your booking has been confirmed — we look forward to welcoming you!',
       returning_pending: 'Your booking is being processed. Please contact us if you have any questions.',
       open_beds: 'Check Availability & Prices',
+      amenities_title: 'All rooms include',
+      size: 'Size',
+      max: 'Max. Guests',
+      bed_label: 'Bed',
+      features_label: 'Features',
+      from: 'From',
+      per_night: 'per night',
+      details: 'Details & Book',
+      beds24_note: 'Secure booking via Beds24 · Instant confirmation',
     },
     it: {
+      eyebrow: 'Alloggio',
       title: 'Camere & Suite',
-      subtitle: 'Soggiorni confortevoli a Langenburg',
+      subtitle: 'Soggiorni eleganti nel cuore storico dell\'Hohenlohe.',
       book_direct: 'Prezzi diretti garantiti',
       no_commission: 'Nessuna commissione',
-      breakfast: 'Colazione disponibile (€14 a persona)',
+      breakfast: 'Colazione opzionale · €14 p.p.',
       book_now: 'Prenota ora',
       book_close: 'Chiudi',
-      group_title: 'Matrimoni & Gruppi',
-      group_text: "Per matrimoni e gruppi creiamo volentieri un'offerta individuale.",
-      returning_confirmed: 'La tua prenotazione è confermata!',
+      group_title: 'Matrimoni & soggiorni di gruppo',
+      group_text: 'Per matrimoni, eventi aziendali e viaggi di gruppo creiamo offerte individuali con contingenti di camere.',
+      returning_confirmed: 'La tua prenotazione è confermata — non vediamo l\'ora di accogliervi!',
       returning_pending: 'La tua prenotazione è in elaborazione. Contattateci per qualsiasi domanda.',
       open_beds: 'Verifica disponibilità e prezzi',
+      amenities_title: 'Tutte le camere includono',
+      size: 'Dimensione',
+      max: 'Max. ospiti',
+      bed_label: 'Letto',
+      features_label: 'Caratteristiche',
+      from: 'Da',
+      per_night: 'a notte',
+      details: 'Dettagli & prenota',
+      beds24_note: 'Prenotazione sicura via Beds24 · Conferma immediata',
     },
   };
-  const t = c[lang] || c.de;
+  const t = C[lang] || C.de;
+  const amenitiesList = AMENITIES[lang] || AMENITIES.de;
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-24">
+    <div className="min-h-screen bg-charcoal text-ivory pb-24 lg:pb-10">
 
       {/* Return banners */}
       {returnState === 'confirmed' && (
-        <div className="max-w-5xl mx-auto px-5 pt-6">
-          <div className="border border-gold/20 bg-gold/10 rounded-2xl p-4 flex gap-3 mb-2">
+        <div className="max-w-5xl mx-auto px-5 pt-24">
+          <div className="border border-gold/20 bg-gold/8 rounded-2xl p-5 flex gap-3 mb-2">
             <CheckCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-ivory text-sm">{t.returning_confirmed}</p>
-              {intentRef && <p className="text-xs text-gold/60 mt-0.5 font-body">Ref: {intentRef}</p>}
+              <p className="font-semibold text-ivory text-sm font-body">{t.returning_confirmed}</p>
+              {intentRef && <p className="text-xs text-gold/50 mt-0.5 font-body">Ref: {intentRef}</p>}
             </div>
           </div>
         </div>
       )}
       {returnState === 'pending' && (
-        <div className="max-w-5xl mx-auto px-5 pt-6">
-          <div className="border border-[#C9A96E]/15 bg-[#C9A96E]/05 rounded-2xl p-4 flex gap-3 mb-2">
+        <div className="max-w-5xl mx-auto px-5 pt-24">
+          <div className="border border-[#C9A96E]/15 bg-[#C9A96E]/5 rounded-2xl p-5 flex gap-3 mb-2">
             <AlertCircle className="w-5 h-5 text-gold/60 flex-shrink-0 mt-0.5" />
             <p className="text-ivory/60 text-sm font-body">{t.returning_pending}</p>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className="text-center py-14 px-5">
-        <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">Krone Langenburg</p>
-        <h1 className="font-display text-5xl md:text-6xl font-light text-ivory mb-3">{t.title}</h1>
-        <p className="text-ivory/40 font-body">{t.subtitle}</p>
+      {/* Hero Header */}
+      <div className={`text-center px-5 ${returnState ? 'pt-8' : 'pt-28'} pb-16`}>
+        <div className="flex items-center justify-center gap-3 mb-5">
+          <div className="h-px w-8 bg-gold/40" />
+          <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body">{t.eyebrow}</p>
+          <div className="h-px w-8 bg-gold/40" />
+        </div>
+        <h1 className="font-display text-5xl md:text-7xl font-light text-ivory mb-4 leading-[1.0]">{t.title}</h1>
+        <p className="text-ivory/40 font-body max-w-md mx-auto">{t.subtitle}</p>
       </div>
 
-      <div className="max-w-5xl mx-auto px-5">
+      <div className="max-w-6xl mx-auto px-5">
 
-        {/* Direct booking trust strip */}
-        <div className="border border-gold/20 bg-gold/5 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-center gap-4 justify-between">
-          <div className="flex items-center gap-3">
-            <Star className="w-5 h-5 text-gold" />
+        {/* Trust strip */}
+        <div className="border border-gold/20 bg-gold/5 rounded-2xl p-5 mb-12 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-3">
+            <Star className="w-4 h-4 text-gold fill-gold/20 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-ivory text-sm font-body">{t.book_direct}</p>
+              <p className="text-ivory text-sm font-body font-semibold">{t.book_direct}</p>
               <p className="text-gold/60 text-xs font-body">{t.no_commission}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-ivory/40 text-xs font-body">
-            <Coffee className="w-4 h-4" /> {t.breakfast}
+          <div className="flex items-center justify-center gap-2 text-ivory/40 text-xs font-body">
+            <Coffee className="w-4 h-4 text-gold/50" /> {t.breakfast}
+          </div>
+          <div className="flex items-center justify-center sm:justify-end gap-2 text-ivory/40 text-xs font-body">
+            <MapPin className="w-3.5 h-3.5 text-gold/50" /> Langenburg, Baden-Württemberg
           </div>
         </div>
 
-        {/* Room cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {ROOMS.map(r => (
-            <div key={r.id} className="glass-card rounded-2xl overflow-hidden border border-[#C9A96E]/10 hover-lift transition-all group">
-              <div className="relative h-52 overflow-hidden">
-                <img src={r.image} alt={r.key_de} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 to-transparent" />
+        {/* Room cards — premium layout */}
+        <div className="space-y-8 mb-14">
+          {ROOMS.map((r, idx) => {
+            const details = ROOM_DETAILS[r.id] || {};
+            const features = details.features?.[lang] || details.features?.de || [];
+            const bed = details.bed?.[lang] || details.bed?.de || '';
+            const isReversed = idx % 2 === 1;
+            return (
+              <div key={r.id}
+                className="glass-card border border-[#C9A96E]/10 rounded-3xl overflow-hidden">
+                <div className={`grid grid-cols-1 lg:grid-cols-2 ${isReversed ? 'lg:grid-flow-dense' : ''}`}>
+                  {/* Image */}
+                  <div className={`relative h-72 lg:h-auto min-h-[320px] overflow-hidden group ${isReversed ? 'lg:col-start-2' : ''}`}>
+                    <img src={r.image} alt={lang === 'de' ? r.key_de : lang === 'en' ? r.key_en : r.key_it}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-charcoal/20" />
+                    {/* Size badge */}
+                    {details.size_m2 && (
+                      <div className="absolute top-5 left-5 bg-charcoal/70 backdrop-blur-sm border border-[#C9A96E]/20 rounded-full px-3 py-1.5 text-[10px] font-body text-gold/70 tracking-wider">
+                        {details.size_m2} m²
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className={`p-8 md:p-10 flex flex-col justify-center ${isReversed ? 'lg:col-start-1' : ''}`}>
+                    <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">
+                      {idx === 2 ? '✦ Suite' : idx === 0 ? 'Einzelzimmer' : 'Doppelzimmer'}
+                    </p>
+                    <h2 className="font-display text-3xl md:text-4xl font-light text-ivory mb-3 leading-tight">
+                      {lang === 'de' ? r.key_de : lang === 'en' ? r.key_en : r.key_it}
+                    </h2>
+                    <p className="text-ivory/55 text-sm font-body leading-relaxed mb-6">
+                      {lang === 'de' ? r.description_de : lang === 'en' ? r.description_en : r.description_it}
+                    </p>
+
+                    {/* Quick specs */}
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      {details.max_guests && (
+                        <span className="flex items-center gap-1.5 text-xs text-ivory/40 font-body border border-[#C9A96E]/10 rounded-full px-3 py-1.5">
+                          <Users className="w-3 h-3 text-gold/40" />
+                          {t.max}: {details.max_guests}
+                        </span>
+                      )}
+                      {bed && (
+                        <span className="flex items-center gap-1.5 text-xs text-ivory/40 font-body border border-[#C9A96E]/10 rounded-full px-3 py-1.5">
+                          <BedDouble className="w-3 h-3 text-gold/40" />
+                          {bed}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Features */}
+                    {features.length > 0 && (
+                      <div className="mb-7">
+                        <p className="text-ivory/25 text-[10px] tracking-[0.25em] uppercase font-body mb-2">{t.features_label}</p>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1">
+                          {features.map((f, i) => (
+                            <span key={i} className="text-xs text-ivory/45 font-body flex items-center gap-1">
+                              <span className="w-1 h-1 rounded-full bg-gold/40 flex-shrink-0" /> {f}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => handleBookNow(r.id)}
+                      disabled={savingIntent}
+                      className="inline-flex items-center justify-center gap-2 px-7 py-3.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold self-start disabled:opacity-50"
+                    >
+                      {t.details} <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="p-5">
-                <h3 className="font-display text-lg font-light text-ivory mb-2">
-                  {lang === 'de' ? r.key_de : lang === 'en' ? r.key_en : r.key_it}
-                </h3>
-                <p className="text-ivory/45 text-sm font-body leading-relaxed mb-4">
-                  {lang === 'de' ? r.description_de : lang === 'en' ? r.description_en : r.description_it}
-                </p>
-                <button
-                  onClick={() => setShowBooking(true)}
-                  className="w-full py-2.5 border border-[#C9A96E]/20 text-gold/70 hover:border-gold/40 hover:text-gold text-xs font-body tracking-widest uppercase rounded-xl transition-colors"
-                >
-                  {t.book_now} <ChevronRight className="w-3 h-3 inline" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Big Book Now CTA */}
-        <div className="glass-card border border-[#C9A96E]/15 rounded-3xl p-8 text-center mb-10">
-          <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">Beds24 · Online Buchung</p>
-          <h2 className="font-display text-3xl font-light text-ivory mb-3">{t.open_beds}</h2>
-          <p className="text-ivory/40 font-body text-sm mb-7">
-            {lang === 'de' ? 'Direkt online buchen — sicher, schnell und ohne Aufpreis.' : lang === 'en' ? 'Book directly online — secure, fast and without surcharges.' : 'Prenota direttamente online — sicuro, veloce e senza sovrapprezzi.'}
+        {/* All-room amenities */}
+        <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-8 mb-10">
+          <h3 className="text-ivory/30 text-[10px] tracking-[0.35em] uppercase font-body mb-5 text-center">{t.amenities_title}</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-center">
+            {amenitiesList.map((a, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <div className="w-9 h-9 rounded-full border border-[#C9A96E]/15 flex items-center justify-center">
+                  {i === 0 && <Wifi className="w-3.5 h-3.5 text-gold/50" />}
+                  {i === 1 && <Wind className="w-3.5 h-3.5 text-gold/50" />}
+                  {i === 2 && <Bath className="w-3.5 h-3.5 text-gold/50" />}
+                  {i >= 3 && <Star className="w-3 h-3 text-gold/40" />}
+                </div>
+                <span className="text-ivory/40 text-xs font-body leading-tight">{a}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Main CTA */}
+        <div className="glass-card border border-[#C9A96E]/15 rounded-3xl p-8 md:p-12 text-center mb-10">
+          <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-4">{t.beds24_note}</p>
+          <h2 className="font-display text-3xl md:text-4xl font-light text-ivory mb-4">{t.open_beds}</h2>
+          <p className="text-ivory/40 font-body text-sm mb-8 max-w-sm mx-auto">
+            {lang === 'de' ? 'Direkt online buchen — sicher, schnell und garantiert zum besten Preis.' : lang === 'en' ? 'Book directly online — secure, fast and guaranteed at the best price.' : 'Prenota direttamente online — sicuro, veloce e al miglior prezzo garantito.'}
           </p>
           <button
-            onClick={() => setShowBooking(true)}
-            className="inline-flex items-center gap-2.5 px-10 py-4 btn-gold rounded-full text-sm font-body font-semibold tracking-wider shadow-gold-glow"
+            onClick={() => handleBookNow(null)}
+            disabled={savingIntent}
+            className="inline-flex items-center gap-2.5 px-10 py-4 btn-gold rounded-full text-sm font-body font-semibold tracking-wider shadow-gold-glow disabled:opacity-60"
           >
             {t.book_now} <ExternalLink className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Wedding / Group CTA */}
-        <div className="bg-espresso border border-[#C9A96E]/10 rounded-2xl p-8 text-center">
-          <h3 className="font-display text-2xl font-light text-ivory mb-2">💍 {t.group_title}</h3>
-          <p className="text-ivory/40 text-sm font-body mb-5">{t.group_text}</p>
-          <Link to="/weddings" className="inline-flex items-center gap-2 px-6 py-3 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
-            {tr('nav', 'contact')} <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+        {/* Wedding / Group */}
+        <div className="bg-espresso border border-[#C9A96E]/10 rounded-2xl p-8 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">💍 {t.group_title}</p>
+            <p className="text-ivory/50 text-sm font-body leading-relaxed">{t.group_text}</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 md:justify-end">
+            <Link to="/weddings"
+              className="flex items-center justify-center gap-2 px-6 py-3 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+              {lang === 'de' ? 'Anfragen' : lang === 'en' ? 'Enquire' : 'Richiedi'} <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link to="/contact"
+              className="flex items-center justify-center gap-2 px-6 py-3 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+              {lang === 'de' ? 'Kontakt' : lang === 'en' ? 'Contact' : 'Contatti'}
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* ── Beds24 Booking Modal / Overlay ── */}
+      {/* Beds24 Full-screen Overlay */}
       {showBooking && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-charcoal">
-          {/* Top bar */}
-          <div className="flex items-center justify-between px-5 py-3 bg-espresso border-b border-[#C9A96E]/15 flex-shrink-0">
+        <div className="fixed inset-0 z-50 flex flex-col bg-charcoal animate-fade-in">
+          <div className="flex items-center justify-between px-5 py-4 bg-espresso border-b border-[#C9A96E]/15 flex-shrink-0">
             <div>
-              <p className="font-display text-base font-light text-ivory">Krone Langenburg</p>
-              <p className="text-gold text-[10px] tracking-[0.3em] uppercase font-body">Online Buchung · Beds24</p>
+              <p className="font-display text-lg font-light text-ivory">Krone Langenburg</p>
+              <p className="text-gold text-[10px] tracking-[0.3em] uppercase font-body">
+                {lang === 'de' ? 'Sichere Online-Buchung' : lang === 'en' ? 'Secure Online Booking' : 'Prenotazione sicura online'}
+              </p>
             </div>
             <button
               onClick={() => setShowBooking(false)}
@@ -176,11 +367,9 @@ export default function Rooms() {
               ✕ {t.book_close}
             </button>
           </div>
-
-          {/* Beds24 iframe */}
           <iframe
             src={beds24EmbedUrl}
-            title="Beds24 Booking"
+            title="Beds24 Secure Booking"
             className="flex-1 w-full border-0 bg-white"
             allow="payment"
           />
