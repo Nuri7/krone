@@ -199,6 +199,40 @@ export default function GuestAccount() {
           ))}
         </div>
 
+        {/* Recent Documents Widget */}
+        {documents.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-ivory/30 text-[10px] tracking-[0.35em] uppercase font-body mb-3 flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5" /> {lang === 'de' ? 'Meine Dokumente' : lang === 'en' ? 'My Documents' : 'I miei documenti'}
+            </h2>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {documents.slice(0, 5).map(d => (
+                <div key={d.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
+                  <div className="min-w-0">
+                    <p className="text-ivory/70 truncate">{d.original_filename}</p>
+                    <p className="text-ivory/30 text-[10px] mt-0.5">{d.created_date ? format(new Date(d.created_date), 'dd.MM.yy HH:mm') : ''}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-body whitespace-nowrap flex-shrink-0 border ${
+                    d.status === 'approved' ? 'text-emerald-400 bg-emerald-950/30 border-emerald-700/20' :
+                    d.status === 'rejected' ? 'text-red-400 bg-red-950/20 border-red-800/20' :
+                    d.status === 'under_review' ? 'text-gold/70 bg-gold/10 border-gold/20' :
+                    'text-ivory/40 bg-ivory/5 border-ivory/10'
+                  }`}>
+                    {d.status === 'approved' && '✓ ' + (lang === 'de' ? 'Genehmigt' : lang === 'en' ? 'Approved' : 'Approvato')}
+                    {d.status === 'rejected' && '✕ ' + (lang === 'de' ? 'Abgelehnt' : lang === 'en' ? 'Rejected' : 'Rifiutato')}
+                    {d.status === 'under_review' && '⧖ ' + (lang === 'de' ? 'In Prüfung' : lang === 'en' ? 'Reviewing' : 'In revisione')}
+                    {d.status === 'uploaded' && '📤 ' + (lang === 'de' ? 'Hochgeladen' : lang === 'en' ? 'Uploaded' : 'Caricato')}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <Link to="/account/documents"
+              className="inline-flex items-center gap-1.5 text-gold/60 hover:text-gold text-xs font-body tracking-wider transition-colors mt-3">
+              {lang === 'de' ? 'Zum Dokumenten-Manager →' : lang === 'en' ? 'Go to Documents →' : 'Vai ai documenti →'}
+            </Link>
+          </div>
+        )}
+
         {/* Reservations */}
         <div>
           <h2 className="text-ivory/30 text-[10px] tracking-[0.35em] uppercase font-body mb-4 flex items-center gap-2">

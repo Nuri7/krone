@@ -42,6 +42,7 @@ function StatCard({ icon: Icon, label, value, sub, color = 'text-gold' }) {
 
 export default function Admin() {
   const navigate = useNavigate();
+  const { lang } = useLang();
   const [user, setUser] = useState(null);
   const [access, setAccess] = useState('loading');
   const [tab, setTab] = useState('reservations');
@@ -327,37 +328,86 @@ export default function Admin() {
             ) : guestDocs.length === 0 ? (
               <div className="text-center py-16 text-ivory/30 font-body text-sm">Keine Dokumente</div>
             ) : (
-              guestDocs.map(doc => (
-                <div key={doc.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-4 hover:border-[#C9A96E]/20 transition-all">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-body text-sm text-ivory">{doc.original_filename}</span>
-                        <StatusBadge status={doc.status} />
-                        <span className="text-ivory/30 text-[10px] font-body uppercase tracking-widest">{doc.category}</span>
-                      </div>
-                      <p className="text-ivory/30 text-xs font-body">{doc.user_email} · {doc.created_date ? format(new Date(doc.created_date), 'dd.MM.yy HH:mm') : ''}</p>
-                      {doc.description && <p className="text-ivory/40 text-xs font-body mt-1">{doc.description}</p>}
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      {doc.status === 'uploaded' && (
-                        <button onClick={async () => {
-                          await base44.entities.GuestDocument.update(doc.id, { status: 'under_review', reviewed_by: user?.email, reviewed_at: new Date().toISOString() });
-                          setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'under_review' } : d));
-                        }} className="px-3 py-1.5 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body tracking-widest uppercase">
-                          Prüfen
-                        </button>
-                      )}
+              guestDocs.map(doc => {
+                const [expanded, setExpanded] = useState(false);
+                const [notes, setNotes] = useState(doc.internal_notes || '');
+                return (
+                  <div key={doc.id} className={`glass-card border rounded-xl p-4 transition-all ${expanded ? 'border-gold/25' : 'border-[#C9A96E]/08 hover:border-[#C9A96E]/20'}`}>
+                    {/* Header */}
+                    <div className="flex items-start gap-3 flex-wrap">
+                      <button onClick={() => setExpanded(!expanded)} className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="font-body text-sm text-ivory">{doc.original_filename}</span>
+                          <StatusBadge status={doc.status} />
+                          <span className="text-ivory/30 text-[10px] font-body uppercase tracking-widest">{doc.category}</span>
+                        </div>
+                        <p className="text-ivory/30 text-xs font-body">{doc.user_email} · {doc.created_date ? format(new Date(doc.created_date), 'dd.MM.yy HH:mm') : ''}</p>
+                        {doc.description && <p className="text-ivory/40 text-xs font-body mt-1">{doc.description}</p>}
+                      </button>
                       <button onClick={async () => {
                         const res = await base44.functions.invoke('guestDocumentAccess', { document_id: doc.id });
                         if (res.data?.signed_url) window.open(res.data.signed_url, '_blank');
-                      }} className="px-3 py-1.5 glass-card border border-[#C9A96E]/15 text-ivory/50 hover:text-gold text-[10px] rounded-lg font-body tracking-widest uppercase flex items-center gap-1">
+                      }} className="px-3 py-1.5 glass-card border border-[#C9A96E]/15 text-ivory/50 hover:text-gold text-[10px] rounded-lg font-body tracking-widest uppercase flex items-center gap-1 flex-shrink-0">
                         <Download className="w-3 h-3" /> DL
                       </button>
                     </div>
+
+                    {/* Expanded actions */}
+                    {expanded && (
+                      <div className="mt-4 pt-4 border-t border-[#C9A96E]/08 space-y-3">
+                        {/* Internal notes */}
+                        <div>
+                          <label className="text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-2 block">Interne Notizen</label>
+                          <textarea
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            placeholder="Notizen für das Team..."
+                            className={inputCls + ' resize-none h-20'}
+                          />
+                        </div>
+
+                        {/* Status buttons */}
+                        <div className="flex gap-2 flex-wrap">
+                          {doc.status === 'uploaded' && (
+                            <button onClick={async () => {
+                              await base44.entities.GuestDocument.update(doc.id, { status: 'under_review', reviewed_by: user?.email, reviewed_at: new Date().toISOString(), internal_notes: notes });
+                              setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'under_review', internal_notes: notes } : d));
+                              setExpanded(false);
+                            }} className="flex-1 py-2 bg-gold/10 border border-gold/20 text-gold text-[10px] rounded-lg font-body hover:bg-gold/20 transition-colors tracking-widest uppercase">
+                              ⧖ In Prüfung
+                            </button>
+                          )}
+                          {(doc.status === 'uploaded' || doc.status === 'under_review') && (
+                            <>
+                              <button onClick={async () => {
+                                await base44.entities.GuestDocument.update(doc.id, { status: 'approved', reviewed_by: user?.email, reviewed_at: new Date().toISOString(), internal_notes: notes });
+                                setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'approved', internal_notes: notes } : d));
+                                setExpanded(false);
+                              }} className="flex-1 py-2 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body hover:bg-emerald-900/60 transition-colors tracking-widest uppercase">
+                                ✓ Genehmigen
+                              </button>
+                              <button onClick={async () => {
+                                await base44.entities.GuestDocument.update(doc.id, { status: 'rejected', reviewed_by: user?.email, reviewed_at: new Date().toISOString(), internal_notes: notes });
+                                setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'rejected', internal_notes: notes } : d));
+                                setExpanded(false);
+                              }} className="flex-1 py-2 bg-red-950/40 border border-red-900/30 text-red-400 text-[10px] rounded-lg font-body hover:bg-red-950/60 transition-colors tracking-widest uppercase">
+                                ✕ Ablehnen
+                              </button>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Review info */}
+                        {doc.reviewed_by && (
+                          <div className="text-[10px] text-ivory/30 border-t border-ivory/10 pt-2">
+                            {lang === 'de' ? 'Überprüft von' : 'Reviewed by'} {doc.reviewed_by} am {doc.reviewed_at ? format(new Date(doc.reviewed_at), 'dd.MM.yy HH:mm') : ''}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         )}
