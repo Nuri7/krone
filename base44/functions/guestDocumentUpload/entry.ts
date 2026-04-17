@@ -56,6 +56,28 @@ Deno.serve(async (req) => {
       body: `<p>Ein Gast hat ein Dokument hochgeladen.</p><ul><li>Gast: ${user.email}</li><li>Kategorie: ${category}</li><li>Datei: ${file.name}</li><li>Größe: ${Math.round(file.size / 1024)} KB</li>${description ? `<li>Beschreibung: ${description}</li>` : ''}</ul>`,
     }).catch(() => {});
 
+    // Notify via Slack
+    const webhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
+    if (webhookUrl && webhookUrl.startsWith('https://')) {
+      const blocks = [
+        { type: 'header', text: { type: 'plain_text', text: '📎 Neues Dokument hochgeladen', emoji: true } },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Gast:*\n${user.email}` },
+            { type: 'mrkdwn', text: `*Kategorie:*\n${category}` },
+            { type: 'mrkdwn', text: `*Datei:*\n${file.name} (${Math.round(file.size / 1024)} KB)` },
+          ]
+        },
+        { type: 'divider' }
+      ];
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocks }),
+      }).catch(e => console.warn('Slack notification failed:', e.message));
+    }
+
     return Response.json({ success: true, document_id: doc.id });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

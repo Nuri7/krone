@@ -51,16 +51,13 @@ export default function GuestMessages() {
     const msg = await base44.entities.GuestMessage.create({
       ...form, user_email: u.email, guest_name: fullName, language: lang, status: 'new',
     });
-    // Notify hotel
-    base44.functions.invoke('notifySlack', {
-      type: 'contact', name: fullName, email: u.email,
-      inquiry_type: form.request_type, message: form.body.slice(0, 200),
+    // Notify hotel via secure backend function (never call integrations from frontend)
+    base44.functions.invoke('sendGuestMessageEmail', {
+      guest_name: fullName,
+      request_type: form.request_type,
+      subject: form.subject,
+      body: form.body,
     }).catch(() => {});
-    base44.asServiceRole?.integrations?.Core?.SendEmail?.({
-      to: 'info@krone-ammesso.de', from_name: 'Krone Gästeportal',
-      subject: `[Gästenachricht] ${form.request_type} — ${fullName}`,
-      body: `<p><b>Von:</b> ${fullName} (${u.email})</p><p><b>Betreff:</b> ${form.subject}</p><p>${form.body.replace(/\n/g, '<br/>')}</p>`,
-    });
     setMessages(prev => [msg, ...prev]);
     setForm({ request_type: 'general', subject: '', body: '' });
     setSent(true);

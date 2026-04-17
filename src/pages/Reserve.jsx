@@ -5,6 +5,8 @@ import { SITE_DEFAULTS, TIME_SLOTS_LUNCH, TIME_SLOTS_DINNER, TIME_SLOTS_SUNDAY }
 import { CheckCircle, AlertCircle, Clock, Users, Calendar, ChevronRight } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 
+// Capacity and closed days used for UI slot display only
+// Server-side validation is the authoritative check (createReservation function)
 const MAX_CAPACITY = SITE_DEFAULTS.restaurant_capacity;
 const CLOSED_DAYS = SITE_DEFAULTS.restaurant_closed_days;
 
@@ -56,24 +58,22 @@ export default function Reserve() {
     if (!form.first_name || !form.last_name || !form.email) return;
     setSubmitting(true);
     setError('');
-    const dupKey = `${form.email}|${date}|${time}`;
-    const dups = await base44.entities.Reservation.filter({ duplicate_check_key: dupKey });
-    if (dups.length > 0) { setError(tr('reservation', 'error_duplicate')); setSubmitting(false); return; }
-    const existing = await base44.entities.Reservation.filter({ reservation_date: date, reservation_time: time, status: { $in: ['pending', 'confirmed'] } });
-    const used = existing.reduce((sum, r) => sum + (r.party_size || 0), 0);
-    if (used + guests > MAX_CAPACITY) { setError(tr('reservation', 'error_full')); setSubmitting(false); return; }
-    const ref = `RES-${Date.now().toString(36).toUpperCase()}`;
-    await base44.entities.Reservation.create({
-      reservation_ref: ref, status: 'confirmed',
-      guest_first_name: form.first_name, guest_last_name: form.last_name,
-      guest_email: form.email, guest_phone: form.phone,
-      reservation_date: date, reservation_time: time,
-      party_size: guests, special_requests: form.requests,
-      language: lang, source: 'website', duplicate_check_key: dupKey,
+    // All capacity checks, dedup, and creation handled server-side
+    const res = await base44.functions.invoke('createReservation', {
+      first_name: form.first_name, last_name: form.last_name,
+      email: form.email, phone: form.phone,
+      date, time, guests, requests: form.requests, lang,
     });
-    base44.functions.invoke('sendReservationEmail', { ref, first_name: form.first_name, last_name: form.last_name, email: form.email, date, time, guests, lang, requests: form.requests }).catch(() => {});
-    base44.functions.invoke('notifySlack', { type: 'reservation', ref, name: `${form.first_name} ${form.last_name}`, date, time, guests, lang }).catch(() => {});
-    setReservationRef(ref);
+    if (!res.data?.success) {
+      const err = res.data?.error || 'error';
+      if (err === 'duplicate') setError(tr('reservation', 'error_duplicate'));
+      else if (err === 'full') setError(tr('reservation', 'error_full'));
+      else if (err.includes('wait')) setError(lang === 'de' ? 'Bitte kurz warten, bevor Sie erneut absenden.' : lang === 'en' ? 'Please wait before submitting again.' : 'Attendere prima di inviare di nuovo.');
+      else setError(err);
+      setSubmitting(false);
+      return;
+    }
+    setReservationRef(res.data.ref);
     setSuccess(true);
     setSubmitting(false);
   }

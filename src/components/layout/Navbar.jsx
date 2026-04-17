@@ -34,15 +34,19 @@ export default function Navbar() {
   const isHome = location.pathname === '/';
   const alwaysDark = !isHome || scrolled;
 
-  const faqLabel = { de: 'FAQ', en: 'FAQ', it: 'FAQ' };
+  // Desktop shows 5 core links (FAQ + Story stay in footer / mobile drawer)
   const navLinks = [
     { to: '/restaurant', label: tr('nav', 'restaurant') },
     { to: '/menu', label: tr('nav', 'menu') },
     { to: '/rooms', label: tr('nav', 'rooms') },
     { to: '/weddings', label: tr('nav', 'weddings') },
-    { to: '/story', label: tr('nav', 'story') },
     { to: '/contact', label: tr('nav', 'contact') },
-    { to: '/faq', label: faqLabel[lang] || 'FAQ' },
+  ];
+  // Mobile drawer gets all links including FAQ and Story
+  const mobileLinks = [
+    ...navLinks,
+    { to: '/story', label: tr('nav', 'story') },
+    { to: '/faq', label: 'FAQ' },
   ];
 
 
@@ -135,7 +139,7 @@ export default function Navbar() {
         {open && (
           <div className="lg:hidden bg-[#0F0D0B] border-t border-[#C9A96E]/10">
             <div className="px-5 py-6 space-y-1">
-              {navLinks.map(l => (
+              {mobileLinks.map(l => (
                 <Link key={l.to} to={l.to}
                   className={`block py-3.5 text-sm tracking-widest uppercase font-body border-b border-[#C9A96E]/08 transition-colors ${
                     location.pathname === l.to ? 'text-gold' : 'text-ivory/70'
@@ -153,6 +157,13 @@ export default function Navbar() {
                   {tr('nav', 'book')}
                 </Link>
               </div>
+              {/* Account/Admin in mobile */}
+              {isLoggedIn && (
+                <Link to={isAdmin ? '/admin' : '/account'}
+                  className="block py-3.5 text-sm tracking-widest uppercase font-body border-b border-[#C9A96E]/08 text-gold/70 transition-colors">
+                  {isAdmin ? '⚙ Admin' : (lang === 'de' ? 'Mein Konto' : lang === 'en' ? 'My Account' : 'Il mio account')}
+                </Link>
+              )}
               <div className="flex gap-3 pt-4">
                 {supported.map(l => (
                   <button key={l} onClick={() => setLang(l)}

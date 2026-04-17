@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLang } from '@/lib/useLang';
-import { CheckCircle, Clock, XCircle, AlertTriangle, Users, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, AlertTriangle, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
@@ -98,9 +98,29 @@ export default function Admin() {
     if (status === 'confirmed') updates.confirmed_at = new Date().toISOString();
     if (status === 'cancelled') updates.cancelled_at = new Date().toISOString();
     await base44.entities.Reservation.update(id, updates);
-    setReservations(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+    const updated = reservations.map(r => r.id === id ? { ...r, ...updates } : r);
+    setReservations(updated);
     if (selectedRes?.id === id) setSelectedRes(prev => ({ ...prev, ...updates }));
     setUpdatingId(null);
+
+    // Fire notifications after status change
+    const r = reservations.find(res => res.id === id);
+    if (!r) return;
+    if (status === 'cancelled') {
+      base44.functions.invoke('sendCancellationEmail', {
+        reservation_ref: r.reservation_ref,
+        guest_email: r.guest_email,
+        guest_first_name: r.guest_first_name,
+        lang: r.language || 'de',
+      }).catch(() => {});
+      base44.functions.invoke('notifySlack', {
+        type: 'reservation_cancelled',
+        ref: r.reservation_ref,
+        name: `${r.guest_first_name} ${r.guest_last_name}`,
+        date: r.reservation_date,
+        time: r.reservation_time,
+      }).catch(() => {});
+    }
   }
 
   async function updateInquiryStatus(id, status) {
@@ -322,12 +342,18 @@ export default function Admin() {
                     <div className="flex gap-2 flex-shrink-0">
                       {doc.status === 'uploaded' && (
                         <button onClick={async () => {
-                          await base44.entities.GuestDocument.update(doc.id, { status: 'under_review' });
+                          await base44.entities.GuestDocument.update(doc.id, { status: 'under_review', reviewed_by: user?.email, reviewed_at: new Date().toISOString() });
                           setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'under_review' } : d));
                         }} className="px-3 py-1.5 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body tracking-widest uppercase">
                           Prüfen
                         </button>
                       )}
+                      <button onClick={async () => {
+                        const res = await base44.functions.invoke('guestDocumentAccess', { document_id: doc.id });
+                        if (res.data?.signed_url) window.open(res.data.signed_url, '_blank');
+                      }} className="px-3 py-1.5 glass-card border border-[#C9A96E]/15 text-ivory/50 hover:text-gold text-[10px] rounded-lg font-body tracking-widest uppercase flex items-center gap-1">
+                        <Download className="w-3 h-3" /> DL
+                      </button>
                     </div>
                   </div>
                 </div>
