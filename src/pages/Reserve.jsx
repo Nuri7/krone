@@ -19,105 +19,105 @@ function getDaySlots(date) {
 }
 
 function MiniCalendar({ selected, onSelect, lang }) {
-  const [viewDate, setViewDate] = useState(new Date());
-  const locale = LOCALE_MAP[lang] || de;
-  const today = new Date();
-  const maxDate = addDays(today, 90);
+   const [viewDate, setViewDate] = useState(new Date());
+   const locale = LOCALE_MAP[lang] || de;
+   const today = new Date();
+   const maxDate = addDays(today, 90);
 
-  const monthStart = startOfMonth(viewDate);
-  const monthEnd = endOfMonth(viewDate);
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+   const monthStart = startOfMonth(viewDate);
+   const monthEnd = endOfMonth(viewDate);
+   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // pad to start on Monday
-  const startPad = (getDay(monthStart) + 6) % 7;
-  const padDays = Array(startPad).fill(null);
+   // pad to start on Monday
+   const startPad = (getDay(monthStart) + 6) % 7;
+   const padDays = Array(startPad).fill(null);
 
-  const isDisabled = (d) =>
-    isBefore(d, today) ||
-    isAfter(d, maxDate) ||
-    CLOSED_DAYS.includes(getDay(d));
+   const isDisabled = (d) =>
+     isBefore(d, today) ||
+     isAfter(d, maxDate) ||
+     CLOSED_DAYS.includes(getDay(d));
 
-  const dayLabels = lang === 'de'
-    ? ['Mo','Di','Mi','Do','Fr','Sa','So']
-    : lang === 'it'
-    ? ['Lu','Ma','Me','Gi','Ve','Sa','Do']
-    : ['Mo','Tu','We','Th','Fr','Sa','Su'];
+   const dayLabels = lang === 'de'
+     ? ['Mo','Di','Mi','Do','Fr','Sa','So']
+     : lang === 'it'
+     ? ['Lu','Ma','Me','Gi','Ve','Sa','Do']
+     : ['Mo','Tu','We','Th','Fr','Sa','Su'];
 
-  return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 w-full">
+   return (
+     <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-full">
       {/* Month navigation */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <button
           onClick={() => setViewDate(d => subMonths(d, 1))}
           disabled={isBefore(startOfMonth(subMonths(viewDate, 1)), startOfMonth(today))}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5" />
         </button>
-        <h3 className="font-display text-lg font-medium text-stone-800 capitalize">
-          {format(viewDate, 'MMMM yyyy', { locale })}
+        <h3 className="font-display text-sm sm:text-lg font-medium text-stone-800 capitalize text-center flex-1">
+          {format(viewDate, 'MMM yyyy', { locale })}
         </h3>
         <button
           onClick={() => setViewDate(d => addMonths(d, 1))}
           disabled={isAfter(startOfMonth(addMonths(viewDate, 1)), startOfMonth(addDays(today, 90)))}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5" />
         </button>
       </div>
 
       {/* Day labels */}
-      <div className="grid grid-cols-7 mb-2">
+      <div className="grid grid-cols-7 mb-1 gap-0.5">
         {dayLabels.map(d => (
-          <div key={d} className="text-center text-[10px] font-body font-semibold text-stone-400 uppercase tracking-wider py-1">
+          <div key={d} className="text-center text-[9px] sm:text-[10px] font-body font-semibold text-stone-400 uppercase tracking-wider py-0.5">
             {d}
           </div>
         ))}
       </div>
 
       {/* Days grid */}
-      <div className="grid grid-cols-7 gap-y-1">
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-y-1">
         {padDays.map((_, i) => <div key={`pad-${i}`} />)}
         {days.map(day => {
-          const disabled = isDisabled(day);
-          const isSelected = selected && isSameDay(day, new Date(selected));
-          const isToday = isSameDay(day, today);
-          const isClosed = CLOSED_DAYS.includes(getDay(day));
+           const disabled = isDisabled(day);
+           const isSelected = selected && isSameDay(day, new Date(selected));
+           const isToday = isSameDay(day, today);
+           const isClosed = CLOSED_DAYS.includes(getDay(day));
 
-          return (
-            <button
-              key={day.toISOString()}
-              onClick={() => !disabled && onSelect(format(day, 'yyyy-MM-dd'))}
-              disabled={disabled}
-              className={`
-                relative w-full aspect-square flex items-center justify-center rounded-full text-sm font-body transition-all
-                ${isSelected
-                  ? 'bg-[#C9A96E] text-white font-semibold shadow-md'
-                  : disabled
-                  ? isClosed
-                    ? 'text-stone-200 cursor-not-allowed'
-                    : 'text-stone-300 cursor-not-allowed'
-                  : 'text-stone-700 hover:bg-[#C9A96E]/10 hover:text-[#8B6914] cursor-pointer'
-                }
-                ${isToday && !isSelected ? 'ring-1 ring-[#C9A96E]/40 ring-offset-1' : ''}
-              `}
-            >
-              {format(day, 'd')}
-              {isClosed && !disabled && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-stone-300 rounded-full" />
-              )}
-            </button>
-          );
-        })}
+           return (
+             <button
+               key={day.toISOString()}
+               onClick={() => !disabled && onSelect(format(day, 'yyyy-MM-dd'))}
+               disabled={disabled}
+               className={`
+                 relative w-full aspect-square flex items-center justify-center rounded-full text-xs sm:text-sm font-body transition-all
+                 ${isSelected
+                   ? 'bg-[#C9A96E] text-white font-semibold shadow-md'
+                   : disabled
+                   ? isClosed
+                     ? 'text-stone-200 cursor-not-allowed'
+                     : 'text-stone-300 cursor-not-allowed'
+                   : 'text-stone-700 hover:bg-[#C9A96E]/10 hover:text-[#8B6914] cursor-pointer'
+                 }
+                 ${isToday && !isSelected ? 'ring-1 ring-[#C9A96E]/40 ring-offset-1' : ''}
+               `}
+             >
+               {format(day, 'd')}
+               {isClosed && !disabled && (
+                 <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-stone-300 rounded-full" />
+               )}
+             </button>
+           );
+         })}
       </div>
 
-      <div className="mt-4 pt-4 border-t border-stone-100 flex items-center gap-4 text-[10px] font-body text-stone-400">
+      <div className="mt-3 pt-3 border-t border-stone-100 flex flex-wrap gap-2 sm:gap-4 text-[9px] sm:text-[10px] font-body text-stone-400">
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-[#C9A96E] inline-block" />
+          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#C9A96E] inline-block" />
           {lang === 'de' ? 'Ausgewählt' : lang === 'en' ? 'Selected' : 'Selezionato'}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full ring-1 ring-[#C9A96E]/40 inline-block" />
+          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ring-1 ring-[#C9A96E]/40 inline-block" />
           {lang === 'de' ? 'Heute' : lang === 'en' ? 'Today' : 'Oggi'}
         </span>
       </div>
@@ -285,24 +285,24 @@ export default function Reserve() {
   const steps = [c.step1, c.step2, c.step3];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-800 pt-16 pb-28 lg:pb-10">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-800 pt-12 pb-24 lg:pb-10 lg:pt-16">
 
       {/* Hero header */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden -mx-5">
         <div className="absolute inset-0 bg-gradient-to-b from-[#1A1410] to-[#0F0D0B]" />
         <img
           src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=80"
           alt="Restaurant"
           className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
-        <div className="relative z-10 text-center py-16 px-5">
-          <p className="text-[#C9A96E] text-[10px] tracking-[0.5em] uppercase font-body mb-3">Krone Langenburg by Ammesso</p>
-          <h1 className="font-display text-4xl md:text-6xl font-light text-white mb-3">{c.title}</h1>
-          <p className="text-white/50 font-body text-sm tracking-wider">{c.sub}</p>
+        <div className="relative z-10 text-center py-10 lg:py-16 px-5">
+          <p className="text-[#C9A96E] text-[9px] sm:text-[10px] tracking-[0.5em] uppercase font-body mb-2 lg:mb-3">Krone Langenburg by Ammesso</p>
+          <h1 className="font-display text-2xl sm:text-3xl md:text-6xl font-light text-white mb-2 lg:mb-3">{c.title}</h1>
+          <p className="text-white/50 font-body text-xs sm:text-sm tracking-wider">{c.sub}</p>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-5 -mt-4">
+      <div className="max-w-5xl mx-auto px-5 -mt-2 lg:-mt-4">
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-0 mb-10 mt-8">

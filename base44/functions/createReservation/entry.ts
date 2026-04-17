@@ -89,9 +89,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'duplicate' }, { status: 409 });
     }
 
-    // Final capacity check (authoritative)
-    if (used + guests > maxCapacity) {
-      return Response.json({ error: 'full' }, { status: 409 });
+    // LOCK: Re-check capacity immediately before create (prevent race condition)
+    const finalCheck = await base44.asServiceRole.entities.Reservation.filter({
+      reservation_date: date,
+      reservation_time: time,
+      status: { $in: ['pending', 'confirmed'] }
+    });
+    const finalUsed = finalCheck.reduce((sum, r) => sum + (r.party_size || 0), 0);
+    if (finalUsed + guests > maxCapacity) {
+      return Response.json({ error: 'full', retry_after_ms: 2000 }, { status: 409 });
     }
 
     // Create reservation (starts as pending, confirmation email will set to confirmed)
@@ -134,11 +140,16 @@ Deno.serve(async (req) => {
         };
         const template = templates[lang] || templates.de;
         
-        await base44.integrations.Core.SendEmail({
+        const emailResult = await base44.integrations.Core.SendEmail({
           to: email,
           subject: template.subject,
           body: template.body
         });
+        
+        // VALIDATE email actually succeeded before marking as confirmed
+        if (!emailResult) {
+          throw new Error('Email service returned no response');
+        }
         
         // Update reservation to confirmed + mark email sent
         await base44.asServiceRole.entities.Reservation.update(reservation.id, {

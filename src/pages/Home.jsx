@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin, Clock, UtensilsCrossed, BedDouble, Star, ChevronDown, Phone, MessageCircle } from 'lucide-react';
+import { ArrowRight, MapPin, Clock, UtensilsCrossed, BedDouble, Star, ChevronDown, Phone, MessageCircle, Send } from 'lucide-react';
 import { useLang } from '@/lib/useLang';
 import { SITE_DEFAULTS } from '@/lib/siteData';
 
@@ -221,7 +221,7 @@ export default function Home() {
           </div>
 
           <div className={`transition-all duration-1000 delay-800 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
               <Link to="/reserve"
                 className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-9 py-4 btn-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold shadow-gold-glow">
                 <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -232,6 +232,13 @@ export default function Home() {
                 <BedDouble className="w-3.5 h-3.5" />
                 {c.book_room}
               </Link>
+              <a href={`https://wa.me/${s.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hallo%20Krone%20Langenburg`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-9 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold">
+                <Send className="w-3.5 h-3.5" />
+                WhatsApp
+              </a>
             </div>
 
             {/* Location */}
