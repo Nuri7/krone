@@ -27,18 +27,52 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Date must be today or in the future' }, { status: 400 });
     }
 
-    // Validate slot exists & is available (use canonical source)
-    const slotRes = await base44.functions.invoke('getReservationTimeSlots', { date });
-    if (!slotRes.data || !slotRes.data.available_slots) {
-      return Response.json(
-        { error: slotRes.data?.closed_reason || 'Slot validation failed' },
-        { status: 400 }
-      );
+    // Validate slot exists & is available (inline logic, no cross-function call)
+    const settings = await base44.asServiceRole.entities.SiteSettings.filter(
+      { key: 'global' },
+      undefined,
+      1
+    );
+    if (!settings || settings.length === 0) {
+      return Response.json({ error: 'System not initialized' }, { status: 500 });
     }
-    if (!slotRes.data.available_slots.includes(time)) {
-      return Response.json({ error: 'Slot no longer available' }, { status: 400 });
+    
+    const maxCapacity = settings[0].restaurant_max_capacity || 120;
+    
+    // Get opening hours for this date
+    const dayOfWeek = new Date(date).getDay();
+    const hours = await base44.asServiceRole.entities.OpeningHour.filter({
+      entity_type: 'restaurant',
+      day_of_week: dayOfWeek
+    });
+    
+    if (!hours || hours.length === 0 || hours[0].is_closed) {
+      return Response.json({ error: 'Restaurant closed on this date' }, { status: 400 });
     }
-    const maxCapacity = slotRes.data.max_capacity;
+    
+    // Check service windows exist
+    const serviceWindows = hours[0].service_windows || [];
+    if (serviceWindows.length === 0) {
+      return Response.json({ error: 'No service windows available' }, { status: 400 });
+    }
+    
+    // Verify time falls within a bookable service window
+    const timeValid = serviceWindows.some(w => {
+      if (!w.is_bookable) return false;
+      return time >= w.start && time <= w.end;
+    });
+    
+    if (!timeValid) {
+      return Response.json({ error: 'Time not available for booking' }, { status: 400 });
+    }
+    
+    // Get existing reservations for this date/time
+    const existing = await base44.asServiceRole.entities.Reservation.filter({
+      reservation_date: date,
+      reservation_time: time,
+      status: { $in: ['pending', 'confirmed'] }
+    });
+    const used = existing.reduce((sum, r) => sum + (r.party_size || 0), 0);
 
     // Anti-spam: check if same email submitted in last 2 minutes
     const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
@@ -56,7 +90,6 @@ Deno.serve(async (req) => {
     }
 
     // Final capacity check (authoritative)
-    const used = slotRes.data.used_capacity[time] || 0;
     if (used + guests > maxCapacity) {
       return Response.json({ error: 'full' }, { status: 409 });
     }
@@ -81,33 +114,107 @@ Deno.serve(async (req) => {
       slack_notified: false,
     });
 
-    // Fire notifications (non-blocking, via base44 functions)
-    // Email triggers confirmation status change
-    base44.functions.invoke('sendReservationEmail', {
-      ref, first_name, last_name, email, date, time, guests, lang, requests,
-    }).catch(e => {
-      console.error('Email notification failed:', e.message);
-      // Log failure
-      base44.asServiceRole.entities.EmailLog.create({
-        recipient: email,
-        subject: `Reservierung bestätigt — ${ref}`,
-        template: 'reservation_confirmation',
-        language: lang,
-        status: 'failed',
-        failure_reason: e.message,
-        sent_at: new Date().toISOString(),
-        related_entity_type: 'Reservation',
-        related_entity_id: reservation.id,
-        related_ref: ref
-      }).catch(() => {});
-    });
+    // Fire notifications (non-blocking, direct async calls)
+    // Send confirmation email
+    (async () => {
+      try {
+        const templates = {
+          de: {
+            subject: `Reservierung bestätigt — Ref: ${ref}`,
+            body: `<html><body style="font-family:Arial;"><h2>Tischreservierung bestätigt</h2><p>Liebe/r ${first_name} ${last_name},</p><p>vielen Dank für Ihre Reservierung. Wir freuen uns auf Sie!</p><table><tr><td>Datum:</td><td><strong>${date}</strong></td></tr><tr><td>Uhrzeit:</td><td><strong>${time}</strong></td></tr><tr><td>Personen:</td><td><strong>${guests}</strong></td></tr><tr><td>Ref:</td><td><strong>${ref}</strong></td></tr></table><p>Bei Fragen kontaktieren Sie bitte info@krone-ammesso.de</p><p>Viele Grüße,<br>Krone Langenburg Team</p></body></html>`
+          },
+          en: {
+            subject: `Reservation Confirmed — Ref: ${ref}`,
+            body: `<html><body style="font-family:Arial;"><h2>Table Reservation Confirmed</h2><p>Dear ${first_name} ${last_name},</p><p>Thank you for your reservation. We look forward to welcoming you!</p><table><tr><td>Date:</td><td><strong>${date}</strong></td></tr><tr><td>Time:</td><td><strong>${time}</strong></td></tr><tr><td>Guests:</td><td><strong>${guests}</strong></td></tr><tr><td>Ref:</td><td><strong>${ref}</strong></td></tr></table><p>If you have any questions, please contact info@krone-ammesso.de</p><p>Best regards,<br>Krone Langenburg Team</p></body></html>`
+          },
+          it: {
+            subject: `Prenotazione confermata — Ref: ${ref}`,
+            body: `<html><body style="font-family:Arial;"><h2>Prenotazione confermata</h2><p>Caro/a ${first_name} ${last_name},</p><p>Grazie per la vostra prenotazione. Non vediamo l'ora di accogliervi!</p><table><tr><td>Data:</td><td><strong>${date}</strong></td></tr><tr><td>Ora:</td><td><strong>${time}</strong></td></tr><tr><td>Ospiti:</td><td><strong>${guests}</strong></td></tr><tr><td>Ref:</td><td><strong>${ref}</strong></td></tr></table><p>Per domande, contattateci a info@krone-ammesso.de</p><p>Cordiali saluti,<br>Team Krone Langenburg</p></body></html>`
+          }
+        };
+        const template = templates[lang] || templates.de;
+        
+        await base44.integrations.Core.SendEmail({
+          to: email,
+          subject: template.subject,
+          body: template.body
+        });
+        
+        // Update reservation to confirmed + mark email sent
+        await base44.asServiceRole.entities.Reservation.update(reservation.id, {
+          status: 'confirmed',
+          email_sent: true,
+          confirmed_at: new Date().toISOString()
+        });
+        
+        // Log success
+        await base44.asServiceRole.entities.EmailLog.create({
+          recipient: email,
+          subject: template.subject,
+          template: 'reservation_confirmation',
+          language: lang,
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          related_entity_type: 'Reservation',
+          related_entity_id: reservation.id,
+          related_ref: ref
+        });
+      } catch (e) {
+        console.error('Email notification failed:', e.message);
+        await base44.asServiceRole.entities.EmailLog.create({
+          recipient: email,
+          subject: `Reservation ${ref}`,
+          template: 'reservation_confirmation',
+          language: lang,
+          status: 'failed',
+          failure_reason: e.message,
+          sent_at: new Date().toISOString(),
+          related_entity_type: 'Reservation',
+          related_entity_id: reservation.id,
+          related_ref: ref
+        }).catch(() => {});
+      }
+    })();
 
-    // Slack notification
-    base44.functions.invoke('notifySlack', {
-      type: 'reservation', ref,
-      name: `${first_name} ${last_name}`,
-      date, time, guests, lang,
-    }).catch(e => console.error('Slack notification failed:', e.message));
+    // Send Slack notification (non-blocking)
+    (async () => {
+      try {
+        const webhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
+        if (!webhookUrl) return;
+        
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            blocks: [
+              { type: 'header', text: { type: 'plain_text', text: '🍽️ Neue Tischreservierung', emoji: true } },
+              {
+                type: 'section',
+                fields: [
+                  { type: 'mrkdwn', text: `*Ref:*\n${ref}` },
+                  { type: 'mrkdwn', text: `*Name:*\n${first_name} ${last_name}` },
+                  { type: 'mrkdwn', text: `*Datum:*\n${date}` },
+                  { type: 'mrkdwn', text: `*Zeit:*\n${time}` },
+                  { type: 'mrkdwn', text: `*Personen:*\n${guests}` },
+                  { type: 'mrkdwn', text: `*Sprache:*\n${lang.toUpperCase()}` },
+                ]
+              }
+            ]
+          })
+        });
+        
+        await base44.asServiceRole.entities.SlackLog.create({
+          channel: '#krone-reservations',
+          message_type: 'new_reservation',
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          related_entity_type: 'Reservation',
+          related_ref: ref
+        });
+      } catch (e) {
+        console.error('Slack notification failed:', e.message);
+      }
+    })();
 
     return Response.json({ success: true, ref, reservation_id: reservation.id });
   } catch (error) {
