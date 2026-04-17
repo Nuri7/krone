@@ -120,10 +120,13 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {/* Reserve CTA */}
-              <Link to="/reserve"
-                className="hidden md:inline-flex items-center px-5 py-2.5 btn-gold rounded-full text-xs tracking-widest uppercase font-body font-semibold">
-                {tr('nav', 'reserve')}
+              {/* Mein Bereich CTA */}
+              <Link to={isAdmin ? '/admin' : '/account'}
+                className="hidden md:inline-flex items-center gap-1.5 px-5 py-2.5 btn-ghost-gold rounded-full text-xs tracking-widest uppercase font-body font-semibold">
+                <UserCircle className="w-4 h-4" />
+                {isAdmin
+                  ? (lang === 'de' ? 'Admin' : 'Admin')
+                  : (lang === 'de' ? 'Mein Bereich' : lang === 'en' ? 'My Account' : 'Il mio profilo')}
               </Link>
 
               {/* Mobile toggle */}
