@@ -16,6 +16,7 @@ import Story from './pages/Story';
 import Contact from './pages/Contact';
 import Legal from './pages/Legal';
 import BookingReturn from './pages/BookingReturn';
+import Restaurant from './pages/Restaurant';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/booking-return" element={<BookingReturn />} />
+        <Route path="/restaurant" element={<Restaurant />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
