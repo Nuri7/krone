@@ -1,0 +1,81 @@
+{
+  "name": "ContactInquiry",
+  "type": "object",
+  "properties": {
+    "inquiry_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "wedding",
+        "group",
+        "business",
+        "event",
+        "press"
+      ],
+      "default": "general"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_review",
+        "replied",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
+    },
+    "email_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "slack_notified": {
+      "type": "boolean",
+      "default": false
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "replied_at": {
+      "type": "string"
+    },
+    "preferred_date": {
+      "type": "string"
+    },
+    "guest_count": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "email",
+    "message"
+  ]
+}

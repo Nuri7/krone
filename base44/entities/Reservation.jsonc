@@ -1,0 +1,97 @@
+{
+  "name": "Reservation",
+  "type": "object",
+  "properties": {
+    "reservation_ref": {
+      "type": "string",
+      "description": "Auto-generated unique reference"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "no_show",
+        "completed"
+      ],
+      "default": "pending"
+    },
+    "guest_first_name": {
+      "type": "string"
+    },
+    "guest_last_name": {
+      "type": "string"
+    },
+    "guest_email": {
+      "type": "string"
+    },
+    "guest_phone": {
+      "type": "string"
+    },
+    "reservation_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reservation_time": {
+      "type": "string"
+    },
+    "party_size": {
+      "type": "number"
+    },
+    "special_requests": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "website",
+        "phone",
+        "walk_in",
+        "email"
+      ],
+      "default": "website"
+    },
+    "email_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "slack_notified": {
+      "type": "boolean",
+      "default": false
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "cancellation_reason": {
+      "type": "string"
+    },
+    "cancelled_at": {
+      "type": "string"
+    },
+    "confirmed_at": {
+      "type": "string"
+    },
+    "duplicate_check_key": {
+      "type": "string",
+      "description": "email+date+time hash for dedup"
+    }
+  },
+  "required": [
+    "guest_first_name",
+    "guest_last_name",
+    "guest_email",
+    "reservation_date",
+    "reservation_time",
+    "party_size"
+  ]
+}

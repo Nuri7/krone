@@ -1,0 +1,73 @@
+{
+  "name": "BookingIntent",
+  "type": "object",
+  "properties": {
+    "intent_ref": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "initiated",
+        "redirected",
+        "returned_confirmed",
+        "returned_pending",
+        "returned_cancelled",
+        "completed",
+        "abandoned"
+      ],
+      "default": "initiated"
+    },
+    "check_in": {
+      "type": "string",
+      "format": "date"
+    },
+    "check_out": {
+      "type": "string",
+      "format": "date"
+    },
+    "guests_adults": {
+      "type": "number"
+    },
+    "guests_children": {
+      "type": "number"
+    },
+    "room_interest": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
+    },
+    "source_page": {
+      "type": "string"
+    },
+    "guest_email": {
+      "type": "string"
+    },
+    "guest_name": {
+      "type": "string"
+    },
+    "beds24_booking_ref": {
+      "type": "string"
+    },
+    "redirected_at": {
+      "type": "string"
+    },
+    "returned_at": {
+      "type": "string"
+    },
+    "beds24_url_used": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,102 @@
+{
+  "name": "SiteSettings",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Unique settings key, e.g. 'global'"
+    },
+    "hotel_name": {
+      "type": "string"
+    },
+    "tagline_de": {
+      "type": "string"
+    },
+    "tagline_en": {
+      "type": "string"
+    },
+    "tagline_it": {
+      "type": "string"
+    },
+    "address_street": {
+      "type": "string"
+    },
+    "address_city": {
+      "type": "string"
+    },
+    "address_zip": {
+      "type": "string"
+    },
+    "address_country": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email_info": {
+      "type": "string"
+    },
+    "email_reservations": {
+      "type": "string"
+    },
+    "beds24_prop_id": {
+      "type": "string"
+    },
+    "beds24_booking_url": {
+      "type": "string"
+    },
+    "restaurant_capacity": {
+      "type": "number"
+    },
+    "restaurant_closed_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "0=Sunday, 1=Monday, etc."
+    },
+    "restaurant_lunch_start": {
+      "type": "string"
+    },
+    "restaurant_lunch_end": {
+      "type": "string"
+    },
+    "restaurant_dinner_start": {
+      "type": "string"
+    },
+    "restaurant_dinner_end": {
+      "type": "string"
+    },
+    "restaurant_sunday_start": {
+      "type": "string"
+    },
+    "restaurant_sunday_end": {
+      "type": "string"
+    },
+    "social_instagram": {
+      "type": "string"
+    },
+    "social_facebook": {
+      "type": "string"
+    },
+    "social_tripadvisor": {
+      "type": "string"
+    },
+    "whatsapp_number": {
+      "type": "string"
+    },
+    "breakfast_price": {
+      "type": "number"
+    },
+    "migration_conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Detected conflicts from old site migration"
+    }
+  },
+  "required": [
+    "key"
+  ]
+}
