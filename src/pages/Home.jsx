@@ -1,343 +1,481 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin, Clock, UtensilsCrossed, BedDouble, Star, ChevronDown } from 'lucide-react';
+import { ArrowRight, MapPin, Clock, UtensilsCrossed, BedDouble, Star, ChevronDown, Phone, MessageCircle } from 'lucide-react';
 import { useLang } from '@/lib/useLang';
 import { SITE_DEFAULTS } from '@/lib/siteData';
 
 const IMAGES = {
   hero: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1800&q=85",
   dining: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1000&q=80",
+  pasta: "https://images.unsplash.com/photo-1551183053-bf91798d792e?w=800&q=80",
   room1: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
   room2: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80",
+  room3: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80",
   chef: "https://static.wixstatic.com/media/e6b39b_b2703a4b8aa7481b9e9ec3a3a9eb6892~mv2.webp/v1/fill/w_324,h_434,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ammesso-6512-1bfcdeba.webp",
   exterior: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&q=80",
+  wedding: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1200&q=80",
+  hohenlohe: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
 };
 
-function AnimatedSection({ children, className = '' }) {
+function useInView(threshold = 0.12) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.15 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, []);
+  return [ref, visible];
+}
+
+function FadeUp({ children, delay = 0, className = '' }) {
+  const [ref, visible] = useInView();
   return (
-    <div ref={ref} className={`transition-all duration-1000 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}>
+    <div ref={ref} style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-1000 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} ${className}`}>
       {children}
     </div>
   );
 }
 
+const REVIEWS = [
+  { name: 'Maria K.', stars: 5, de: 'Außergewöhnliches Erlebnis — das Essen war auf einem anderen Niveau. Wir kommen definitiv wieder.', en: 'An extraordinary experience — the food was on another level. We will definitely come back.', it: 'Un\'esperienza straordinaria — il cibo era a un altro livello. Torneremo sicuramente.' },
+  { name: 'Thomas B.', stars: 5, de: 'Das schönste Restaurant in der Region. Authentisch, herzlich, und jedes Gericht eine Offenbarung.', en: 'The most beautiful restaurant in the region. Authentic, warm, and every dish a revelation.', it: 'Il ristorante più bello della regione. Autentico, caloroso, ogni piatto una rivelazione.' },
+  { name: 'Sophie L.', stars: 5, de: 'Wir haben unsere Hochzeit hier gefeiert. Alles war perfekt — das Ambiente, das Essen, das Team.', en: 'We celebrated our wedding here. Everything was perfect — the atmosphere, the food, the team.', it: 'Abbiamo celebrato il nostro matrimonio qui. Tutto era perfetto.' },
+];
+
 export default function Home() {
-  const { tr, lang } = useLang();
+  const { lang } = useLang();
   const s = SITE_DEFAULTS;
   const [heroLoaded, setHeroLoaded] = useState(false);
+  const [activeReview, setActiveReview] = useState(0);
 
-  const content = {
+  useEffect(() => {
+    const t = setInterval(() => setActiveReview(r => (r + 1) % REVIEWS.length), 5000);
+    return () => clearInterval(t);
+  }, []);
+
+  const C = {
     de: {
-      hero_title: "Wo Heimat schmeckt",
-      hero_sub: "echt · herzlich · hausgemacht",
-      hero_tagline: "Krone Langenburg by Ammesso",
-      restaurant_title: "Kulinarium by Ammesso",
-      restaurant_text: "Mediterrane Küche mit Herz und Persönlichkeit. Jedes Gericht erzählt eine Geschichte – mit Leidenschaft und hochwertigen Zutaten.",
-      rooms_title: "Zimmer & Suiten",
-      rooms_text: "Ruhige, stilvolle Unterkunft mitten im Herzen Hohenlohes. Erwachen Sie mit dem Charme eines historischen Hauses.",
-      story_title: "Ein Traum, der seit Jahren köchelt",
-      story_text: "Seit der ersten Idee bis heute – jede Zutat, jede Technik und jede Geschichte in unserem Restaurant ist mit Leidenschaft gewachsen.",
-      reserve_cta: "Tisch reservieren",
-      book_cta: "Zimmer buchen",
-      menu_cta: "Speisekarte",
-      story_cta: "Unsere Geschichte",
-      direct_book: "Direktbucher-Preise garantiert",
-      no_fees: "Keine Buchungsgebühren",
-      hours_title: "Öffnungszeiten",
-      closed: "Ruhetag",
-      trust_title: "Bereit für einen unvergesslichen Abend?",
+      hero_eyebrow: 'Krone Langenburg by Ammesso',
+      hero_title: 'Wo Heimat schmeckt.',
+      hero_sub: 'Mediterrane Küche mit Herz. Stilvolle Zimmer im historischen Herz Hohenlohes.',
+      reserve: 'Tisch reservieren',
+      book_room: 'Zimmer buchen',
+      scroll: 'Entdecken',
+      hours_title: 'Öffnungszeiten',
+      closed: 'Ruhetag',
+      dining_eyebrow: 'Kulinarium by Ammesso',
+      dining_title: 'Mediterrane Seele. Hohenloher Herz.',
+      dining_p1: 'Im Kulinarium by Ammesso begegnen sich zwei Welten: die lebendige Aromenvielfalt des Mittelmeerraums und die ehrliche Bodenständigkeit Hohenlohes. Chef Omar Ammesso kocht nicht für den Trend — er kocht für den Moment.',
+      dining_p2: 'Handgemachte Pasta, langsam geschmorte Fleischgerichte, saisonale Zutaten vom Wochenmarkt. Jedes Gericht ist eine persönliche Geschichte — ausgedrückt in Geschmack.',
+      menu_cta: 'Zur Speisekarte',
+      rooms_eyebrow: 'Unterkunft',
+      rooms_title: 'Schlafen, wo Geschichte wohnt.',
+      rooms_p: 'Unsere Zimmer und Suiten verbinden historisches Flair mit modernem Komfort. Wachen Sie auf im Herzen von Langenburg — still, warm, vollständig.',
+      rooms_trust: 'Direktbucher-Preise · Keine Gebühren · Frühstück auf Anfrage',
+      rooms_cta: 'Zimmer & Preise',
+      story_eyebrow: 'Unsere Geschichte',
+      story_title: 'Ein Traum, der schmeckt.',
+      story_p: 'Omar Ammesso ist kein gelernter Koch — er ist ein Besessener. Aufgewachsen zwischen zwei Kulturen, destilliert er in jedem Gericht das Beste aus beiden Welten. Die Krone Langenburg ist sein Zuhause. Und wenn Sie bei uns essen, sind Sie Teil davon.',
+      story_cta: 'Die Geschichte lesen',
+      weddings_eyebrow: 'Hochzeiten & Events',
+      weddings_title: 'Ihr besonderer Tag. Unser ganzes Herz.',
+      weddings_p: 'Von der Traumhochzeit bis zum Firmenevent — wir schaffen unvergessliche Momente mit Leidenschaft und Liebe zum Detail. Raumkontingente, Private Dining, exklusive Abende.',
+      weddings_cta: 'Jetzt anfragen',
+      trust_eyebrow: 'Warum die Krone?',
+      trust_1_title: 'Authentisch',
+      trust_1: 'Kein Franchise, kein Konzept. Echte Küche, echte Menschen, echtes Hohenlohe.',
+      trust_2_title: 'Persönlich',
+      trust_2: 'Vom ersten Tisch bis zur letzten Suite kennen wir jeden Gast beim Namen.',
+      trust_3_title: 'Historisch',
+      trust_3: 'Ein Haus mit Geschichte — restauriert mit Respekt für das Original.',
+      trust_4_title: 'Leidenschaftlich',
+      trust_4: 'Hinter jedem Gericht steckt ein Mensch mit einer Geschichte.',
+      review_title: 'Was Gäste sagen',
+      cta_title: 'Bereit für einen Abend, den Sie nicht vergessen?',
+      cta_sub: 'Reservieren Sie Ihren Tisch oder buchen Sie Ihr Zimmer — direkt, ohne Aufpreis.',
+      phone_cta: 'Anrufen',
+      location_label: 'Langenburg, Hohenlohe',
     },
     en: {
-      hero_title: "Where Home Tastes Real",
-      hero_sub: "genuine · warm · handcrafted",
-      hero_tagline: "Krone Langenburg by Ammesso",
-      restaurant_title: "Kulinarium by Ammesso",
-      restaurant_text: "Mediterranean cuisine with heart and personality. Every dish tells a story — with passion and quality ingredients.",
-      rooms_title: "Rooms & Suites",
-      rooms_text: "Quiet, stylish accommodation in the heart of Hohenlohe. Wake up to the charm of a historic property.",
-      story_title: "A Dream Years in the Making",
-      story_text: "From the first idea to today — every ingredient, technique and story in our restaurant has grown with passion.",
-      reserve_cta: "Reserve a Table",
-      book_cta: "Book a Room",
-      menu_cta: "View Menu",
-      story_cta: "Our Story",
-      direct_book: "Best Direct Booking Rates",
-      no_fees: "No Booking Fees",
-      hours_title: "Opening Hours",
-      closed: "Closed",
-      trust_title: "Ready for an unforgettable evening?",
+      hero_eyebrow: 'Krone Langenburg by Ammesso',
+      hero_title: 'Where Home Tastes Real.',
+      hero_sub: 'Mediterranean cuisine with heart. Stylish rooms in the historic heart of Hohenlohe.',
+      reserve: 'Reserve a Table',
+      book_room: 'Book a Room',
+      scroll: 'Discover',
+      hours_title: 'Opening Hours',
+      closed: 'Closed',
+      dining_eyebrow: 'Kulinarium by Ammesso',
+      dining_title: 'Mediterranean Soul. Hohenlohe Heart.',
+      dining_p1: 'At Kulinarium by Ammesso, two worlds meet: the vibrant flavors of the Mediterranean and the honest groundedness of Hohenlohe. Chef Omar Ammesso doesn\'t cook for trends — he cooks for the moment.',
+      dining_p2: 'Handmade pasta, slow-braised meats, seasonal ingredients from the market. Every dish is a personal story — expressed in taste.',
+      menu_cta: 'View Menu',
+      rooms_eyebrow: 'Accommodation',
+      rooms_title: 'Sleep Where History Lives.',
+      rooms_p: 'Our rooms and suites combine historic character with modern comfort. Wake up in the heart of Langenburg — quiet, warm, complete.',
+      rooms_trust: 'Direct rates · No fees · Breakfast on request',
+      rooms_cta: 'Rooms & Rates',
+      story_eyebrow: 'Our Story',
+      story_title: 'A Dream That Tastes.',
+      story_p: 'Omar Ammesso is not a trained chef — he is an obsessive. Raised between two cultures, he distills the best of both worlds into every dish. Krone Langenburg is his home. And when you dine with us, you become part of it.',
+      story_cta: 'Read the Story',
+      weddings_eyebrow: 'Weddings & Events',
+      weddings_title: 'Your Special Day. Our Whole Heart.',
+      weddings_p: 'From dream weddings to corporate events — we create unforgettable moments with passion and attention to detail. Room contingents, private dining, exclusive evenings.',
+      weddings_cta: 'Enquire Now',
+      trust_eyebrow: 'Why the Krone?',
+      trust_1_title: 'Authentic',
+      trust_1: 'No franchise, no concept. Real food, real people, real Hohenlohe.',
+      trust_2_title: 'Personal',
+      trust_2: 'From the first table to the last suite, we know every guest by name.',
+      trust_3_title: 'Historic',
+      trust_3: 'A house with history — restored with respect for the original.',
+      trust_4_title: 'Passionate',
+      trust_4: 'Behind every dish is a person with a story.',
+      review_title: 'What Guests Say',
+      cta_title: 'Ready for an evening you won\'t forget?',
+      cta_sub: 'Reserve your table or book your room — directly, without fees.',
+      phone_cta: 'Call Us',
+      location_label: 'Langenburg, Hohenlohe',
     },
     it: {
-      hero_title: "Dove il gusto è di casa",
-      hero_sub: "autentico · caloroso · artigianale",
-      hero_tagline: "Krone Langenburg by Ammesso",
-      restaurant_title: "Kulinarium by Ammesso",
-      restaurant_text: "Cucina mediterranea con cuore e personalità. Ogni piatto racconta una storia — con passione e ingredienti di qualità.",
-      rooms_title: "Camere & Suite",
-      rooms_text: "Alloggio tranquillo e raffinato nel cuore dell'Hohenlohe. Svegliatevi con il fascino di una proprietà storica.",
-      story_title: "Un sogno cucinato per anni",
-      story_text: "Dalla prima idea ad oggi — ogni ingrediente, tecnica e storia nel nostro ristorante è cresciuta con passione.",
-      reserve_cta: "Prenota un tavolo",
-      book_cta: "Prenota una camera",
-      menu_cta: "Vedi il menu",
-      story_cta: "La nostra storia",
-      direct_book: "Prezzi diretti garantiti",
-      no_fees: "Nessuna commissione",
-      hours_title: "Orari di apertura",
-      closed: "Chiuso",
-      trust_title: "Pronto per una serata indimenticabile?",
+      hero_eyebrow: 'Krone Langenburg by Ammesso',
+      hero_title: 'Dove il gusto è di casa.',
+      hero_sub: 'Cucina mediterranea con cuore. Camere eleganti nel cuore storico dell\'Hohenlohe.',
+      reserve: 'Prenota un tavolo',
+      book_room: 'Prenota una camera',
+      scroll: 'Scopri',
+      hours_title: 'Orari di apertura',
+      closed: 'Chiuso',
+      dining_eyebrow: 'Kulinarium by Ammesso',
+      dining_title: 'Anima mediterranea. Cuore dell\'Hohenlohe.',
+      dining_p1: 'Al Kulinarium by Ammesso si incontrano due mondi: la vivace varietà di sapori del Mediterraneo e l\'onesta concretezza dell\'Hohenlohe. Lo chef Omar Ammesso non cucina per le tendenze — cucina per il momento.',
+      dining_p2: 'Pasta fatta a mano, carni a cottura lenta, ingredienti stagionali dal mercato. Ogni piatto è una storia personale — espressa nel sapore.',
+      menu_cta: 'Vedi il menu',
+      rooms_eyebrow: 'Alloggio',
+      rooms_title: 'Dormire dove vive la storia.',
+      rooms_p: 'Le nostre camere e suite combinano il fascino storico con il comfort moderno. Svegliatevi nel cuore di Langenburg — tranquillo, caldo, completo.',
+      rooms_trust: 'Prezzi diretti · Nessuna commissione · Colazione su richiesta',
+      rooms_cta: 'Camere e prezzi',
+      story_eyebrow: 'La nostra storia',
+      story_title: 'Un sogno che sa di buono.',
+      story_p: 'Omar Ammesso non è uno chef di formazione — è un ossessionato. Cresciuto tra due culture, distilla il meglio di entrambi i mondi in ogni piatto. Krone Langenburg è la sua casa. E quando cenate con noi, ne fate parte.',
+      story_cta: 'Leggi la storia',
+      weddings_eyebrow: 'Matrimoni & eventi',
+      weddings_title: 'Il vostro giorno speciale. Tutto il nostro cuore.',
+      weddings_p: 'Dal matrimonio dei sogni agli eventi aziendali — creiamo momenti indimenticabili con passione e cura per i dettagli.',
+      weddings_cta: 'Richiedi ora',
+      trust_eyebrow: 'Perché la Krone?',
+      trust_1_title: 'Autentico',
+      trust_1: 'Nessun franchising, nessun concept. Cibo vero, persone vere, Hohenlohe vero.',
+      trust_2_title: 'Personale',
+      trust_2: 'Dal primo tavolo all\'ultima suite, conosciamo ogni ospite per nome.',
+      trust_3_title: 'Storico',
+      trust_3: 'Una casa con storia — restaurata con rispetto per l\'originale.',
+      trust_4_title: 'Appassionato',
+      trust_4: 'Dietro ogni piatto c\'è una persona con una storia.',
+      review_title: 'Cosa dicono gli ospiti',
+      cta_title: 'Pronto per una serata che non dimenticherete?',
+      cta_sub: 'Prenotate il vostro tavolo o la vostra camera — direttamente, senza commissioni.',
+      phone_cta: 'Chiama',
+      location_label: 'Langenburg, Hohenlohe',
     },
   };
-  const c = content[lang] || content.de;
+  const c = C[lang] || C.de;
 
   return (
-    <div className="bg-charcoal text-ivory pb-20 lg:pb-0">
+    <div className="bg-charcoal text-ivory overflow-x-hidden pb-20 lg:pb-0">
 
-      {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background */}
-        <img src={IMAGES.hero} alt="Krone Langenburg by Ammesso"
+      {/* ── HERO ────────────────────────────────────────── */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        <img src={IMAGES.hero} alt="Krone Langenburg"
           onLoad={() => setHeroLoaded(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${heroLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full object-cover scale-105 transition-all duration-[2s] ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
           loading="eager" />
-        {/* Multi-layer overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/70 via-charcoal/40 to-charcoal/85" />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/30 via-transparent to-charcoal/30" />
+        {/* Layered overlays for depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/75 via-charcoal/35 to-charcoal/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/40 via-transparent to-charcoal/40" />
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-charcoal to-transparent" />
 
-        {/* Content */}
-        <div className="relative z-10 text-center px-5 max-w-4xl mx-auto pt-24">
-          <div className={`transition-all duration-1000 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body font-medium mb-6">
-              {c.hero_tagline}
-            </p>
+        <div className="relative z-10 text-center px-5 max-w-5xl mx-auto flex-1 flex flex-col items-center justify-center pt-24">
+          <div className={`transition-all duration-1000 delay-200 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px w-10 bg-gold/40" />
+              <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body font-medium">{c.hero_eyebrow}</p>
+              <div className="h-px w-10 bg-gold/40" />
+            </div>
           </div>
-          <div className={`transition-all duration-1000 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-ivory leading-[1.05] tracking-tight mb-4">
+
+          <div className={`transition-all duration-1000 delay-400 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <h1 className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-[108px] font-light text-ivory leading-[0.95] tracking-tight mb-6">
               {c.hero_title}
             </h1>
           </div>
-          <div className={`transition-all duration-1000 delay-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <p className="text-ivory/50 text-sm sm:text-base tracking-[0.25em] uppercase font-body mb-10">
+
+          <div className={`transition-all duration-1000 delay-600 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <p className="text-ivory/55 text-sm sm:text-base md:text-lg font-body font-light leading-relaxed max-w-2xl mb-10">
               {c.hero_sub}
             </p>
           </div>
-          <div className={`transition-all duration-1000 delay-1000 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+          <div className={`transition-all duration-1000 delay-800 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               <Link to="/reserve"
-                className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
+                className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-9 py-4 btn-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold shadow-gold-glow">
                 <UtensilsCrossed className="w-3.5 h-3.5" />
-                {c.reserve_cta}
+                {c.reserve}
               </Link>
               <Link to="/rooms"
-                className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+                className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-9 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold">
                 <BedDouble className="w-3.5 h-3.5" />
-                {c.book_cta}
+                {c.book_room}
               </Link>
             </div>
-          </div>
 
-          {/* Location */}
-          <div className={`mt-12 flex items-center justify-center gap-2 text-ivory/35 text-xs font-body transition-all duration-1000 delay-1200 ${heroLoaded ? 'opacity-100' : 'opacity-0'}`}>
-            <MapPin className="w-3.5 h-3.5 text-gold/50" />
-            <span className="tracking-wider">{s.address_street}, {s.address_zip} {s.address_city}</span>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-5 h-5 text-gold/40" />
-        </div>
-      </section>
-
-      {/* ── BRAND STRIP ──────────────────────────────────────── */}
-      <section className="py-16 px-5 border-y border-[#C9A96E]/10 bg-espresso">
-        <AnimatedSection>
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="section-divider mb-8" />
-            <p className="font-display text-2xl md:text-3xl lg:text-4xl font-light text-ivory leading-relaxed italic">
-              {lang === 'de' && <>&ldquo;Wo Heimat schmeckt — echt, herzlich, hausgemacht.&rdquo;</>}
-              {lang === 'en' && <>&ldquo;Where home tastes real — genuine, warm, handcrafted.&rdquo;</>}
-              {lang === 'it' && <>&ldquo;Dove il gusto è di casa — autentico, caloroso, artigianale.&rdquo;</>}
-            </p>
-            <div className="section-divider mt-8" />
-          </div>
-        </AnimatedSection>
-      </section>
-
-      {/* ── HOURS ────────────────────────────────────────────── */}
-      <section className="py-14 px-5 bg-charcoal">
-        <AnimatedSection>
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-3 justify-center mb-8">
-              <Clock className="w-4 h-4 text-gold/60" />
-              <span className="text-ivory/30 text-[10px] tracking-[0.4em] uppercase font-body">{c.hours_title}</span>
+            {/* Location */}
+            <div className="mt-10 flex items-center justify-center gap-2 text-ivory/30 text-xs font-body">
+              <MapPin className="w-3.5 h-3.5 text-gold/40" />
+              <span className="tracking-wider">{s.address_street} · {s.address_zip} {s.address_city}</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          </div>
+        </div>
+
+        {/* Hours strip */}
+        <div className={`relative z-10 w-full mt-auto transition-all duration-1000 delay-1000 ${heroLoaded ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="border-t border-[#C9A96E]/15 bg-charcoal/60 backdrop-blur-md">
+            <div className="max-w-3xl mx-auto px-5 py-4 grid grid-cols-3 divide-x divide-[#C9A96E]/15">
               {[
-                { day: lang === 'de' ? 'Montag' : lang === 'en' ? 'Monday' : 'Lunedì', hours: c.closed, dim: true },
-                { day: lang === 'de' ? 'Di – Sa' : lang === 'en' ? 'Tue – Sat' : 'Mar – Sab', hours: ['12:00 – 14:30', '17:30 – 22:00'] },
-                { day: lang === 'de' ? 'Sonntag' : lang === 'en' ? 'Sunday' : 'Domenica', hours: ['12:00 – 20:00'] },
+                { d: lang === 'de' ? 'Montag' : lang === 'en' ? 'Monday' : 'Lunedì', h: c.closed, dim: true },
+                { d: lang === 'de' ? 'Di – Sa' : lang === 'en' ? 'Tue – Sat' : 'Mar – Sab', h: '12:00–14:30 · 17:30–22:00' },
+                { d: lang === 'de' ? 'Sonntag' : lang === 'en' ? 'Sunday' : 'Domenica', h: '12:00–20:00' },
               ].map((item, i) => (
-                <div key={i} className={`glass-card rounded-xl p-5 text-center ${item.dim ? 'opacity-40' : ''}`}>
-                  <p className="text-ivory/40 text-[10px] tracking-[0.3em] uppercase font-body mb-2">{item.day}</p>
-                  {Array.isArray(item.hours)
-                    ? item.hours.map((h, j) => <p key={j} className="text-ivory text-sm font-body">{h}</p>)
-                    : <p className="text-ivory/60 text-sm font-body">{item.hours}</p>
-                  }
+                <div key={i} className={`px-4 text-center ${item.dim ? 'opacity-30' : ''}`}>
+                  <p className="text-ivory/35 text-[9px] tracking-[0.3em] uppercase font-body mb-0.5">{item.d}</p>
+                  <p className="text-ivory/70 text-xs font-body">{item.h}</p>
                 </div>
               ))}
             </div>
           </div>
-        </AnimatedSection>
+        </div>
+
+        {/* Scroll */}
+        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-ivory/25">
+          <span className="text-[9px] tracking-[0.4em] uppercase font-body">{c.scroll}</span>
+          <ChevronDown className="w-4 h-4 animate-bounce" />
+        </div>
       </section>
 
-      {/* ── RESTAURANT ───────────────────────────────────────── */}
-      <section className="py-20 px-5">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <AnimatedSection>
-            <div className="relative rounded-2xl overflow-hidden h-80 md:h-[480px] shadow-premium hover-lift">
-              <img src={IMAGES.dining} alt="Kulinarium by Ammesso" className="w-full h-full object-cover" loading="lazy" />
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent" />
-              <div className="absolute bottom-5 left-5">
-                <span className="bg-gold/90 text-charcoal text-[10px] font-body font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                  Kulinarium by Ammesso
-                </span>
+      {/* ── DINING ──────────────────────────────────────── */}
+      <section className="py-24 px-5">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <FadeUp>
+            <div className="relative">
+              {/* Stacked images for depth */}
+              <div className="absolute -top-4 -right-4 w-2/5 h-48 rounded-xl overflow-hidden shadow-premium opacity-70">
+                <img src={IMAGES.pasta} alt="Pasta" className="w-full h-full object-cover" loading="lazy" />
+              </div>
+              <div className="relative rounded-2xl overflow-hidden h-[420px] md:h-[520px] shadow-premium">
+                <img src={IMAGES.dining} alt="Kulinarium Dining" className="w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-charcoal/10 to-transparent" />
+                <div className="absolute bottom-6 left-6">
+                  <span className="bg-gold text-charcoal text-[9px] font-body font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.2em]">
+                    Kulinarium by Ammesso
+                  </span>
+                </div>
               </div>
             </div>
-          </AnimatedSection>
-          <AnimatedSection>
-            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-4">{lang === 'de' ? 'Restaurant' : 'Restaurant'}</p>
-            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-5 leading-tight">{c.restaurant_title}</h2>
-            <p className="text-ivory/55 leading-relaxed font-body mb-8">{c.restaurant_text}</p>
+          </FadeUp>
+
+          <FadeUp delay={150}>
+            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-5">{c.dining_eyebrow}</p>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-light text-ivory mb-6 leading-[1.05]">{c.dining_title}</h2>
+            <p className="text-ivory/60 leading-relaxed font-body mb-4">{c.dining_p1}</p>
+            <p className="text-ivory/45 leading-relaxed font-body text-sm mb-10">{c.dining_p2}</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/reserve"
-                className="flex items-center justify-center gap-2 px-6 py-3.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
-                {c.reserve_cta}
+                className="flex items-center justify-center gap-2 px-7 py-3.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+                <UtensilsCrossed className="w-3.5 h-3.5" /> {c.reserve}
               </Link>
               <Link to="/menu"
-                className="flex items-center justify-center gap-2 px-6 py-3.5 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+                className="flex items-center justify-center gap-2 px-7 py-3.5 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
                 {c.menu_cta} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-          </AnimatedSection>
+          </FadeUp>
         </div>
       </section>
 
-      {/* ── ROOMS ─────────────────────────────────────────────── */}
-      <section className="py-20 px-5 bg-espresso">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <AnimatedSection className="order-2 md:order-1">
-            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-4">
-              {lang === 'de' ? 'Unterkunft' : lang === 'en' ? 'Accommodation' : 'Alloggio'}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-5 leading-tight">{c.rooms_title}</h2>
-            <p className="text-ivory/55 leading-relaxed font-body mb-6">{c.rooms_text}</p>
-            <div className="flex items-center gap-2 text-xs text-ivory/40 font-body mb-8">
-              <Star className="w-3.5 h-3.5 text-gold/60" />
-              <span>{c.direct_book} · {c.no_fees}</span>
+      {/* ── ROOMS ───────────────────────────────────────── */}
+      <section className="py-24 px-5 bg-espresso">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <FadeUp className="order-2 lg:order-1">
+            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-5">{c.rooms_eyebrow}</p>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-light text-ivory mb-6 leading-[1.05]">{c.rooms_title}</h2>
+            <p className="text-ivory/60 leading-relaxed font-body mb-6">{c.rooms_p}</p>
+            <div className="flex items-center gap-2 text-ivory/35 text-xs font-body mb-10">
+              <Star className="w-3.5 h-3.5 text-gold/50 fill-gold/20" />
+              <span>{c.rooms_trust}</span>
             </div>
             <Link to="/rooms"
-              className="inline-flex items-center gap-2 px-6 py-3.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
-              {c.book_cta} <ArrowRight className="w-3.5 h-3.5" />
+              className="inline-flex items-center gap-2 px-7 py-3.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+              {c.rooms_cta} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </AnimatedSection>
-          <AnimatedSection className="order-1 md:order-2">
+          </FadeUp>
+
+          <FadeUp delay={150} className="order-1 lg:order-2">
             <div className="grid grid-cols-2 gap-4">
-              <div className="relative rounded-xl overflow-hidden h-48 md:h-64 shadow-card hover-lift">
-                <img src={IMAGES.room1} alt="Zimmer" className="w-full h-full object-cover" loading="lazy" />
+              <div className="space-y-4">
+                <div className="relative rounded-2xl overflow-hidden h-48 md:h-60 shadow-card hover-lift">
+                  <img src={IMAGES.room1} alt="Deluxe Zimmer" className="w-full h-full object-cover" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 to-transparent" />
+                </div>
+                <div className="relative rounded-xl overflow-hidden h-32 md:h-40 shadow-card hover-lift opacity-70">
+                  <img src={IMAGES.hohenlohe} alt="Hohenlohe" className="w-full h-full object-cover" loading="lazy" />
+                </div>
               </div>
-              <div className="relative rounded-xl overflow-hidden h-48 md:h-64 shadow-card hover-lift mt-8">
-                <img src={IMAGES.room2} alt="Suite" className="w-full h-full object-cover" loading="lazy" />
+              <div className="space-y-4 pt-8">
+                <div className="relative rounded-xl overflow-hidden h-32 md:h-40 shadow-card hover-lift opacity-70">
+                  <img src={IMAGES.room3} alt="Suite" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div className="relative rounded-2xl overflow-hidden h-48 md:h-60 shadow-card hover-lift">
+                  <img src={IMAGES.room2} alt="Doppelzimmer" className="w-full h-full object-cover" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 to-transparent" />
+                </div>
               </div>
             </div>
-          </AnimatedSection>
+          </FadeUp>
         </div>
       </section>
 
-      {/* ── CHEF STORY ─────────────────────────────────────────── */}
+      {/* ── TRUST PILLARS ───────────────────────────────── */}
       <section className="py-20 px-5">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <AnimatedSection>
-            <div className="relative rounded-2xl overflow-hidden h-96 md:h-[500px] shadow-premium hover-lift">
+        <div className="max-w-6xl mx-auto">
+          <FadeUp>
+            <div className="text-center mb-14">
+              <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-3">{c.trust_eyebrow}</p>
+              <div className="section-divider" />
+            </div>
+          </FadeUp>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {[
+              { title: c.trust_1_title, text: c.trust_1, icon: '✦' },
+              { title: c.trust_2_title, text: c.trust_2, icon: '◇' },
+              { title: c.trust_3_title, text: c.trust_3, icon: '◆' },
+              { title: c.trust_4_title, text: c.trust_4, icon: '✦' },
+            ].map((item, i) => (
+              <FadeUp key={i} delay={i * 80}>
+                <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-6 h-full">
+                  <p className="text-gold/60 text-lg mb-4">{item.icon}</p>
+                  <h3 className="font-display text-xl font-light text-ivory mb-2">{item.title}</h3>
+                  <p className="text-ivory/40 text-sm font-body leading-relaxed">{item.text}</p>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CHEF & STORY ────────────────────────────────── */}
+      <section className="py-24 px-5 bg-espresso border-y border-[#C9A96E]/10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <FadeUp>
+            <div className="relative rounded-2xl overflow-hidden h-[460px] shadow-premium">
               <img src={IMAGES.chef} alt="Chef Omar Ammesso" className="w-full h-full object-cover object-top" loading="lazy" />
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6">
-                <p className="font-display text-2xl text-ivory font-light">Omar Ammesso</p>
-                <p className="text-gold text-xs tracking-widest font-body mt-0.5">Chef & Founder</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
+              <div className="absolute bottom-7 left-7">
+                <p className="font-display text-2xl text-ivory font-light leading-tight">Omar Ammesso</p>
+                <p className="text-gold text-[10px] tracking-[0.35em] uppercase font-body mt-1">Chef & Founder · Krone Langenburg</p>
               </div>
             </div>
-          </AnimatedSection>
-          <AnimatedSection>
-            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-4">
-              {lang === 'de' ? 'Unsere Geschichte' : lang === 'en' ? 'Our Story' : 'La nostra storia'}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-5 leading-tight">{c.story_title}</h2>
-            <p className="text-ivory/55 leading-relaxed font-body mb-4">{c.story_text}</p>
-            <blockquote className="border-l-2 border-gold/40 pl-5 my-6 italic font-display text-xl text-ivory/70">
-              {lang === 'de' && '"Ammesso bringt Gefühl auf den Teller – bei ihm schmeckt man Herz, Vergangenheit und Vision in jedem Bissen."'}
-              {lang === 'en' && '"Ammesso brings feeling to the plate — in every bite you taste heart, history and vision."'}
-              {lang === 'it' && '"Ammesso porta emozione nel piatto — in ogni boccone si sente cuore, passato e visione."'}
+          </FadeUp>
+          <FadeUp delay={150}>
+            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-5">{c.story_eyebrow}</p>
+            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-6 leading-[1.05]">{c.story_title}</h2>
+            <p className="text-ivory/60 leading-relaxed font-body mb-7">{c.story_p}</p>
+            <blockquote className="border-l-2 border-gold/40 pl-5 italic font-display text-xl text-ivory/60 mb-8 leading-relaxed">
+              {lang === 'de' && '"Ich koche nicht für den Michelin-Stern. Ich koche dafür, dass du morgen wieder kommst."'}
+              {lang === 'en' && '"I don\'t cook for the Michelin star. I cook so you come back tomorrow."'}
+              {lang === 'it' && '"Non cucino per la stella Michelin. Cucino affinché tu torni domani."'}
             </blockquote>
             <Link to="/story"
-              className="inline-flex items-center gap-2 text-gold text-xs tracking-[0.2em] uppercase font-body hover:gap-3 transition-all">
+              className="inline-flex items-center gap-2 text-gold text-xs tracking-[0.25em] uppercase font-body hover:gap-3 transition-all">
               {c.story_cta} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </AnimatedSection>
+          </FadeUp>
         </div>
       </section>
 
-      {/* ── WEDDINGS STRIP ─────────────────────────────────────── */}
-      <section className="py-20 px-5 bg-espresso">
-        <AnimatedSection>
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-4">
-              {lang === 'de' ? 'Hochzeiten & Events' : lang === 'en' ? 'Weddings & Events' : 'Matrimoni & Eventi'}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-6">
-              {lang === 'de' ? 'Ihr besonderer Tag verdient einen besonderen Ort.' : lang === 'en' ? 'Your special day deserves a special place.' : 'Il tuo giorno speciale merita un luogo speciale.'}
-            </h2>
-            <p className="text-ivory/50 leading-relaxed font-body mb-8 max-w-xl mx-auto">
-              {lang === 'de' && 'Hochzeiten, Feiern, Firmenevents — wir gestalten unvergessliche Momente mit Leidenschaft und Liebe zum Detail.'}
-              {lang === 'en' && 'Weddings, celebrations, corporate events — we create unforgettable moments with passion and attention to detail.'}
-              {lang === 'it' && 'Matrimoni, feste, eventi aziendali — creiamo momenti indimenticabili con passione e cura per i dettagli.'}
-            </p>
-            <Link to="/weddings"
-              className="inline-flex items-center gap-2.5 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
-              {lang === 'de' ? 'Anfragen' : lang === 'en' ? 'Enquire' : 'Richiedi'} <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </AnimatedSection>
+      {/* ── REVIEWS ─────────────────────────────────────── */}
+      <section className="py-20 px-5">
+        <div className="max-w-3xl mx-auto text-center">
+          <FadeUp>
+            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-10">{c.review_title}</p>
+            <div className="relative min-h-[140px]">
+              {REVIEWS.map((r, i) => (
+                <div key={i}
+                  className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ${i === activeReview ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+                  <div className="flex gap-1 mb-5">
+                    {[...Array(r.stars)].map((_, j) => <Star key={j} className="w-4 h-4 fill-gold text-gold" />)}
+                  </div>
+                  <p className="font-display text-xl md:text-2xl font-light text-ivory/80 italic leading-relaxed mb-4 max-w-2xl">
+                    &ldquo;{lang === 'de' ? r.de : lang === 'en' ? r.en : r.it}&rdquo;
+                  </p>
+                  <p className="text-ivory/30 text-xs font-body tracking-widest uppercase">— {r.name}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center gap-2 mt-8">
+              {REVIEWS.map((_, i) => (
+                <button key={i} onClick={() => setActiveReview(i)}
+                  className={`w-6 h-1 rounded-full transition-all ${i === activeReview ? 'bg-gold' : 'bg-gold/20'}`} />
+              ))}
+            </div>
+          </FadeUp>
+        </div>
       </section>
 
-      {/* ── FINAL CTA ──────────────────────────────────────────── */}
-      <section className="relative py-24 px-5 overflow-hidden">
-        <img src={IMAGES.exterior} alt="Krone Langenburg" className="absolute inset-0 w-full h-full object-cover opacity-25" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/80 to-charcoal/95" />
-        <AnimatedSection className="relative z-10">
+      {/* ── WEDDINGS ────────────────────────────────────── */}
+      <section className="relative py-28 px-5 overflow-hidden">
+        <img src={IMAGES.wedding} alt="Weddings & Events" className="absolute inset-0 w-full h-full object-cover opacity-20" loading="lazy" />
+        <div className="absolute inset-0 bg-gradient-to-b from-espresso/90 to-charcoal/95" />
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <FadeUp>
+            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-5">{c.weddings_eyebrow}</p>
+            <h2 className="font-display text-4xl md:text-6xl font-light text-ivory mb-6 leading-[1.05]">{c.weddings_title}</h2>
+            <p className="text-ivory/50 leading-relaxed font-body mb-10 max-w-xl mx-auto">{c.weddings_p}</p>
+            <Link to="/weddings"
+              className="inline-flex items-center gap-2.5 px-9 py-4 btn-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold shadow-gold-glow">
+              {c.weddings_cta} <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA ───────────────────────────────────── */}
+      <section className="py-24 px-5 bg-espresso border-t border-[#C9A96E]/10">
+        <FadeUp>
           <div className="max-w-2xl mx-auto text-center">
-            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-4">Krone Langenburg by Ammesso</p>
-            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-4">{c.trust_title}</h2>
-            <div className="section-divider my-6" />
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-4">Krone Langenburg by Ammesso</p>
+            <h2 className="font-display text-4xl md:text-5xl font-light text-ivory mb-3 leading-[1.05]">{c.cta_title}</h2>
+            <p className="text-ivory/40 font-body text-sm mb-10">{c.cta_sub}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/reserve"
-                className="flex items-center justify-center gap-2.5 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
-                <UtensilsCrossed className="w-3.5 h-3.5" />
-                {c.reserve_cta}
+                className="flex items-center justify-center gap-2.5 px-9 py-4 btn-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold shadow-gold-glow">
+                <UtensilsCrossed className="w-3.5 h-3.5" /> {c.reserve}
               </Link>
               <a href={`tel:${s.phone}`}
-                className="flex items-center justify-center gap-2.5 px-8 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
-                {s.phone}
+                className="flex items-center justify-center gap-2.5 px-9 py-4 btn-ghost-gold rounded-full text-xs tracking-[0.2em] uppercase font-body font-semibold">
+                <Phone className="w-3.5 h-3.5" /> {c.phone_cta}
               </a>
             </div>
+            <div className="mt-8 flex items-center justify-center gap-2 text-ivory/25 text-xs font-body">
+              <MapPin className="w-3 h-3" />
+              <span>{s.address_street} · {s.address_zip} {s.address_city} · {c.location_label}</span>
+            </div>
           </div>
-        </AnimatedSection>
+        </FadeUp>
       </section>
     </div>
   );
