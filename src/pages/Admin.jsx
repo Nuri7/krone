@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLang } from '@/lib/useLang';
-import { CheckCircle, Clock, XCircle, AlertTriangle, Users, UtensilsCrossed, Mail, RefreshCw, Eye, MessageSquare, BedDouble } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, AlertTriangle, Users, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 
 const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
@@ -48,10 +48,12 @@ export default function Admin() {
   const [reservations, setReservations] = useState([]);
   const [inquiries, setInquiries] = useState([]);
   const [intents, setIntents] = useState([]);
+  const [guestDocs, setGuestDocs] = useState([]);
+  const [guestMsgs, setGuestMsgs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRes, setSelectedRes] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
-  const [stats, setStats] = useState({ today: 0, pending: 0, confirmed: 0, contacts: 0, intents: 0 });
+  const [stats, setStats] = useState({ today: 0, pending: 0, confirmed: 0, contacts: 0, intents: 0, docs: 0, msgs: 0 });
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -66,20 +68,26 @@ export default function Admin() {
   async function loadAll() {
     setLoading(true);
     const today = new Date().toISOString().split('T')[0];
-    const [res, inq, int_] = await Promise.all([
+    const [res, inq, int_, docs, msgs] = await Promise.all([
       base44.entities.Reservation.list('-created_date', 100),
       base44.entities.ContactInquiry.list('-created_date', 50),
       base44.entities.BookingIntent.list('-created_date', 50),
+      base44.entities.GuestDocument.list('-created_date', 50).catch(() => []),
+      base44.entities.GuestMessage.list('-created_date', 50).catch(() => []),
     ]);
     setReservations(res);
     setInquiries(inq);
     setIntents(int_);
+    setGuestDocs(docs);
+    setGuestMsgs(msgs);
     setStats({
       today: res.filter(r => r.reservation_date === today).length,
       pending: res.filter(r => r.status === 'pending').length,
       confirmed: res.filter(r => r.status === 'confirmed' && r.reservation_date >= today).length,
       contacts: inq.filter(i => i.status === 'new').length,
       intents: int_.filter(i => i.status === 'redirected').length,
+      docs: docs.filter(d => d.status === 'uploaded').length,
+      msgs: msgs.filter(m => m.status === 'new').length,
     });
     setLoading(false);
   }
@@ -123,6 +131,8 @@ export default function Admin() {
     { id: 'reservations', label: 'Reservierungen', icon: UtensilsCrossed, count: stats.pending },
     { id: 'contacts', label: 'Kontakt', icon: MessageSquare, count: stats.contacts },
     { id: 'bookings', label: 'Buchungen', icon: BedDouble, count: stats.intents },
+    { id: 'documents', label: 'Dokumente', icon: FileText, count: stats.docs },
+    { id: 'messages', label: 'Nachrichten', icon: Heart, count: stats.msgs },
   ];
 
   return (
@@ -141,12 +151,14 @@ export default function Admin() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
           <StatCard icon={UtensilsCrossed} label="Heute" value={stats.today} color="text-gold" />
           <StatCard icon={Clock} label="Ausstehend" value={stats.pending} color="text-gold/70" />
           <StatCard icon={CheckCircle} label="Bestätigt" value={stats.confirmed} color="text-emerald-400" />
-          <StatCard icon={MessageSquare} label="Neue Anfragen" value={stats.contacts} color="text-blue-400" />
-          <StatCard icon={BedDouble} label="Buchungs-Intents" value={stats.intents} color="text-ivory/50" />
+          <StatCard icon={MessageSquare} label="Anfragen" value={stats.contacts} color="text-blue-400" />
+          <StatCard icon={BedDouble} label="Buchungen" value={stats.intents} color="text-ivory/50" />
+          <StatCard icon={FileText} label="Dokumente" value={stats.docs} color="text-ivory/50" />
+          <StatCard icon={Heart} label="Nachrichten" value={stats.msgs} color="text-rose-400" />
         </div>
 
         {/* Pending alerts */}
@@ -276,6 +288,84 @@ export default function Admin() {
                         </button>
                       )}
                       <a href={`mailto:${inq.email}`}
+                        className="px-3 py-1.5 btn-ghost-gold border rounded-lg text-[10px] font-body tracking-widest uppercase flex items-center gap-1">
+                        <Mail className="w-3 h-3" /> E-Mail
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* GUEST DOCUMENTS */}
+        {tab === 'documents' && (
+          <div className="space-y-2">
+            {loading ? (
+              <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-gold/20 border-t-gold rounded-full animate-spin" /></div>
+            ) : guestDocs.length === 0 ? (
+              <div className="text-center py-16 text-ivory/30 font-body text-sm">Keine Dokumente</div>
+            ) : (
+              guestDocs.map(doc => (
+                <div key={doc.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-4 hover:border-[#C9A96E]/20 transition-all">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="font-body text-sm text-ivory">{doc.original_filename}</span>
+                        <StatusBadge status={doc.status} />
+                        <span className="text-ivory/30 text-[10px] font-body uppercase tracking-widest">{doc.category}</span>
+                      </div>
+                      <p className="text-ivory/30 text-xs font-body">{doc.user_email} · {doc.created_date ? format(new Date(doc.created_date), 'dd.MM.yy HH:mm') : ''}</p>
+                      {doc.description && <p className="text-ivory/40 text-xs font-body mt-1">{doc.description}</p>}
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      {doc.status === 'uploaded' && (
+                        <button onClick={async () => {
+                          await base44.entities.GuestDocument.update(doc.id, { status: 'under_review' });
+                          setGuestDocs(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'under_review' } : d));
+                        }} className="px-3 py-1.5 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body tracking-widest uppercase">
+                          Prüfen
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* GUEST MESSAGES */}
+        {tab === 'messages' && (
+          <div className="space-y-2">
+            {loading ? (
+              <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-gold/20 border-t-gold rounded-full animate-spin" /></div>
+            ) : guestMsgs.length === 0 ? (
+              <div className="text-center py-16 text-ivory/30 font-body text-sm">Keine Nachrichten</div>
+            ) : (
+              guestMsgs.map(msg => (
+                <div key={msg.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-4 hover:border-[#C9A96E]/20 transition-all">
+                  <div className="flex items-start gap-3 flex-wrap">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="font-body text-sm text-ivory">{msg.guest_name || msg.user_email}</span>
+                        <StatusBadge status={msg.status} />
+                        <span className="text-ivory/30 text-[10px] font-body uppercase tracking-widest">{msg.request_type}</span>
+                      </div>
+                      <p className="text-ivory/50 text-xs font-body">{msg.subject}</p>
+                      {msg.body && <p className="text-ivory/35 text-xs font-body mt-1 line-clamp-2">{msg.body}</p>}
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      {msg.status === 'new' && (
+                        <button onClick={async () => {
+                          await base44.entities.GuestMessage.update(msg.id, { status: 'in_progress' });
+                          setGuestMsgs(prev => prev.map(m => m.id === msg.id ? { ...m, status: 'in_progress' } : m));
+                        }} className="px-3 py-1.5 bg-blue-900/40 border border-blue-700/30 text-blue-400 text-[10px] rounded-lg font-body tracking-widest uppercase">
+                          In Bearbeitung
+                        </button>
+                      )}
+                      <a href={`mailto:${msg.user_email}`}
                         className="px-3 py-1.5 btn-ghost-gold border rounded-lg text-[10px] font-body tracking-widest uppercase flex items-center gap-1">
                         <Mail className="w-3 h-3" /> E-Mail
                       </a>

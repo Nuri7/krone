@@ -1,0 +1,64 @@
+{
+  "name": "GuestDocument",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "id_document",
+        "invoice_data",
+        "event_attachment",
+        "verification",
+        "special_request",
+        "other"
+      ],
+      "default": "other"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "uploaded",
+        "under_review",
+        "approved",
+        "rejected"
+      ],
+      "default": "uploaded"
+    },
+    "file_uri": {
+      "type": "string",
+      "description": "Private storage URI (never expose publicly)"
+    },
+    "original_filename": {
+      "type": "string"
+    },
+    "file_size_bytes": {
+      "type": "number"
+    },
+    "mime_type": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "reviewed_at": {
+      "type": "string"
+    },
+    "related_reservation_ref": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "file_uri",
+    "original_filename"
+  ]
+}

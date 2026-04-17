@@ -1,0 +1,71 @@
+{
+  "name": "GuestMessage",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "guest_name": {
+      "type": "string"
+    },
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "arrival_time",
+        "invoice_address",
+        "room_preference",
+        "extra_bed",
+        "group_followup",
+        "dietary",
+        "document_note",
+        "other"
+      ],
+      "default": "general"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "resolved",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "staff_reply": {
+      "type": "string"
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "related_reservation_ref": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
+    },
+    "resolved_at": {
+      "type": "string"
+    },
+    "replied_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "body"
+  ]
+}

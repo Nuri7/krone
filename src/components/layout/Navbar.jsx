@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, LayoutDashboard, UserCircle } from 'lucide-react';
 import { useLang } from '@/lib/useLang';
 import { base44 } from '@/api/base44Client';
 
@@ -14,11 +14,12 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     base44.auth.me().then(u => {
-      if (u && (ADMIN_EMAILS.includes(u.email) || u.role === 'admin')) setIsAdmin(true);
+      if (u) { setIsLoggedIn(true); if (ADMIN_EMAILS.includes(u.email) || u.role === 'admin') setIsAdmin(true); }
     }).catch(() => {});
   }, []);
 
@@ -33,6 +34,7 @@ export default function Navbar() {
   const isHome = location.pathname === '/';
   const alwaysDark = !isHome || scrolled;
 
+  const faqLabel = { de: 'FAQ', en: 'FAQ', it: 'FAQ' };
   const navLinks = [
     { to: '/restaurant', label: tr('nav', 'restaurant') },
     { to: '/menu', label: tr('nav', 'menu') },
@@ -40,6 +42,7 @@ export default function Navbar() {
     { to: '/weddings', label: tr('nav', 'weddings') },
     { to: '/story', label: tr('nav', 'story') },
     { to: '/contact', label: tr('nav', 'contact') },
+    { to: '/faq', label: faqLabel[lang] || 'FAQ' },
   ];
 
 
@@ -99,11 +102,17 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Admin shortcut */}
+              {/* Account / Admin shortcut */}
               {isAdmin && (
-                <Link to="/admin" title="Admin Dashboard"
+                <Link to="/admin" title="Admin"
                   className="hidden md:flex w-8 h-8 items-center justify-center text-ivory/30 hover:text-gold transition-colors">
                   <LayoutDashboard className="w-4 h-4" />
+                </Link>
+              )}
+              {isLoggedIn && !isAdmin && (
+                <Link to="/account" title="Konto"
+                  className="hidden md:flex w-8 h-8 items-center justify-center text-ivory/30 hover:text-gold transition-colors">
+                  <UserCircle className="w-4 h-4" />
                 </Link>
               )}
 

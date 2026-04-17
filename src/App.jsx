@@ -19,6 +19,11 @@ import Legal from './pages/Legal';
 import BookingReturn from './pages/BookingReturn';
 import Weddings from './pages/Weddings';
 import Admin from './pages/Admin';
+import FAQ from './pages/FAQ';
+import GuestAccount from './pages/GuestAccount';
+import GuestProfile from './pages/GuestProfile';
+import GuestDocuments from './pages/GuestDocuments';
+import GuestMessages from './pages/GuestMessages';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -59,6 +64,11 @@ const AuthenticatedApp = () => {
         <Route path="/booking-return" element={<BookingReturn />} />
         <Route path="/weddings" element={<Weddings />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/account" element={<GuestAccount />} />
+        <Route path="/account/profile" element={<GuestProfile />} />
+        <Route path="/account/documents" element={<GuestDocuments />} />
+        <Route path="/account/messages" element={<GuestMessages />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

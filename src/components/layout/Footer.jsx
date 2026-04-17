@@ -89,7 +89,9 @@ export default function Footer() {
               { to: '/reserve', de: 'Tisch reservieren', en: 'Reserve a Table', it: 'Prenota' },
               { to: '/weddings', de: 'Hochzeiten & Events', en: 'Weddings & Events', it: 'Matrimoni & Eventi' },
               { to: '/story', de: 'Unsere Geschichte', en: 'Our Story', it: 'La nostra storia' },
+              { to: '/faq', de: 'FAQ', en: 'FAQ', it: 'FAQ' },
               { to: '/contact', de: 'Kontakt', en: 'Contact', it: 'Contatti' },
+              { to: '/account', de: 'Mein Konto', en: 'My Account', it: 'Il mio account' },
               { to: '/legal', de: 'Impressum', en: 'Legal', it: 'Note legali' },
             ].map(l => (
               <li key={l.to}>

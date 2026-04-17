@@ -1,0 +1,61 @@
+{
+  "name": "GuestProfile",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Linked user email (auth identity)"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address_street": {
+      "type": "string"
+    },
+    "address_city": {
+      "type": "string"
+    },
+    "address_zip": {
+      "type": "string"
+    },
+    "address_country": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "de",
+        "en",
+        "it"
+      ],
+      "default": "de"
+    },
+    "dietary_notes": {
+      "type": "string"
+    },
+    "preferences": {
+      "type": "string",
+      "description": "Free-text guest preferences"
+    },
+    "newsletter_opt_in": {
+      "type": "boolean",
+      "default": false
+    },
+    "gdpr_consent": {
+      "type": "boolean",
+      "default": false
+    },
+    "gdpr_consent_date": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}
