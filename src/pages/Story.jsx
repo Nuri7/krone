@@ -1,90 +1,137 @@
 import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/useLang';
+import { ArrowRight } from 'lucide-react';
 
-const CHEF_IMAGE = "https://static.wixstatic.com/media/e6b39b_b2703a4b8aa7481b9e9ec3a3a9eb6892~mv2.webp/v1/fill/w_324,h_434,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ammesso-6512-1bfcdeba.webp";
-const RESTAURANT_IMAGE = "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80";
+const CHEF_IMG = "https://static.wixstatic.com/media/e6b39b_b2703a4b8aa7481b9e9ec3a3a9eb6892~mv2.webp/v1/fill/w_324,h_434,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ammesso-6512-1bfcdeba.webp";
+const RESTAURANT_IMG = "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80";
 
 export default function Story() {
-  const { tr, lang } = useLang();
+  const { lang } = useLang();
+
+  const c = {
+    de: {
+      label: 'Unsere Geschichte', title: 'Ein Traum, der seit Jahren köchelt',
+      brand: 'Kulinarium by Ammesso — Wo Geschmack zu Hause ist',
+      text1: 'Mitten im Herzen Hohenlohes vereint Kulinarium by Ammesso mediterrane Leichtigkeit mit deutscher Bodenständigkeit. Unsere Küche ist ehrlich, emotional und voller Persönlichkeit.',
+      text2: 'Hier entstehen Gerichte, die Geschichten erzählen — mit Liebe zum Detail, Leidenschaft fürs Handwerk und einer tiefen Verbundenheit zu hochwertigen Zutaten. Bei uns steht der Mensch im Mittelpunkt — sowohl in der Küche als auch am Tisch.',
+      chef_label: 'Chefkoch & Gründer',
+      quote: '"Ammesso bringt Gefühl auf den Teller – bei ihm schmeckt man Herz, Vergangenheit und Vision in jedem Bissen."',
+      chef_bio: 'Omar Ammesso, mit vollem Namen Omar Ouardaoui, ist nicht nur der Gründer von Kulinarium, sondern auch dessen kreativer Kern. Seine Leidenschaft fürs Kochen entdeckte er früh – inspiriert von den Aromen seiner Kindheit und einer tiefen Liebe zur mediterranen Küche. Ausgebildet in verschiedenen Küchen Europas, entwickelte er schnell seinen eigenen Stil: kraftvoll, persönlich und voller Emotion. Für Ammesso ist Kochen kein Beruf – es ist Sprache, Identität, und eine tägliche Liebeserklärung an das Leben.',
+      values: [
+        { e: '🫀', t: 'Mit Herz', d: 'Jedes Gericht ist eine persönliche Aussage.' },
+        { e: '🌿', t: 'Mit Ehrlichkeit', d: 'Hochwertige, ehrliche Zutaten ohne Kompromisse.' },
+        { e: '🏡', t: 'Mit Wärme', d: 'Jeder Gast fühlt sich wie zu Hause.' },
+      ],
+      cta: 'Tisch reservieren',
+    },
+    en: {
+      label: 'Our Story', title: 'A Dream Years in the Making',
+      brand: 'Kulinarium by Ammesso — Where Taste Feels Like Home',
+      text1: 'In the heart of Hohenlohe, Kulinarium by Ammesso combines Mediterranean lightness with German groundedness. Our cuisine is honest, emotional and full of personality.',
+      text2: 'Dishes are created that tell stories — with attention to detail, passion for craftsmanship and a deep connection to quality ingredients. The person is at the centre — in the kitchen and at the table.',
+      chef_label: 'Head Chef & Founder',
+      quote: '"Ammesso brings feeling to the plate — in every bite you taste heart, history and vision."',
+      chef_bio: 'Omar Ammesso, born Omar Ouardaoui, is not only the founder of Kulinarium but also its creative core. His passion for cooking started early — inspired by the aromas of his childhood and a deep love for Mediterranean cuisine. Trained in various European kitchens, he quickly developed his own style: powerful, personal and full of emotion. For Ammesso, cooking is not a profession — it is language, identity, and a daily declaration of love for life.',
+      values: [
+        { e: '🫀', t: 'With Heart', d: 'Every dish is a personal statement.' },
+        { e: '🌿', t: 'With Honesty', d: 'Quality, honest ingredients without compromise.' },
+        { e: '🏡', t: 'With Warmth', d: 'Every guest feels at home.' },
+      ],
+      cta: 'Reserve a Table',
+    },
+    it: {
+      label: 'La nostra storia', title: 'Un sogno cucinato per anni',
+      brand: 'Kulinarium by Ammesso — Dove il gusto è di casa',
+      text1: 'Nel cuore dell\'Hohenlohe, Kulinarium by Ammesso unisce la leggerezza mediterranea con la concretezza tedesca. La nostra cucina è onesta, emozionale e piena di personalità.',
+      text2: 'Qui nascono piatti che raccontano storie — con attenzione ai dettagli, passione per l\'artigianato e un profondo legame con ingredienti di qualità.',
+      chef_label: 'Chef & Fondatore',
+      quote: '"Ammesso porta emozione nel piatto — in ogni boccone si sente cuore, passato e visione."',
+      chef_bio: 'Omar Ammesso, vero nome Omar Ouardaoui, non è solo il fondatore di Kulinarium, ma anche il suo cuore creativo. La sua passione per la cucina è nata presto — ispirata dagli aromi della sua infanzia e da un profondo amore per la cucina mediterranea.',
+      values: [
+        { e: '🫀', t: 'Con Cuore', d: 'Ogni piatto è una dichiarazione personale.' },
+        { e: '🌿', t: 'Con Onestà', d: 'Ingredienti di alta qualità, senza compromessi.' },
+        { e: '🏡', t: 'Con Calore', d: 'Ogni ospite si sente a casa.' },
+      ],
+      cta: 'Prenota un tavolo',
+    },
+  };
+  const cv = c[lang] || c.de;
 
   return (
-    <div className="min-h-screen pb-16 md:pb-0">
+    <div className="min-h-screen bg-charcoal text-ivory pb-20 lg:pb-0">
       {/* Hero */}
-      <div className="relative h-72 md:h-96 overflow-hidden">
-        <img src={RESTAURANT_IMAGE} alt="Kulinarium by Ammesso" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-          <div>
-            <p className="text-amber-300 text-xs uppercase tracking-widest mb-3">Krone Langenburg</p>
-            <h1 className="text-4xl font-light text-white">{tr('story', 'title')}</h1>
+      <div className="relative h-[55vh] min-h-[360px] overflow-hidden">
+        <img src={RESTAURANT_IMG} alt="Kulinarium by Ammesso" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-charcoal/20 to-charcoal" />
+        <div className="absolute inset-0 flex items-end pb-12 px-5">
+          <div className="max-w-3xl mx-auto w-full">
+            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">{cv.label}</p>
+            <h1 className="font-display text-4xl md:text-6xl font-light text-ivory">{cv.title}</h1>
           </div>
         </div>
       </div>
 
-      {/* Brand statement */}
-      <section className="bg-amber-50 py-12 px-4 text-center">
-        <p className="text-amber-700 text-sm font-medium italic max-w-xl mx-auto">
-          "{tr('story', 'brand')}"
-        </p>
+      {/* Brand quote */}
+      <section className="py-14 px-5 bg-espresso border-y border-[#C9A96E]/10">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="section-divider mb-8" />
+          <p className="font-display text-2xl font-light text-ivory/70 italic">&ldquo;{cv.brand}&rdquo;</p>
+          <div className="section-divider mt-8" />
+        </div>
       </section>
 
       {/* Story text */}
-      <section className="py-16 px-4">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-stone-700 text-lg leading-relaxed mb-6">{tr('story', 'text1')}</p>
-          <p className="text-stone-600 leading-relaxed">{tr('story', 'text2')}</p>
+      <section className="py-16 px-5">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <p className="font-body text-ivory/70 text-lg leading-relaxed">{cv.text1}</p>
+          <p className="font-body text-ivory/55 leading-relaxed">{cv.text2}</p>
         </div>
       </section>
 
       {/* Chef section */}
-      <section className="py-16 px-4 bg-stone-900 text-white">
+      <section className="py-16 px-5 bg-espresso">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="relative rounded-2xl overflow-hidden h-96 md:h-[30rem]">
-            <img src={CHEF_IMAGE} alt="Chef Omar Ammesso" className="w-full h-full object-cover object-top" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="relative rounded-2xl overflow-hidden h-[480px] shadow-premium">
+            <img src={CHEF_IMG} alt="Chef Omar Ammesso" className="w-full h-full object-cover object-top" loading="lazy" />
+            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6">
+              <p className="font-display text-2xl text-ivory font-light">Omar Ammesso</p>
+              <p className="text-gold text-xs tracking-widest font-body mt-0.5">{cv.chef_label}</p>
+            </div>
           </div>
           <div>
-            <p className="text-amber-400 text-xs uppercase tracking-widest mb-3">{tr('story', 'chef_title')}</p>
-            <h2 className="text-3xl font-light mb-2">Omar Ammesso</h2>
-            <p className="text-stone-400 text-sm italic mb-6">Omar Ouardaoui</p>
-            <blockquote className="border-l-2 border-amber-500 pl-4 text-stone-300 italic text-sm mb-6">
-              {lang === 'de' && '"Ammesso bringt Gefühl auf den Teller – bei ihm schmeckt man Herz, Vergangenheit und Vision in jedem Bissen."'}
-              {lang === 'en' && '"Ammesso brings feeling to the plate – in every bite you taste heart, history and vision."'}
-              {lang === 'it' && '"Ammesso porta emozione nel piatto – in ogni boccone si sente cuore, passato e visione."'}
+            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-4">{cv.chef_label}</p>
+            <h2 className="font-display text-4xl font-light text-ivory mb-2">Omar Ammesso</h2>
+            <p className="text-ivory/35 text-sm italic font-body mb-6">Omar Ouardaoui</p>
+            <blockquote className="border-l-2 border-gold/40 pl-5 mb-6 italic font-display text-xl text-ivory/60 leading-relaxed">
+              {cv.quote}
             </blockquote>
-            <p className="text-stone-300 leading-relaxed text-sm">{tr('story', 'chef_bio')}</p>
+            <p className="text-ivory/50 font-body text-sm leading-relaxed">{cv.chef_bio}</p>
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-          {[
-            { emoji: '🫀', de: 'Mit Herz', en: 'With Heart', it: 'Con Cuore', desc_de: 'Jedes Gericht ist eine persönliche Aussage.', desc_en: 'Every dish is a personal statement.', desc_it: 'Ogni piatto è una dichiarazione personale.' },
-            { emoji: '🌿', de: 'Mit Ehrlichkeit', en: 'With Honesty', it: 'Con Onestà', desc_de: 'Hochwertige, ehrliche Zutaten ohne Kompromisse.', desc_en: 'High-quality, honest ingredients without compromise.', desc_it: 'Ingredienti di alta qualità, senza compromessi.' },
-            { emoji: '🏡', de: 'Mit Wärme', en: 'With Warmth', it: 'Con Calore', desc_de: 'Jeder Gast fühlt sich wie zu Hause.', desc_en: 'Every guest feels at home.', desc_it: 'Ogni ospite si sente a casa.' },
-          ].map(v => (
-            <div key={v.de} className="p-6 bg-stone-50 rounded-2xl">
-              <div className="text-4xl mb-4">{v.emoji}</div>
-              <h3 className="font-semibold text-stone-800 mb-2">
-                {lang === 'de' ? v.de : lang === 'en' ? v.en : v.it}
-              </h3>
-              <p className="text-stone-500 text-sm leading-relaxed">
-                {lang === 'de' ? v.desc_de : lang === 'en' ? v.desc_en : v.desc_it}
-              </p>
+      <section className="py-16 px-5">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+          {cv.values.map((v, i) => (
+            <div key={i} className="glass-card rounded-2xl p-8 border border-[#C9A96E]/10">
+              <div className="text-4xl mb-4">{v.e}</div>
+              <h3 className="font-display text-xl font-light text-ivory mb-2">{v.t}</h3>
+              <p className="text-ivory/40 text-sm font-body leading-relaxed">{v.d}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="bg-amber-600 py-12 px-4 text-center text-white">
-        <h2 className="text-2xl font-light mb-5">
-          {lang === 'de' ? 'Erleben Sie es selbst.' : lang === 'en' ? 'Come experience it yourself.' : 'Vieni a scoprirlo di persona.'}
+      <section className="bg-espresso py-14 px-5 text-center border-t border-[#C9A96E]/10">
+        <h2 className="font-display text-4xl font-light text-ivory mb-6">
+          {lang === 'de' ? 'Erleben Sie es selbst.' : lang === 'en' ? 'Come experience it.' : 'Vieni a scoprirlo.'}
         </h2>
-        <Link to="/reserve" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-amber-700 font-semibold rounded-xl hover:bg-amber-50 transition-colors shadow-lg">
-          {tr('nav', 'reserve')}
+        <Link to="/reserve"
+          className="inline-flex items-center gap-2.5 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
+          {cv.cta} <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </section>
     </div>

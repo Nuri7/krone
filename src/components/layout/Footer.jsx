@@ -8,109 +8,117 @@ export default function Footer() {
   const s = SITE_DEFAULTS;
 
   return (
-    <footer className="bg-stone-900 text-stone-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer className="bg-[#0A0805] border-t border-[#C9A96E]/10">
+      {/* Top section */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-16 pb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="lg:col-span-1">
-          <p className="text-white font-semibold tracking-widest text-sm uppercase mb-1">
-            Krone Langenburg
-          </p>
-          <p className="text-amber-500 text-xs tracking-widest uppercase mb-4">by Ammesso</p>
-          <p className="text-stone-400 text-sm leading-relaxed">
+          <p className="font-display text-xl font-light text-ivory tracking-[0.1em] uppercase mb-0.5">Krone Langenburg</p>
+          <p className="text-gold text-xs tracking-[0.3em] uppercase font-body mb-5">by Ammesso</p>
+          <p className="text-ivory/50 text-sm leading-relaxed font-body">
             {lang === 'de' && 'Mediterrane Küche mit Herz. Stilvolle Unterkunft im Herzen Hohenlohes.'}
-            {lang === 'en' && 'Mediterranean cuisine with heart. Stylish accommodation in the heart of Hohenlohe.'}
-            {lang === 'it' && 'Cucina mediterranea con cuore. Alloggio raffinato nel cuore dell\'Hohenlohe.'}
+            {lang === 'en' && 'Mediterranean cuisine with heart. Stylish accommodation in Hohenlohe.'}
+            {lang === 'it' && 'Cucina mediterranea con cuore. Alloggio raffinato nell\'Hohenlohe.'}
           </p>
-          <div className="flex gap-3 mt-5">
+          <div className="flex gap-3 mt-6">
             <a href={s.social_instagram} target="_blank" rel="noopener noreferrer"
-              className="w-9 h-9 bg-stone-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
-              <Instagram className="w-4 h-4" />
+              className="w-9 h-9 border border-[#C9A96E]/20 rounded-full flex items-center justify-center text-ivory/40 hover:text-gold hover:border-gold/40 transition-colors">
+              <Instagram className="w-3.5 h-3.5" />
             </a>
             <a href={s.social_facebook} target="_blank" rel="noopener noreferrer"
-              className="w-9 h-9 bg-stone-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors">
-              <Facebook className="w-4 h-4" />
+              className="w-9 h-9 border border-[#C9A96E]/20 rounded-full flex items-center justify-center text-ivory/40 hover:text-gold hover:border-gold/40 transition-colors">
+              <Facebook className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
 
         {/* Contact */}
         <div>
-          <h3 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">
-            {tr('contact', 'address_title')}
+          <h3 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body font-medium mb-5">
+            {lang === 'de' ? 'Kontakt' : lang === 'en' ? 'Contact' : 'Contatti'}
           </h3>
-          <ul className="space-y-3 text-sm">
-            <li className="flex gap-2">
-              <MapPin className="w-4 h-4 mt-0.5 text-amber-500 flex-shrink-0" />
-              <span>{s.address_street}, {s.address_zip} {s.address_city}</span>
+          <ul className="space-y-3 text-sm font-body">
+            <li className="flex gap-3 text-ivory/55">
+              <MapPin className="w-3.5 h-3.5 mt-0.5 text-gold/60 flex-shrink-0" />
+              <span>{s.address_street}<br />{s.address_zip} {s.address_city}</span>
             </li>
-            <li className="flex gap-2">
-              <Phone className="w-4 h-4 mt-0.5 text-amber-500 flex-shrink-0" />
-              <a href={`tel:${s.phone}`} className="hover:text-white transition-colors">{s.phone}</a>
+            <li className="flex gap-3">
+              <Phone className="w-3.5 h-3.5 mt-0.5 text-gold/60 flex-shrink-0" />
+              <a href={`tel:${s.phone}`} className="text-ivory/55 hover:text-gold transition-colors">{s.phone}</a>
             </li>
-            <li className="flex gap-2">
-              <Mail className="w-4 h-4 mt-0.5 text-amber-500 flex-shrink-0" />
-              <a href={`mailto:${s.email_info}`} className="hover:text-white transition-colors">{s.email_info}</a>
+            <li className="flex gap-3">
+              <Mail className="w-3.5 h-3.5 mt-0.5 text-gold/60 flex-shrink-0" />
+              <a href={`mailto:${s.email_info}`} className="text-ivory/55 hover:text-gold transition-colors">{s.email_info}</a>
             </li>
           </ul>
-          <a
-            href="https://www.google.com/maps/dir/?api=1&destination=Hauptstra%C3%9Fe+24%2C+74595+Langenburg"
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Hauptstra%C3%9Fe+24%2C+74595+Langenburg"
             target="_blank" rel="noopener noreferrer"
-            className="mt-4 inline-flex text-sm text-amber-500 hover:text-amber-400 transition-colors"
-          >
-            {tr('contact', 'directions')} →
+            className="mt-5 inline-flex text-xs text-gold/60 hover:text-gold transition-colors tracking-wider font-body">
+            {lang === 'de' ? 'Route planen →' : lang === 'en' ? 'Get Directions →' : 'Come raggiungerci →'}
           </a>
         </div>
 
-        {/* Opening hours */}
+        {/* Hours */}
         <div>
-          <h3 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">
-            {tr('home', 'hours_title')}
+          <h3 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body font-medium mb-5">
+            {lang === 'de' ? 'Öffnungszeiten' : lang === 'en' ? 'Opening Hours' : 'Orari'}
           </h3>
-          <ul className="space-y-2 text-sm">
-            <li className="flex justify-between">
-              <span>{tr('home', 'monday')}</span>
-              <span className="text-stone-500">{tr('home', 'closed')}</span>
+          <ul className="space-y-3 text-sm font-body">
+            <li className="flex justify-between text-ivory/30">
+              <span>{lang === 'de' ? 'Montag' : lang === 'en' ? 'Monday' : 'Lunedì'}</span>
+              <span>{lang === 'de' ? 'Ruhetag' : lang === 'en' ? 'Closed' : 'Chiuso'}</span>
             </li>
-            <li>
-              <span className="text-stone-400">{tr('home', 'tue_sat')}</span>
-              <div className="text-stone-500 text-xs mt-0.5">
-                {tr('home', 'lunch')}: 12:00–14:30<br />
-                {tr('home', 'dinner')}: 17:30–22:00
-              </div>
+            <li className="text-ivory/55">
+              <div className="font-medium text-ivory/70">{lang === 'de' ? 'Di – Sa' : lang === 'en' ? 'Tue – Sat' : 'Mar – Sab'}</div>
+              <div className="text-xs text-ivory/40 mt-0.5">12:00–14:30 · 17:30–22:00</div>
             </li>
-            <li>
-              <span className="text-stone-400">{tr('home', 'sunday')}</span>
-              <div className="text-stone-500 text-xs mt-0.5">12:00–20:00</div>
+            <li className="text-ivory/55">
+              <div className="font-medium text-ivory/70">{lang === 'de' ? 'Sonntag' : lang === 'en' ? 'Sunday' : 'Domenica'}</div>
+              <div className="text-xs text-ivory/40 mt-0.5">12:00–20:00</div>
             </li>
           </ul>
         </div>
 
-        {/* Quick links */}
+        {/* Links */}
         <div>
-          <h3 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">
-            Links
-          </h3>
-          <ul className="space-y-2 text-sm">
+          <h3 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body font-medium mb-5">Navigation</h3>
+          <ul className="space-y-2.5 text-sm font-body">
             {[
-              { to: '/menu', label: tr('nav', 'menu') },
-              { to: '/rooms', label: tr('nav', 'rooms') },
-              { to: '/reserve', label: tr('nav', 'reserve') },
-              { to: '/story', label: tr('nav', 'story') },
-              { to: '/contact', label: tr('nav', 'contact') },
-              { to: '/legal', label: tr('footer', 'legal') },
+              { to: '/menu', de: 'Speisekarte', en: 'Menu', it: 'Menu' },
+              { to: '/rooms', de: 'Zimmer & Suiten', en: 'Rooms & Suites', it: 'Camere & Suite' },
+              { to: '/reserve', de: 'Tisch reservieren', en: 'Reserve a Table', it: 'Prenota' },
+              { to: '/weddings', de: 'Hochzeiten & Events', en: 'Weddings & Events', it: 'Matrimoni & Eventi' },
+              { to: '/story', de: 'Unsere Geschichte', en: 'Our Story', it: 'La nostra storia' },
+              { to: '/contact', de: 'Kontakt', en: 'Contact', it: 'Contatti' },
+              { to: '/legal', de: 'Impressum', en: 'Legal', it: 'Note legali' },
             ].map(l => (
               <li key={l.to}>
-                <Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link>
+                <Link to={l.to} className="text-ivory/40 hover:text-gold transition-colors tracking-wide">
+                  {lang === 'de' ? l.de : lang === 'en' ? l.en : l.it}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-stone-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-stone-500">
-          <span>© {new Date().getFullYear()} Krone Langenburg by Ammesso. {tr('footer', 'rights')}.</span>
-          <Link to="/legal" className="hover:text-stone-300 transition-colors">{tr('footer', 'legal')}</Link>
+      {/* Divider */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+        <div className="h-px bg-gradient-to-r from-transparent via-[#C9A96E]/20 to-transparent" />
+      </div>
+
+      {/* Bottom */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <span className="text-ivory/25 text-xs font-body tracking-wide">
+          © {new Date().getFullYear()} Krone Langenburg by Ammesso. {lang === 'de' ? 'Alle Rechte vorbehalten.' : lang === 'en' ? 'All rights reserved.' : 'Tutti i diritti riservati.'}
+        </span>
+        <div className="flex gap-5">
+          <Link to="/legal" className="text-ivory/25 hover:text-gold/60 transition-colors text-xs font-body tracking-wide">
+            {lang === 'de' ? 'Impressum' : lang === 'en' ? 'Legal' : 'Note legali'}
+          </Link>
+          <Link to="/privacy" className="text-ivory/25 hover:text-gold/60 transition-colors text-xs font-body tracking-wide">
+            {lang === 'de' ? 'Datenschutz' : lang === 'en' ? 'Privacy' : 'Privacy'}
+          </Link>
         </div>
       </div>
     </footer>

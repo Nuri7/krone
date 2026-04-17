@@ -2,172 +2,164 @@ import { useState } from 'react';
 import { useLang } from '@/lib/useLang';
 import { base44 } from '@/api/base44Client';
 import { SITE_DEFAULTS } from '@/lib/siteData';
-import { MapPin, Phone, Mail, CheckCircle, Instagram, Facebook } from 'lucide-react';
+import { MapPin, Phone, Mail, CheckCircle, Instagram, Facebook, Clock } from 'lucide-react';
 
 export default function Contact() {
-  const { tr, lang } = useLang();
+  const { lang } = useLang();
   const s = SITE_DEFAULTS;
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', message: '', inquiry_type: 'general' });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
   const TYPES = [
-    { id: 'general', label: tr('contact', 'type_general') },
-    { id: 'wedding', label: tr('contact', 'type_wedding') },
-    { id: 'group', label: tr('contact', 'type_group') },
-    { id: 'business', label: tr('contact', 'type_business') },
+    { id: 'general', de: 'Allgemeine Anfrage', en: 'General Enquiry', it: 'Richiesta generale' },
+    { id: 'wedding', de: 'Hochzeit & Events', en: 'Wedding & Events', it: 'Matrimoni & eventi' },
+    { id: 'group', de: 'Gruppenanfrage', en: 'Group Booking', it: 'Prenotazione di gruppo' },
+    { id: 'business', de: 'Geschäftsreise', en: 'Business Travel', it: "Viaggio d'affari" },
   ];
 
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
-    await base44.entities.ContactInquiry.create({
-      ...form,
-      language: lang,
-      source: 'website',
-    });
-    base44.functions.invoke('sendContactEmail', {
-      ...form, lang,
-    }).catch(() => {});
+    await base44.entities.ContactInquiry.create({ ...form, language: lang, source: 'website' });
+    base44.functions.invoke('sendContactEmail', { ...form, lang }).catch(() => {});
     base44.functions.invoke('notifySlack', {
-      type: 'contact',
-      name: `${form.first_name} ${form.last_name}`,
-      email: form.email,
-      inquiry_type: form.inquiry_type,
-      message: form.message.slice(0, 200),
+      type: 'contact', name: `${form.first_name} ${form.last_name}`,
+      email: form.email, inquiry_type: form.inquiry_type, message: form.message.slice(0, 200),
     }).catch(() => {});
     setDone(true);
     setSubmitting(false);
   }
 
+  const c = {
+    de: { title: 'Kontakt', sub: 'Wir freuen uns von Ihnen zu hören', addr_title: 'Anschrift', hours_title: 'Öffnungszeiten', directions: 'Route planen', send: 'Nachricht senden', success: 'Vielen Dank! Wir melden uns bald.', inquiry_type: 'Art der Anfrage', first: 'Vorname', last: 'Nachname', email: 'E-Mail', phone: 'Telefon', message: 'Nachricht' },
+    en: { title: 'Contact', sub: 'We look forward to hearing from you', addr_title: 'Address', hours_title: 'Opening Hours', directions: 'Get Directions', send: 'Send Message', success: 'Thank you! We will be in touch soon.', inquiry_type: 'Type of Enquiry', first: 'First Name', last: 'Last Name', email: 'Email', phone: 'Phone', message: 'Message' },
+    it: { title: 'Contatti', sub: 'Siamo felici di sentirvi', addr_title: 'Indirizzo', hours_title: 'Orari di apertura', directions: 'Come raggiungerci', send: 'Invia messaggio', success: 'Grazie! Vi risponderemo presto.', inquiry_type: 'Tipo di richiesta', first: 'Nome', last: 'Cognome', email: 'Email', phone: 'Telefono', message: 'Messaggio' },
+  };
+  const t = c[lang] || c.de;
+
+  const inputClass = "w-full bg-[#1A1410] border border-[#C9A96E]/15 rounded-xl px-4 py-3 text-sm text-ivory placeholder-ivory/20 focus:outline-none focus:border-gold/40 transition-colors font-body";
+
   return (
-    <div className="min-h-screen bg-stone-50 pt-24 pb-24">
-      <div className="max-w-5xl mx-auto px-4">
+    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-24">
+      <div className="max-w-6xl mx-auto px-5">
         {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-amber-600 text-xs uppercase tracking-widest font-semibold mb-2">Krone Langenburg by Ammesso</p>
-          <h1 className="text-4xl font-light text-stone-800 mb-2">{tr('contact', 'title')}</h1>
-          <p className="text-stone-500">{tr('contact', 'subtitle')}</p>
+        <div className="text-center py-14">
+          <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">Krone Langenburg by Ammesso</p>
+          <h1 className="font-display text-5xl md:text-6xl font-light text-ivory mb-3">{t.title}</h1>
+          <p className="text-ivory/40 font-body">{t.sub}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-          {/* Info column */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
-              <h2 className="font-semibold text-stone-800 mb-4">{tr('contact', 'address_title')}</h2>
-              <ul className="space-y-3 text-sm text-stone-600">
-                <li className="flex gap-3">
-                  <MapPin className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+          {/* Info */}
+          <div className="lg:col-span-2 space-y-5">
+            <div className="glass-card rounded-2xl p-6 border border-[#C9A96E]/10">
+              <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body mb-5">{t.addr_title}</h2>
+              <ul className="space-y-4 text-sm font-body">
+                <li className="flex gap-3 text-ivory/60">
+                  <MapPin className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
                   <span>{s.address_street}<br />{s.address_zip} {s.address_city}<br />{s.address_country}</span>
                 </li>
                 <li className="flex gap-3">
-                  <Phone className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                  <a href={`tel:${s.phone}`} className="hover:text-amber-600 transition-colors">{s.phone}</a>
+                  <Phone className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
+                  <a href={`tel:${s.phone}`} className="text-ivory/60 hover:text-gold transition-colors">{s.phone}</a>
                 </li>
                 <li className="flex gap-3">
-                  <Mail className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                  <a href={`mailto:${s.email_info}`} className="hover:text-amber-600 transition-colors">{s.email_info}</a>
+                  <Mail className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
+                  <a href={`mailto:${s.email_info}`} className="text-ivory/60 hover:text-gold transition-colors">{s.email_info}</a>
                 </li>
               </ul>
-              <a
-                href="https://www.google.com/maps/dir/?api=1&destination=Hauptstra%C3%9Fe+24%2C+74595+Langenburg"
+              <a href="https://www.google.com/maps/dir/?api=1&destination=Hauptstra%C3%9Fe+24%2C+74595+Langenburg"
                 target="_blank" rel="noopener noreferrer"
-                className="mt-5 block text-center py-3 border border-amber-600 text-amber-700 font-semibold rounded-xl hover:bg-amber-50 transition-colors text-sm"
-              >
-                {tr('contact', 'directions')}
+                className="mt-5 block text-center py-3 border border-[#C9A96E]/20 text-gold text-xs tracking-[0.2em] uppercase font-body rounded-xl hover:bg-gold/5 transition-colors">
+                {t.directions}
               </a>
             </div>
 
-            {/* Hours */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
-              <h2 className="font-semibold text-stone-800 mb-4">{tr('home', 'hours_title')}</h2>
-              <ul className="space-y-2 text-sm text-stone-600">
-                <li className="flex justify-between"><span>{tr('home', 'monday')}</span><span className="text-stone-400">{tr('home', 'closed')}</span></li>
-                <li>
-                  <div className="font-medium">{tr('home', 'tue_sat')}</div>
-                  <div className="text-stone-400 text-xs">{tr('home', 'lunch')}: 12:00–14:30 · {tr('home', 'dinner')}: 17:30–22:00</div>
+            <div className="glass-card rounded-2xl p-6 border border-[#C9A96E]/10">
+              <div className="flex items-center gap-2 mb-5">
+                <Clock className="w-3.5 h-3.5 text-gold/60" />
+                <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body">{t.hours_title}</h2>
+              </div>
+              <ul className="space-y-3 text-sm font-body">
+                <li className="flex justify-between text-ivory/30">
+                  <span>{lang === 'de' ? 'Montag' : lang === 'en' ? 'Monday' : 'Lunedì'}</span>
+                  <span>{lang === 'de' ? 'Ruhetag' : lang === 'en' ? 'Closed' : 'Chiuso'}</span>
                 </li>
                 <li>
-                  <div className="font-medium">{tr('home', 'sunday')}</div>
-                  <div className="text-stone-400 text-xs">12:00–20:00</div>
+                  <div className="text-ivory/60">{lang === 'de' ? 'Di – Sa' : lang === 'en' ? 'Tue – Sat' : 'Mar – Sab'}</div>
+                  <div className="text-ivory/35 text-xs mt-0.5">12:00 – 14:30 · 17:30 – 22:00</div>
+                </li>
+                <li>
+                  <div className="text-ivory/60">{lang === 'de' ? 'Sonntag' : lang === 'en' ? 'Sunday' : 'Domenica'}</div>
+                  <div className="text-ivory/35 text-xs mt-0.5">12:00 – 20:00</div>
                 </li>
               </ul>
             </div>
 
-            {/* Social */}
             <div className="flex gap-3">
               <a href={s.social_instagram} target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-white rounded-xl border border-stone-100 text-stone-600 hover:text-amber-600 hover:border-amber-200 transition-colors text-sm shadow-sm">
+                className="flex-1 flex items-center justify-center gap-2 py-3 glass-card rounded-xl text-ivory/40 hover:text-gold border border-[#C9A96E]/10 hover:border-[#C9A96E]/30 transition-all text-xs font-body tracking-widest uppercase">
                 <Instagram className="w-4 h-4" /> Instagram
               </a>
               <a href={s.social_facebook} target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-white rounded-xl border border-stone-100 text-stone-600 hover:text-amber-600 hover:border-amber-200 transition-colors text-sm shadow-sm">
+                className="flex-1 flex items-center justify-center gap-2 py-3 glass-card rounded-xl text-ivory/40 hover:text-gold border border-[#C9A96E]/10 hover:border-[#C9A96E]/30 transition-all text-xs font-body tracking-widest uppercase">
                 <Facebook className="w-4 h-4" /> Facebook
               </a>
             </div>
           </div>
 
-          {/* Form column */}
+          {/* Form */}
           <div className="lg:col-span-3">
             {done ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-10 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-stone-800 mb-2">{tr('contact', 'success')}</h2>
-                <p className="text-stone-500 text-sm">{s.email_info}</p>
+              <div className="glass-card rounded-2xl p-12 text-center border border-[#C9A96E]/10 h-full flex flex-col items-center justify-center">
+                <CheckCircle className="w-12 h-12 text-gold mb-4" />
+                <h2 className="font-display text-2xl font-light text-ivory mb-2">{t.success}</h2>
+                <p className="text-ivory/40 text-sm font-body">{s.email_info}</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
+              <div className="glass-card rounded-2xl p-7 border border-[#C9A96E]/10">
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Inquiry type */}
                   <div>
-                    <label className="block text-xs font-medium text-stone-600 mb-2">{tr('contact', 'inquiry_type')}</label>
+                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-2">{t.inquiry_type}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      {TYPES.map(t => (
-                        <button key={t.id} type="button" onClick={() => setForm(f => ({ ...f, inquiry_type: t.id }))}
-                          className={`px-3 py-2.5 rounded-xl text-sm border-2 text-left transition-all ${form.inquiry_type === t.id ? 'border-amber-600 bg-amber-50 text-amber-800 font-medium' : 'border-stone-200 text-stone-600'}`}>
-                          {t.label}
+                      {TYPES.map(tp => (
+                        <button key={tp.id} type="button"
+                          onClick={() => setForm(f => ({ ...f, inquiry_type: tp.id }))}
+                          className={`px-3 py-2.5 rounded-xl text-xs font-body text-left border transition-all ${
+                            form.inquiry_type === tp.id ? 'border-gold bg-gold/10 text-gold' : 'border-[#C9A96E]/10 text-ivory/40 hover:border-[#C9A96E]/30'
+                          }`}>
+                          {lang === 'de' ? tp.de : lang === 'en' ? tp.en : tp.it}
                         </button>
                       ))}
                     </div>
                   </div>
-
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-stone-600 mb-1">{tr('contact', 'first_name')} *</label>
-                      <input type="text" autoComplete="given-name" required value={form.first_name}
-                        onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))}
-                        className="w-full border border-stone-200 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                      <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.first} *</label>
+                      <input type="text" required value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} className={inputClass} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-stone-600 mb-1">{tr('contact', 'last_name')} *</label>
-                      <input type="text" autoComplete="family-name" required value={form.last_name}
-                        onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))}
-                        className="w-full border border-stone-200 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                      <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.last} *</label>
+                      <input type="text" required value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} className={inputClass} />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-stone-600 mb-1">{tr('contact', 'email')} *</label>
-                    <input type="email" autoComplete="email" required value={form.email}
-                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                      className="w-full border border-stone-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.email} *</label>
+                    <input type="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-stone-600 mb-1">{tr('contact', 'phone')}</label>
-                    <input type="tel" autoComplete="tel" value={form.phone}
-                      onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                      className="w-full border border-stone-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.phone}</label>
+                    <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-stone-600 mb-1">{tr('contact', 'message')} *</label>
-                    <textarea rows={5} required value={form.message}
-                      onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                      className="w-full border border-stone-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none" />
+                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.message} *</label>
+                    <textarea rows={5} required value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                      className={`${inputClass} resize-none`} />
                   </div>
                   <button type="submit" disabled={submitting}
-                    className="w-full py-4 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors">
-                    {submitting ? tr('common', 'loading') : tr('contact', 'send')}
+                    className="w-full py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold disabled:opacity-50 transition-all">
+                    {submitting ? '...' : t.send}
                   </button>
                 </form>
               </div>

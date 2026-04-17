@@ -12,21 +12,23 @@ import Home from './pages/Home';
 import Reserve from './pages/Reserve';
 import Rooms from './pages/Rooms';
 import MenuPage from './pages/MenuPage';
+import Restaurant from './pages/Restaurant';
 import Story from './pages/Story';
 import Contact from './pages/Contact';
 import Legal from './pages/Legal';
 import BookingReturn from './pages/BookingReturn';
-import Restaurant from './pages/Restaurant';
+import Weddings from './pages/Weddings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-stone-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-charcoal">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-stone-400 text-sm">Krone Langenburg</p>
+          <div className="w-8 h-8 border-2 border-[#C9A96E]/20 border-t-[#C9A96E] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="font-display text-xl font-light text-ivory/40 tracking-widest">Krone Langenburg</p>
+          <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mt-1">by Ammesso</p>
         </div>
       </div>
     );
@@ -48,11 +50,13 @@ const AuthenticatedApp = () => {
         <Route path="/reserve" element={<Reserve />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/menu" element={<MenuPage />} />
+        <Route path="/restaurant" element={<Restaurant />} />
         <Route path="/story" element={<Story />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/legal" element={<Legal />} />
+        <Route path="/privacy" element={<Legal />} />
         <Route path="/booking-return" element={<BookingReturn />} />
-        <Route path="/restaurant" element={<Restaurant />} />
+        <Route path="/weddings" element={<Weddings />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
