@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, MapPin, Clock, UtensilsCrossed, BedDouble, Star, ChevronDown, Phone, MessageCircle, Send } from 'lucide-react';
 import { useLang } from '@/lib/useLang';
 import { SITE_DEFAULTS } from '@/lib/siteData';
+import { base44 } from '@/api/base44Client';
 
 const IMAGES = {
   hero: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1800&q=85",
