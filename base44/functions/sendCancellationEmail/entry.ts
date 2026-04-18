@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
     }
 
     // Find reservation
-    const reservations = await base44.asServiceRole.entities.Reservation.filter(
+    const reservations = await base44.asServiceRole.entities.RestaurantReservation.filter(
       { reservation_ref },
       undefined,
       1
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
 
     // Send email
     try {
-      await base44.integrations.Core.SendEmail({
+      await base44.asServiceRole.integrations.Core.SendEmail({
         to: guest_email,
         subject: template.subject,
         body: template.body
@@ -64,13 +64,13 @@ Deno.serve(async (req) => {
         language: lang || 'de',
         status: 'sent',
         sent_at: new Date().toISOString(),
-        related_entity_type: 'Reservation',
+        related_entity_type: 'RestaurantReservation',
         related_entity_id: reservation.id,
         related_ref: reservation_ref
       }).catch(() => {});
 
       // Update reservation
-      await base44.asServiceRole.entities.Reservation.update(reservation.id, {
+      await base44.asServiceRole.entities.RestaurantReservation.update(reservation.id, {
         cancellation_confirmation_sent: true,
         cancellation_confirmation_sent_at: new Date().toISOString()
       });
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
         status: 'failed',
         failure_reason: emailErr.message,
         sent_at: new Date().toISOString(),
-        related_entity_type: 'Reservation',
+        related_entity_type: 'RestaurantReservation',
         related_entity_id: reservation.id,
         related_ref: reservation_ref
       }).catch(() => {});

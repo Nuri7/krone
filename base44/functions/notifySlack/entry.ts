@@ -149,9 +149,9 @@ Deno.serve(async (req) => {
 
     // Update records after successful Slack send
     if ((type === 'reservation' || type === 'reservation_cancelled') && ref) {
-      const items = await base44.asServiceRole.entities.Reservation.filter({ reservation_ref: ref });
+      const items = await base44.asServiceRole.entities.RestaurantReservation.filter({ reservation_ref: ref });
       if (items.length > 0) {
-        await base44.asServiceRole.entities.Reservation.update(items[0].id, { slack_notified: true });
+        await base44.asServiceRole.entities.RestaurantReservation.update(items[0].id, { slack_notified: true, slack_notified_at: new Date().toISOString() });
       }
     }
 

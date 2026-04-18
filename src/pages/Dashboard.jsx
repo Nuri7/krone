@@ -39,15 +39,15 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const [reservations, intents, messages] = await Promise.all([
-        base44.entities.Reservation.list('-created_date', 500).catch(() => []),
-        base44.entities.BookingIntent.list('-created_date', 500).catch(() => []),
+        base44.entities.RestaurantReservation.list('-created_date', 500).catch(() => []),
+        base44.entities.HotelBookingIntent.list('-created_date', 500).catch(() => []),
         base44.entities.GuestMessage.list('-created_date', 500).catch(() => []),
       ]);
 
       // Calculate metrics
       const confirmed = reservations.filter(r => r.status === 'confirmed').length;
-      const pending = reservations.filter(r => r.status === 'pending').length;
-      const cancelled = reservations.filter(r => r.status === 'cancelled').length;
+      const pending = reservations.filter(r => r.status === 'new' || r.status === 'pending').length;
+      const cancelled = reservations.filter(r => r.status === 'cancelled_by_guest' || r.status === 'cancelled_by_staff').length;
 
       setMetrics({
         totalReservations: reservations.length,
@@ -81,7 +81,7 @@ export default function Dashboard() {
       ];
 
       // Booking intent status
-      const redirected = intents.filter(i => i.status === 'redirected').length;
+      const redirected = intents.filter(i => i.status === 'redirected_to_beds24').length;
       const syncedConfirmed = intents.filter(i => i.status === 'synced_confirmed').length;
       const bookingStatus = [
         { name: lang === 'de' ? 'Weitergeleitet' : 'Redirected', value: redirected, color: '#3b82f6' },

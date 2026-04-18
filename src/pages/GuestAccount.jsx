@@ -34,7 +34,7 @@ export default function GuestAccount() {
       const u = await base44.auth.me();
       setUser(u);
       const [res, docs, msgs] = await Promise.all([
-        base44.entities.Reservation.filter({ guest_email: u.email }, '-reservation_date', 20).catch(() => []),
+        base44.entities.RestaurantReservation.filter({ guest_email: u.email }, '-reservation_date', 20).catch(() => []),
         base44.entities.GuestDocument.filter({ user_email: u.email }, '-created_date', 10).catch(() => []),
         base44.entities.GuestMessage.filter({ user_email: u.email }, '-created_date', 10).catch(() => []),
       ]);

@@ -225,10 +225,13 @@ export default function Reserve() {
       setLoading(false);
       return;
     }
-    const existing = await base44.entities.Reservation.filter({ reservation_date: d, status: { $in: ['pending', 'confirmed'] } });
+    const existing = await base44.entities.RestaurantReservation.filter({ reservation_date: d });
+    const activeStatuses = ['new', 'pending', 'confirmed', 'seated'];
     const cap = {};
     daySlots.forEach(s => { cap[s] = 0; });
-    existing.forEach(r => { if (cap[r.reservation_time] !== undefined) cap[r.reservation_time] += (r.party_size || 0); });
+    existing
+      .filter(r => activeStatuses.includes(r.status))
+      .forEach(r => { if (cap[r.reservation_time] !== undefined) cap[r.reservation_time] += (r.party_size || 0); });
     setUsedCapacity(cap);
     setSlots(daySlots);
     setLoading(false);

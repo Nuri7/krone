@@ -8,14 +8,20 @@ import { format } from 'date-fns';
 const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
 
 const STATUS_COLORS = {
+  new: 'text-gold/80 bg-gold/10 border-gold/20',
   pending: 'text-gold/80 bg-gold/10 border-gold/20',
   confirmed: 'text-emerald-400 bg-emerald-950/40 border-emerald-800/30',
+  seated: 'text-blue-400 bg-blue-950/40 border-blue-800/30',
+  completed: 'text-ivory/40 bg-ivory/5 border-ivory/10',
+  cancelled_by_guest: 'text-red-400 bg-red-950/40 border-red-800/30',
+  cancelled_by_staff: 'text-red-400 bg-red-950/40 border-red-800/30',
   cancelled: 'text-red-400 bg-red-950/40 border-red-800/30',
   no_show: 'text-red-400/60 bg-red-950/20 border-red-900/20',
-  completed: 'text-ivory/40 bg-ivory/5 border-ivory/10',
-  new: 'text-gold/80 bg-gold/10 border-gold/20',
+  archived: 'text-ivory/20 bg-ivory/5 border-ivory/10',
   in_review: 'text-blue-400 bg-blue-950/30 border-blue-800/20',
   replied: 'text-emerald-400 bg-emerald-950/30 border-emerald-800/20',
+  in_progress: 'text-blue-400 bg-blue-950/30 border-blue-800/20',
+  resolved: 'text-emerald-400 bg-emerald-950/30 border-emerald-800/20',
   closed: 'text-ivory/30 bg-ivory/5 border-ivory/10',
 };
 
@@ -72,9 +78,9 @@ export default function Admin() {
     setLoading(true);
     const today = new Date().toISOString().split('T')[0];
     const [res, inq, int_, docs, msgs] = await Promise.all([
-      base44.entities.Reservation.list('-created_date', 100),
+      base44.entities.RestaurantReservation.list('-created_date', 100),
       base44.entities.ContactInquiry.list('-created_date', 50),
-      base44.entities.BookingIntent.list('-created_date', 50),
+      base44.entities.HotelBookingIntent.list('-created_date', 50).catch(() => []),
       base44.entities.GuestDocument.list('-created_date', 50).catch(() => []),
       base44.entities.GuestMessage.list('-created_date', 50).catch(() => []),
     ]);
@@ -85,10 +91,10 @@ export default function Admin() {
     setGuestMsgs(msgs);
     setStats({
       today: res.filter(r => r.reservation_date === today).length,
-      pending: res.filter(r => r.status === 'pending').length,
+      pending: res.filter(r => r.status === 'new' || r.status === 'pending').length,
       confirmed: res.filter(r => r.status === 'confirmed' && r.reservation_date >= today).length,
       contacts: inq.filter(i => i.status === 'new').length,
-      intents: int_.filter(i => i.status === 'redirected').length,
+      intents: int_.filter(i => i.status === 'initiated' || i.status === 'redirected_to_beds24').length,
       docs: docs.filter(d => d.status === 'uploaded').length,
       msgs: msgs.filter(m => m.status === 'new').length,
     });
@@ -98,9 +104,9 @@ export default function Admin() {
   async function updateResStatus(id, status) {
     setUpdatingId(id);
     const updates = { status };
-    if (status === 'confirmed') updates.confirmed_at = new Date().toISOString();
-    if (status === 'cancelled') updates.cancelled_at = new Date().toISOString();
-    await base44.entities.Reservation.update(id, updates);
+    if (status === 'confirmed') { updates.confirmed_at = new Date().toISOString(); updates.confirmed_by = user?.email; }
+    if (status === 'cancelled') { updates.cancelled_at = new Date().toISOString(); updates.cancelled_by = 'staff'; }
+    await base44.entities.RestaurantReservation.update(id, updates);
     // Log the status change
     const target = reservations.find(res => res.id === id);
     if (target) {
@@ -121,13 +127,13 @@ export default function Admin() {
     // Fire notifications after status change
     const r = reservations.find(res => res.id === id);
     if (!r) return;
-    if (status === 'cancelled') {
+    if (status === 'cancelled_by_staff' || status === 'cancelled_by_guest') {
       base44.functions.invoke('sendCancellationEmail', {
         reservation_ref: r.reservation_ref,
         guest_email: r.guest_email,
         guest_first_name: r.guest_first_name,
         lang: r.language || 'de',
-      }).catch(() => {});
+      }).catch(console.warn);
       base44.functions.invoke('notifySlack', {
         type: 'reservation_cancelled',
         ref: r.reservation_ref,
@@ -208,7 +214,7 @@ export default function Admin() {
           <div className="mb-5 border border-gold/20 bg-gold/8 rounded-xl p-4 flex items-center gap-3">
             <AlertTriangle className="w-4 h-4 text-gold flex-shrink-0" />
             <p className="text-sm font-body text-ivory/70">
-              <strong className="text-gold">{stats.pending}</strong> Reservierung{stats.pending !== 1 ? 'en' : ''} warten auf Bestätigung.
+              <strong className="text-gold">{stats.pending}</strong> neue Reservierung{stats.pending !== 1 ? 'en' : ''} – bitte prüfen und bestätigen.
             </p>
           </div>
         )}
@@ -243,20 +249,20 @@ export default function Admin() {
                         <span className="font-body text-sm text-ivory">{r.guest_first_name} {r.guest_last_name}</span>
                         <StatusBadge status={r.status} />
                         <span className="text-ivory/40 text-xs font-body">{r.reservation_date} · {r.reservation_time} · {r.party_size} P.</span>
-                        {!r.email_sent && <span className="text-[10px] text-red-400/70 border border-red-900/30 px-2 py-0.5 rounded-full font-body">E-Mail ausstehend</span>}
+                        {!r.email_confirmation_sent && <span className="text-[10px] text-red-400/70 border border-red-900/30 px-2 py-0.5 rounded-full font-body">E-Mail ausstehend</span>}
                         {!r.slack_notified && <span className="text-[10px] text-ivory/20 border border-ivory/10 px-2 py-0.5 rounded-full font-body">Slack ausstehend</span>}
                       </div>
                       <div className="text-ivory/30 text-xs font-body mt-0.5">{r.guest_email} · {r.reservation_ref}</div>
                     </button>
                     <div className="flex gap-2 flex-shrink-0">
-                      {r.status === 'pending' && (
+                      {(r.status === 'new' || r.status === 'pending') && (
                         <button onClick={() => updateResStatus(r.id, 'confirmed')} disabled={updatingId === r.id}
                           className="px-3 py-1.5 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body hover:bg-emerald-900/60 transition-colors tracking-widest uppercase">
                           ✓ Bestätigen
                         </button>
                       )}
-                      {r.status !== 'cancelled' && r.status !== 'no_show' && (
-                        <button onClick={() => updateResStatus(r.id, 'cancelled')} disabled={updatingId === r.id}
+                      {!['cancelled_by_guest','cancelled_by_staff','no_show','archived','completed'].includes(r.status) && (
+                        <button onClick={() => updateResStatus(r.id, 'cancelled_by_staff')} disabled={updatingId === r.id}
                           className="px-3 py-1.5 bg-red-950/40 border border-red-900/30 text-red-400 text-[10px] rounded-lg font-body hover:bg-red-950/60 transition-colors tracking-widest uppercase">
                           ✕ Absagen
                         </button>
@@ -271,15 +277,22 @@ export default function Admin() {
                         <div className="flex justify-between"><span className="text-ivory/30">Sprache</span><span className="text-ivory/70">{r.language?.toUpperCase()}</span></div>
                         <div className="flex justify-between"><span className="text-ivory/30">Quelle</span><span className="text-ivory/70">{r.source}</span></div>
                         <div className="flex justify-between"><span className="text-ivory/30">Erstellt</span><span className="text-ivory/70">{r.created_date ? format(new Date(r.created_date), 'dd.MM.yy HH:mm') : '—'}</span></div>
-                        {r.special_requests && (
+                        {(r.notes || r.dietary_notes) && (
                           <div className="pt-2 border-t border-[#C9A96E]/08">
                             <span className="text-ivory/30 block mb-1">Sonderwünsche</span>
-                            <span className="text-ivory/60">{r.special_requests}</span>
+                            {r.notes && <span className="text-ivory/60">{r.notes}</span>}
+                            {r.dietary_notes && <span className="text-ivory/50 text-xs block mt-1">🥗 {r.dietary_notes}</span>}
                           </div>
                         )}
                       </div>
                       <div className="space-y-2">
                         <div className="flex gap-2">
+                          {r.status === 'confirmed' && (
+                          <button onClick={() => updateResStatus(r.id, 'seated')}
+                            className="flex-1 py-2 bg-blue-900/40 border border-blue-800/30 text-blue-400 text-[10px] rounded-lg font-body hover:bg-blue-900/60 transition-colors tracking-widest uppercase">
+                            Eingecheckt
+                          </button>
+                        )}
                           <button onClick={() => updateResStatus(r.id, 'completed')}
                             className="flex-1 py-2 bg-ivory/5 border border-ivory/10 text-ivory/40 text-[10px] rounded-lg font-body hover:text-ivory hover:border-ivory/20 transition-colors tracking-widest uppercase">
                             Abgeschlossen
