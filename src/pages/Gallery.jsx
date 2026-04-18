@@ -43,14 +43,14 @@ export default function Gallery() {
     <div className="min-h-screen bg-charcoal text-ivory pb-24 lg:pb-10">
 
       {/* Header */}
-      <div className="bg-espresso pt-24 pb-14 px-5 border-b border-[#C9A96E]/10">
+      <div className="bg-espresso pt-20 sm:pt-24 pb-10 sm:pb-14 px-5 border-b border-[#C9A96E]/10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-3 mb-5">
+          <div className="flex items-center justify-center gap-3 mb-4 sm:mb-5">
             <div className="h-px w-8 bg-gold/40" />
             <p className="text-gold text-[10px] tracking-[0.5em] uppercase font-body">Krone Langenburg by Ammesso</p>
             <div className="h-px w-8 bg-gold/40" />
           </div>
-          <h1 className="font-display text-5xl md:text-6xl font-light text-ivory mb-4">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-ivory mb-3 sm:mb-4">
             {lang === 'de' ? 'Galerie' : lang === 'en' ? 'Gallery' : 'Galleria'}
           </h1>
           <p className="text-ivory/40 font-body text-sm max-w-md mx-auto">
@@ -59,9 +59,9 @@ export default function Gallery() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-5 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-5 py-8 sm:py-10">
         {/* Category filter */}
-        <div className="flex flex-wrap gap-2 mb-10 justify-center">
+        <div className="flex flex-wrap gap-2 mb-8 sm:mb-10 justify-center">
           {cats.map(cat => (
             <button key={cat} onClick={() => setActiveCat(cat)}
               className={`px-4 py-2 rounded-full text-xs font-body tracking-wider uppercase border transition-all ${activecat === cat ? 'border-gold bg-gold/10 text-gold' : 'border-[#C9A96E]/15 text-ivory/40 hover:border-[#C9A96E]/30 hover:text-ivory/60'}`}>
@@ -71,7 +71,7 @@ export default function Gallery() {
         </div>
 
         {/* Masonry-style grid */}
-        <div className="columns-2 md:columns-3 gap-4 space-y-4">
+        <div className="columns-2 sm:columns-2 md:columns-3 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
           {filtered.map((img, i) => (
             <div key={i}
               className="break-inside-avoid relative rounded-2xl overflow-hidden group cursor-pointer hover-lift"
@@ -125,7 +125,7 @@ export default function Gallery() {
           <button className="absolute left-5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-ivory/50 hover:text-ivory transition-colors" onClick={e => { e.stopPropagation(); prev(); }}>
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <button className="absolute right-16 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-ivory/50 hover:text-ivory transition-colors" onClick={e => { e.stopPropagation(); next(); }}>
+          <button className="absolute right-4 sm:right-16 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-ivory/50 hover:text-ivory transition-colors" onClick={e => { e.stopPropagation(); next(); }}>
             <ChevronRight className="w-6 h-6" />
           </button>
           <div onClick={e => e.stopPropagation()} className="max-w-5xl w-full max-h-[85vh] flex flex-col items-center">

@@ -43,6 +43,19 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true });
   } catch (error) {
+    console.error('sendContactEmail error:', error.message);
+    // Log the failure to EmailLog for admin visibility
+    try {
+      const base44Fallback = createClientFromRequest(req);
+      await base44Fallback.asServiceRole.entities.EmailLog.create({
+        recipient: 'info@krone-ammesso.de',
+        subject: 'Contact email send failure',
+        template: 'contact_confirmation',
+        status: 'failed',
+        failure_reason: error.message,
+        sent_at: new Date().toISOString(),
+      });
+    } catch (_) {}
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

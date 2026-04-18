@@ -84,15 +84,15 @@ export default function GuestDocuments() {
   if (loading) return <div className="min-h-screen bg-charcoal flex items-center justify-center"><div className="w-7 h-7 border-2 border-gold/20 border-t-gold rounded-full animate-spin" /></div>;
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-24 px-5">
+    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-28 lg:pb-10 px-4 sm:px-5">
       <div className="max-w-xl mx-auto">
-        <Link to="/account" className="flex items-center gap-2 text-ivory/30 hover:text-ivory text-xs font-body tracking-widest uppercase mb-8 transition-colors">
+        <Link to="/account" className="flex items-center gap-2 text-ivory/30 hover:text-ivory text-xs font-body tracking-widest uppercase mb-6 sm:mb-8 transition-colors mt-4">
           <ArrowLeft className="w-3.5 h-3.5" /> {t.back}
         </Link>
-        <h1 className="font-display text-4xl font-light text-ivory mb-8">{t.title}</h1>
+        <h1 className="font-display text-3xl sm:text-4xl font-light text-ivory mb-6 sm:mb-8">{t.title}</h1>
 
         {/* Upload form */}
-        <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-6 mb-6">
+        <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-5 sm:p-6 mb-6">
           <h2 className="text-ivory/40 text-[10px] tracking-[0.3em] uppercase font-body mb-5">{t.upload_title}</h2>
           <form onSubmit={handleUpload} className="space-y-4">
             <div>
@@ -137,7 +137,12 @@ export default function GuestDocuments() {
 
         {/* Document list */}
         {docs.length === 0 ? (
-          <div className="glass-card border border-[#C9A96E]/08 rounded-xl p-8 text-center text-ivory/30 text-sm font-body">{t.empty}</div>
+          <div className="glass-card border border-[#C9A96E]/08 rounded-xl p-8 text-center">
+            <p className="text-ivory/30 text-sm font-body mb-2">{t.empty}</p>
+            <p className="text-ivory/20 text-xs font-body">
+              {lang === 'de' ? 'Laden Sie Dokumente hoch, die wir für Ihren Aufenthalt benötigen.' : lang === 'en' ? 'Upload documents we need for your stay.' : 'Caricate i documenti necessari per il vostro soggiorno.'}
+            </p>
+          </div>
         ) : (
           <div className="space-y-2">
             {docs.map(doc => {

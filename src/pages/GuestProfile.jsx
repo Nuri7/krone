@@ -63,12 +63,12 @@ export default function GuestProfile() {
   if (loading) return <div className="min-h-screen bg-charcoal flex items-center justify-center"><div className="w-7 h-7 border-2 border-gold/20 border-t-gold rounded-full animate-spin" /></div>;
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-24 px-5">
+    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-28 lg:pb-10 px-4 sm:px-5">
       <div className="max-w-xl mx-auto">
-        <Link to="/account" className="flex items-center gap-2 text-ivory/30 hover:text-ivory text-xs font-body tracking-widest uppercase mb-8 transition-colors">
+        <Link to="/account" className="flex items-center gap-2 text-ivory/30 hover:text-ivory text-xs font-body tracking-widest uppercase mb-6 sm:mb-8 transition-colors mt-4">
           <ArrowLeft className="w-3.5 h-3.5" /> {t.back}
         </Link>
-        <h1 className="font-display text-4xl font-light text-ivory mb-8">{t.title}</h1>
+        <h1 className="font-display text-3xl sm:text-4xl font-light text-ivory mb-6 sm:mb-8">{t.title}</h1>
 
         <form onSubmit={handleSave} className="space-y-5">
           <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-6 space-y-4">

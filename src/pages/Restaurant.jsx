@@ -172,18 +172,18 @@ export default function Restaurant() {
       </section>
 
       {/* ── FOOD GALLERY ─────────────────────────────────────── */}
-      <section className="py-6 px-5 bg-espresso">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="relative rounded-2xl overflow-hidden h-64 md:col-span-2 group">
+      <section className="py-6 px-4 sm:px-5 bg-espresso">
+        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden aspect-square col-span-2 group">
             <img src={IMG_FOOD1} alt="Pasta Ammesso" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 to-transparent" />
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="relative rounded-2xl overflow-hidden flex-1 group">
+          <div className="flex flex-col gap-2 sm:gap-4">
+            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden flex-1 group">
               <img src={IMG_FOOD2} alt="Kulinarium Gericht" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
             </div>
-            <div className="relative rounded-2xl overflow-hidden flex-1 group">
+            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden flex-1 group">
               <img src={IMG_PASTA} alt="Pasta fresca" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
             </div>

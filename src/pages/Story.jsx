@@ -60,13 +60,13 @@ export default function Story() {
   return (
     <div className="min-h-screen bg-charcoal text-ivory pb-20 lg:pb-0">
       {/* Hero */}
-      <div className="relative h-[55vh] min-h-[360px] overflow-hidden">
-        <img src={RESTAURANT_IMG} alt="Kulinarium by Ammesso" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-charcoal/20 to-charcoal" />
-        <div className="absolute inset-0 flex items-end pb-12 px-5">
+      <div className="relative h-[50vh] sm:h-[55vh] min-h-[320px] sm:min-h-[360px] overflow-hidden">
+        <img src={RESTAURANT_IMG} alt="Kulinarium by Ammesso" className="w-full h-full object-cover" loading="eager" />
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/60 via-charcoal/25 to-charcoal" />
+        <div className="absolute inset-0 flex items-end pb-10 sm:pb-12 px-5">
           <div className="max-w-3xl mx-auto w-full">
             <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">{cv.label}</p>
-            <h1 className="font-display text-4xl md:text-6xl font-light text-ivory">{cv.title}</h1>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-light text-ivory leading-tight">{cv.title}</h1>
           </div>
         </div>
       </div>
@@ -89,9 +89,9 @@ export default function Story() {
       </section>
 
       {/* Chef section */}
-      <section className="py-16 px-5 bg-espresso">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="relative rounded-2xl overflow-hidden h-[480px] shadow-premium">
+      <section className="py-12 sm:py-16 px-4 sm:px-5 bg-espresso">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
+          <div className="relative rounded-2xl overflow-hidden h-72 sm:h-[480px] shadow-premium">
             <img src={CHEF_IMG} alt="Chef Omar Ammesso" className="w-full h-full object-cover object-top" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
@@ -112,21 +112,23 @@ export default function Story() {
       </section>
 
       {/* Values */}
-      <section className="py-16 px-5">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+      <section className="py-12 sm:py-16 px-4 sm:px-5">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
           {cv.values.map((v, i) => (
-            <div key={i} className="glass-card rounded-2xl p-8 border border-[#C9A96E]/10">
-              <div className="text-4xl mb-4">{v.e}</div>
-              <h3 className="font-display text-xl font-light text-ivory mb-2">{v.t}</h3>
-              <p className="text-ivory/40 text-sm font-body leading-relaxed">{v.d}</p>
+            <div key={i} className="glass-card rounded-2xl p-6 sm:p-8 border border-[#C9A96E]/10 flex sm:flex-col items-center sm:items-center gap-4 sm:gap-0 text-left sm:text-center">
+              <div className="text-3xl sm:text-4xl sm:mb-4 flex-shrink-0">{v.e}</div>
+              <div>
+                <h3 className="font-display text-xl font-light text-ivory mb-1 sm:mb-2">{v.t}</h3>
+                <p className="text-ivory/40 text-sm font-body leading-relaxed">{v.d}</p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="bg-espresso py-14 px-5 text-center border-t border-[#C9A96E]/10">
-        <h2 className="font-display text-4xl font-light text-ivory mb-6">
+      <section className="bg-espresso py-12 sm:py-14 px-4 sm:px-5 text-center border-t border-[#C9A96E]/10">
+        <h2 className="font-display text-3xl sm:text-4xl font-light text-ivory mb-5 sm:mb-6">
           {lang === 'de' ? 'Erleben Sie es selbst.' : lang === 'en' ? 'Come experience it.' : 'Vieni a scoprirlo.'}
         </h2>
         <Link to="/reserve"

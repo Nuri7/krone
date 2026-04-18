@@ -296,14 +296,14 @@ export default function Reserve() {
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-800 pt-12 pb-24 lg:pb-10 lg:pt-16">
 
       {/* Hero header */}
-      <div className="relative overflow-hidden -mx-5">
+      <div className="relative overflow-hidden w-full">
         <div className="absolute inset-0 bg-gradient-to-b from-[#1A1410] to-[#0F0D0B]" />
         <img
           src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=80"
           alt="Restaurant"
           className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
-        <div className="relative z-10 text-center py-10 lg:py-16 px-5">
+        <div className="relative z-10 text-center py-8 lg:py-14 px-5">
           <p className="text-[#C9A96E] text-[9px] sm:text-[10px] tracking-[0.5em] uppercase font-body mb-2 lg:mb-3">Krone Langenburg by Ammesso</p>
           <h1 className="font-display text-2xl sm:text-3xl md:text-6xl font-light text-white mb-2 lg:mb-3">{c.title}</h1>
           <p className="text-white/50 font-body text-xs sm:text-sm tracking-wider">{c.sub}</p>
@@ -404,7 +404,7 @@ export default function Reserve() {
         {/* ── STEP 2: Time ── */}
         {step === 2 && (
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-3xl shadow-xl p-8">
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
               <button onClick={() => setStep(1)} className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 text-xs font-body tracking-widest uppercase mb-6 transition-colors">
                 <ChevronLeft className="w-4 h-4" /> {tr('common', 'back')}
               </button>
@@ -434,7 +434,7 @@ export default function Reserve() {
         {/* ── STEP 3: Form ── */}
         {step === 3 && (
           <div className="max-w-xl mx-auto">
-            <div className="bg-white rounded-3xl shadow-xl p-8">
+            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
               <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 text-xs font-body tracking-widest uppercase mb-6 transition-colors">
                 <ChevronLeft className="w-4 h-4" /> {tr('common', 'back')}
               </button>

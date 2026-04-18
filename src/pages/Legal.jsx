@@ -6,9 +6,9 @@ export default function Legal() {
   const s = SITE_DEFAULTS;
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-24 pb-16">
-      <div className="max-w-3xl mx-auto px-5">
-        <h1 className="font-display text-5xl font-light text-ivory mb-10">
+    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-24 pb-24 lg:pb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-5">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-ivory mb-8 sm:mb-10 mt-6 sm:mt-0">
           {lang === 'de' ? 'Impressum & Datenschutz' : lang === 'en' ? 'Legal & Privacy' : 'Note legali & Privacy'}
         </h1>
 

@@ -155,7 +155,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-20 px-5">
+    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-28 lg:pb-10 px-4 sm:px-5">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}

@@ -65,7 +65,7 @@ export default function BookingReturn() {
   const cfg = configs[state];
 
   return (
-    <div className="min-h-screen bg-charcoal flex items-center justify-center px-5 pt-20 pb-16">
+    <div className="min-h-screen bg-charcoal flex items-center justify-center px-4 sm:px-5 pt-16 sm:pt-20 pb-28 lg:pb-16">
       <div className="max-w-md w-full">
         <div className={`glass-card rounded-2xl p-10 text-center border ${cfg.color} mb-6`}>
           <div className="flex justify-center mb-6">{cfg.icon}</div>
