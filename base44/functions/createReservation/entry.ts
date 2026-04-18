@@ -100,6 +100,8 @@ Deno.serve(async (req) => {
     });
 
     // Fire confirmation email (non-blocking)
+    // NOTE: Base44 SendEmail can only send to app users, not external emails.
+    // For external guests, we log the attempt and admin must trigger manually via admin dashboard.
     (async () => {
       try {
         const templates = {
@@ -187,20 +189,29 @@ Deno.serve(async (req) => {
         };
         const template = templates[lang] || templates.de;
 
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: email,
-          from_name: 'Krone Langenburg by Ammesso',
-          subject: template.subject,
-          body: template.body
-        });
+        // Try to send email. If recipient is external (not an app user), SendEmail will fail.
+        // In that case, log it and leave status as 'new' for admin to confirm/email manually.
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: email,
+            from_name: 'Krone Langenburg by Ammesso',
+            subject: template.subject,
+            body: template.body
+          });
 
-        // Update to confirmed + mark email sent
-        await base44.asServiceRole.entities.RestaurantReservation.update(reservation.id, {
-          status: 'confirmed',
-          email_confirmation_sent: true,
-          email_confirmation_sent_at: new Date().toISOString(),
-          confirmed_at: new Date().toISOString(),
-        });
+          // Email sent successfully — mark confirmed
+          await base44.asServiceRole.entities.RestaurantReservation.update(reservation.id, {
+            status: 'confirmed',
+            email_confirmation_sent: true,
+            email_confirmation_sent_at: new Date().toISOString(),
+            confirmed_at: new Date().toISOString(),
+          });
+        } catch (emailErr) {
+          // Email failed (likely external address). Leave status as 'new' and log for admin.
+          console.warn('Email send failed, reservation stays in "new" status for admin confirmation:', emailErr.message);
+          // EmailLog will be recorded in catch block below
+          throw emailErr; // Re-throw to trigger outer catch
+        }
 
         await base44.asServiceRole.entities.EmailLog.create({
           recipient: email,

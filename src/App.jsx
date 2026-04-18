@@ -24,6 +24,7 @@ import GuestAccount from './pages/GuestAccount';
 import GuestProfile from './pages/GuestProfile';
 import GuestDocuments from './pages/GuestDocuments';
 import GuestMessages from './pages/GuestMessages';
+import GuestReservations from './pages/GuestReservations';
 import Gallery from './pages/Gallery';
 import Dashboard from './pages/Dashboard';
 import ActivityLogPage from './pages/ActivityLogPage';
@@ -72,6 +73,7 @@ const AuthenticatedApp = () => {
         <Route path="/account/profile" element={<GuestProfile />} />
         <Route path="/account/documents" element={<GuestDocuments />} />
         <Route path="/account/messages" element={<GuestMessages />} />
+        <Route path="/account/reservations" element={<GuestReservations />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/activity-log" element={<ActivityLogPage />} />

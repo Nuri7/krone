@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLang } from '@/lib/useLang';
-import { User, FileText, MessageSquare, UtensilsCrossed, BedDouble, LogOut, ChevronRight, Settings, LayoutDashboard, Calendar, Clock } from 'lucide-react';
+import { User, FileText, MessageSquare, UtensilsCrossed, BedDouble, LogOut, ChevronRight, Settings, LayoutDashboard, Activity, Clock, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
 const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
@@ -58,10 +58,7 @@ export default function GuestAccount() {
       },
       quick_reserve: 'Tisch reservieren',
       quick_rooms: 'Zimmer buchen',
-      res_title: 'Ihre Reservierungen',
-      res_empty: 'Noch keine Tischreservierungen vorhanden.',
-      res_empty_cta: 'Jetzt Ihren nächsten Tisch reservieren',
-      guests_label: 'Personen',
+
       new_badge: 'Neu',
     },
     en: {
@@ -76,10 +73,7 @@ export default function GuestAccount() {
       },
       quick_reserve: 'Reserve a Table',
       quick_rooms: 'Book a Room',
-      res_title: 'Your Reservations',
-      res_empty: 'No table reservations yet.',
-      res_empty_cta: 'Reserve your next table',
-      guests_label: 'Guests',
+
       new_badge: 'New',
     },
     it: {
@@ -94,10 +88,7 @@ export default function GuestAccount() {
       },
       quick_reserve: 'Prenota un tavolo',
       quick_rooms: 'Prenota una camera',
-      res_title: 'Le tue prenotazioni',
-      res_empty: 'Nessuna prenotazione ancora.',
-      res_empty_cta: 'Prenota il tuo prossimo tavolo',
-      guests_label: 'Ospiti',
+
       new_badge: 'Nuovo',
     },
   };
@@ -115,6 +106,7 @@ export default function GuestAccount() {
 
   const isAdmin = user && (ADMIN_EMAILS.includes(user.email) || user.role === 'admin');
   const newMessages = messages.filter(m => m.status === 'new').length;
+  const hasPastReservations = reservations.some(r => new Date(r.reservation_date) <= new Date());
 
   return (
     <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-28 lg:pb-10 px-4 sm:px-5">
@@ -172,6 +164,7 @@ export default function GuestAccount() {
         {/* Account sections */}
         <div className="space-y-2 mb-6 sm:mb-8">
           {[
+            { to: '/account/reservations', icon: Calendar, label: lang === 'de' ? 'Meine Reservierungen' : lang === 'en' ? 'My Reservations' : 'Le mie prenotazioni', desc: lang === 'de' ? 'Sehen Sie Ihre Tischreservierungen' : lang === 'en' ? 'View your table reservations' : 'Visualizza le tue prenotazioni' },
             { to: '/account/profile', icon: Settings, ...c.sections.profile },
             { to: '/account/messages', icon: MessageSquare, ...c.sections.messages, badge: newMessages > 0 ? newMessages : null },
             { to: '/account/documents', icon: FileText, ...c.sections.documents, badge: documents.length > 0 ? documents.length : null },
@@ -183,7 +176,7 @@ export default function GuestAccount() {
                   <item.icon className="w-4 h-4 text-gold/50 group-hover:text-gold/70 transition-colors" />
                 </div>
                 <div>
-                  <p className="text-ivory/75 text-sm font-body font-medium">{item.label}</p>
+                  <p className="text-ivory/75 text-sm font-body font-medium">{item.label || item[lang === 'de' ? 'label' : 'label']}</p>
                   <p className="text-ivory/30 text-xs font-body mt-0.5">{item.desc}</p>
                 </div>
               </div>
@@ -233,43 +226,24 @@ export default function GuestAccount() {
           </div>
         )}
 
-        {/* Reservations */}
-        <div>
-          <h2 className="text-ivory/30 text-[10px] tracking-[0.35em] uppercase font-body mb-4 flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5" /> {c.res_title}
-          </h2>
-          {reservations.length === 0 ? (
-            <div className="glass-card border border-[#C9A96E]/08 rounded-2xl p-8 text-center">
-              <p className="text-ivory/25 text-sm font-body mb-4">{c.res_empty}</p>
-              <Link to="/reserve" className="inline-flex items-center gap-1.5 text-gold/60 hover:text-gold text-xs font-body tracking-wider transition-colors">
-                {c.res_empty_cta} <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {reservations.slice(0, 6).map(r => (
-                <div key={r.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1A1410] border border-[#C9A96E]/10 flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-gold/40" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-body text-xs sm:text-sm text-ivory/80 font-medium truncate">
-                        {r.reservation_date} · {r.reservation_time}
-                      </p>
-                      <p className="text-ivory/30 text-[10px] sm:text-xs font-body mt-0.5 truncate">
-                        {r.party_size} {c.guests_label} · <span className="hidden sm:inline">{r.reservation_ref}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <span className={`text-[10px] font-body font-medium px-2 sm:px-2.5 py-1 rounded-full border flex-shrink-0 whitespace-nowrap ${STATUS_COLORS[r.status] || 'text-ivory/30 bg-ivory/5 border-ivory/10'}`}>
-                    {statusMap[r.status] || r.status}
-                  </span>
+        {/* Reservations Quick Link */}
+        {reservations.length > 0 && (
+          <div>
+            <Link to="/account/reservations"
+              className="glass-card border border-[#C9A96E]/10 rounded-2xl p-5 flex items-center justify-between hover:border-[#C9A96E]/25 transition-all group">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                  <Calendar className="w-4 h-4 text-gold/70 group-hover:text-gold transition-colors" />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div>
+                  <p className="text-ivory/75 text-sm font-body font-medium">{c.res_title}</p>
+                  <p className="text-ivory/30 text-xs font-body mt-0.5">{reservations.length} {lang === 'de' ? 'Reservierungen' : lang === 'en' ? 'reservations' : 'prenotazioni'}</p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-ivory/15 group-hover:text-ivory/30 transition-colors group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
