@@ -6,13 +6,13 @@ import { MessageSquare, Send, ArrowLeft, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 const REQUEST_TYPES = [
-  { id: 'general', de: 'Allgemeine Frage', en: 'General Question', it: 'Domanda generale' },
+  { id: 'general_question', de: 'Allgemeine Frage', en: 'General Question', it: 'Domanda generale' },
   { id: 'arrival_time', de: 'Ankunftszeit', en: 'Arrival Time', it: 'Orario di arrivo' },
   { id: 'invoice_address', de: 'Rechnungsadresse', en: 'Invoice Address', it: 'Indirizzo fattura' },
   { id: 'room_preference', de: 'Zimmerwunsch', en: 'Room Preference', it: 'Preferenza camera' },
   { id: 'extra_bed', de: 'Zusatzbett / Kinderbett', en: 'Extra / Baby Bed', it: 'Letto extra / culla' },
-  { id: 'dietary', de: 'Ernährungshinweis', en: 'Dietary Request', it: 'Richiesta alimentare' },
-  { id: 'other', de: 'Sonstiges', en: 'Other', it: 'Altro' },
+  { id: 'dietary_request', de: 'Ernährungshinweis', en: 'Dietary Request', it: 'Richiesta alimentare' },
+  { id: 'special_request', de: 'Sonderwunsch', en: 'Special Request', it: 'Richiesta speciale' },
 ];
 
 const STATUS_INFO = {
@@ -27,7 +27,7 @@ export default function GuestMessages() {
   const [user, setUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ request_type: 'general', subject: '', body: '' });
+  const [form, setForm] = useState({ message_type: 'general_question', subject: '', body: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -54,12 +54,12 @@ export default function GuestMessages() {
     // Notify hotel via secure backend function (never call integrations from frontend)
     base44.functions.invoke('sendGuestMessageEmail', {
       guest_name: fullName,
-      request_type: form.request_type,
+      request_type: form.message_type,
       subject: form.subject,
       body: form.body,
     }).catch(() => {});
     setMessages(prev => [msg, ...prev]);
-    setForm({ request_type: 'general', subject: '', body: '' });
+    setForm({ message_type: 'general_question', subject: '', body: '' });
     setSent(true);
     setSending(false);
     setTimeout(() => setSent(false), 4000);
@@ -90,7 +90,7 @@ export default function GuestMessages() {
           <form onSubmit={handleSend} className="space-y-4">
             <div>
               <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.type}</label>
-              <select value={form.request_type} onChange={e => setForm(f => ({ ...f, request_type: e.target.value }))} className={inputClass}>
+              <select value={form.message_type} onChange={e => setForm(f => ({ ...f, message_type: e.target.value }))} className={inputClass}>
                 {REQUEST_TYPES.map(rt => (
                   <option key={rt.id} value={rt.id}>{lang === 'de' ? rt.de : lang === 'en' ? rt.en : rt.it}</option>
                 ))}
@@ -128,7 +128,7 @@ export default function GuestMessages() {
           <div className="space-y-2">
             {messages.map(msg => {
               const statusInfo = STATUS_INFO[msg.status] || STATUS_INFO.new;
-              const rt = REQUEST_TYPES.find(r => r.id === msg.request_type);
+              const rt = REQUEST_TYPES.find(r => r.id === (msg.message_type || msg.request_type));
               return (
                 <div key={msg.id}
                   className={`glass-card border rounded-xl p-4 cursor-pointer transition-all ${selected === msg.id ? 'border-gold/20' : 'border-[#C9A96E]/08 hover:border-[#C9A96E]/20'}`}

@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
         };
         const template = templates[lang] || templates.de;
         
-        const emailResult = await base44.integrations.Core.SendEmail({
+        const emailResult = await base44.asServiceRole.integrations.Core.SendEmail({
           to: email,
           subject: template.subject,
           body: template.body

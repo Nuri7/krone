@@ -174,20 +174,22 @@ export default function Admin() {
     <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-16">
       <div className="max-w-6xl mx-auto px-5">
         {/* Header */}
-        <div className="flex items-center justify-between py-6 sm:py-8">
-          <div>
+        <div className="flex items-center justify-between py-6 sm:py-8 gap-3">
+          <div className="min-w-0">
             <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-1">Admin</p>
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ivory">Dashboard</h1>
-            <p className="text-ivory/30 text-xs font-body mt-1 truncate max-w-[180px] sm:max-w-none">{user?.email}</p>
+            <p className="text-ivory/30 text-xs font-body mt-1 truncate max-w-[140px] sm:max-w-xs">{user?.email}</p>
           </div>
-          <Link to="/activity-log" className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors flex-shrink-0">
-            <Activity className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Activity Log</span>
-          </Link>
-          <button onClick={loadAll} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-ivory text-xs font-body transition-colors flex-shrink-0">
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Aktualisieren</span>
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link to="/activity-log" className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
+              <Activity className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Log</span>
+            </Link>
+            <button onClick={loadAll} className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-ivory text-xs font-body transition-colors">
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Aktualisieren</span>
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -491,7 +493,7 @@ export default function Admin() {
                       </div>
                       <p className="text-ivory/30 text-xs font-body">
                         {int.guests_adults} Erw. {int.guests_children > 0 ? `· ${int.guests_children} Kinder` : ''} · Sprache: {int.language?.toUpperCase() || 'DE'}
-                        {int.room_interest && ` · Zimmer: ${int.room_interest}`}
+                        {(int.room_interest || int.room_category_interest) && ` · Zimmer: ${int.room_interest || int.room_category_interest}`}
                       </p>
                       <p className="text-ivory/20 text-[10px] font-body mt-0.5">{int.created_date ? format(new Date(int.created_date), 'dd.MM.yy HH:mm') : ''}</p>
                     </div>

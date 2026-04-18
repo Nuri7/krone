@@ -7,7 +7,8 @@ import { format } from 'date-fns';
 
 const CATEGORIES = [
   { id: 'id_document', de: 'Ausweisdokument', en: 'ID Document', it: 'Documento d\'identità' },
-  { id: 'invoice_data', de: 'Rechnungsdaten', en: 'Invoice Data', it: 'Dati fattura' },
+  { id: 'passport', de: 'Reisepass', en: 'Passport', it: 'Passaporto' },
+  { id: 'invoice_address', de: 'Rechnungsadresse', en: 'Invoice Address', it: 'Indirizzo fattura' },
   { id: 'event_attachment', de: 'Event-Anhang', en: 'Event Attachment', it: 'Allegato evento' },
   { id: 'verification', de: 'Verifizierung', en: 'Verification', it: 'Verifica' },
   { id: 'special_request', de: 'Sonderwunsch', en: 'Special Request', it: 'Richiesta speciale' },

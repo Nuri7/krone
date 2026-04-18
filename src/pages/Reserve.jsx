@@ -191,8 +191,15 @@ function TimeGrid({ slots, usedCapacity, guests, selected, onSelect, lang }) {
 
 const inputClass = "w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3.5 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#C9A96E]/60 focus:ring-2 focus:ring-[#C9A96E]/10 transition-all font-body";
 
+const COPY = {
+  de: { title: 'Tischreservierung', sub: 'Wählen Sie Ihren Wunschtermin', step1: 'Datum & Gäste', step2: 'Uhrzeit', step3: 'Ihre Daten', guests_label: 'Anzahl der Gäste', date_label: 'Datum wählen', closed_msg: 'Montag ist unser Ruhetag – bitte wählen Sie einen anderen Tag.', no_slots: 'Keine verfügbaren Zeiten.', confirm: 'Verbindlich reservieren', policy: 'Ihre Reservierung ist verbindlich. Bei Nichterscheinen behalten wir uns vor, künftige Reservierungen einzuschränken.', success_title: 'Reservierung bestätigt', success_text: 'Sie erhalten in Kürze eine Bestätigung per E-Mail.', error_duplicate: 'Diese E-Mail-Adresse hat für diesen Zeitslot bereits eine Reservierung.', error_full: 'Dieser Zeitslot ist leider ausgebucht. Bitte wählen Sie eine andere Zeit.' },
+  en: { title: 'Table Reservation', sub: 'Choose your preferred date', step1: 'Date & Guests', step2: 'Time', step3: 'Your Details', guests_label: 'Number of guests', date_label: 'Select date', closed_msg: 'Monday is our day off — please select another date.', no_slots: 'No available times.', confirm: 'Confirm Reservation', policy: 'Your reservation is binding. In case of no-show we reserve the right to restrict future bookings.', success_title: 'Reservation Confirmed', success_text: 'You will receive a confirmation email shortly.', error_duplicate: 'This email already has a reservation for this time slot.', error_full: 'This time slot is fully booked. Please choose a different time.' },
+  it: { title: 'Prenotazione Tavolo', sub: 'Scegli la tua data preferita', step1: 'Data & Ospiti', step2: 'Orario', step3: 'I tuoi dati', guests_label: 'Numero di ospiti', date_label: 'Seleziona data', closed_msg: 'Lunedì siamo chiusi — scegli un altro giorno.', no_slots: 'Nessun orario disponibile.', confirm: 'Conferma prenotazione', policy: 'La prenotazione è vincolante. In caso di mancata presentazione ci riserviamo di limitare le future prenotazioni.', success_title: 'Prenotazione confermata', success_text: 'Riceverete a breve una conferma via email.', error_duplicate: 'Questa email ha già una prenotazione per questo orario.', error_full: 'Questo orario è al completo. Scegliete un orario diverso.' },
+};
+
 export default function Reserve() {
-  const { tr, lang } = useLang();
+  const { lang } = useLang();
+  const c = COPY[lang] || COPY.de;
   const [step, setStep] = useState(1);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -260,13 +267,6 @@ export default function Reserve() {
     }).catch(() => {});
   }
 
-  const C = {
-    de: { title: 'Tischreservierung', sub: 'Wählen Sie Ihren Wunschtermin', step1: 'Datum & Gäste', step2: 'Uhrzeit', step3: 'Ihre Daten', guests_label: 'Anzahl der Gäste', date_label: 'Datum wählen', closed_msg: 'Montag ist unser Ruhetag – bitte wählen Sie einen anderen Tag.', no_slots: 'Keine verfügbaren Zeiten.', confirm: 'Verbindlich reservieren', policy: 'Ihre Reservierung ist verbindlich. Bei Nichterscheinen behalten wir uns vor, künftige Reservierungen einzuschränken.', success_title: 'Reservierung bestätigt', success_text: 'Sie erhalten in Kürze eine Bestätigung per E-Mail.', error_duplicate: 'Diese E-Mail-Adresse hat für diesen Zeitslot bereits eine Reservierung.', error_full: 'Dieser Zeitslot ist leider ausgebucht. Bitte wählen Sie eine andere Zeit.' },
-    en: { title: 'Table Reservation', sub: 'Choose your preferred date', step1: 'Date & Guests', step2: 'Time', step3: 'Your Details', guests_label: 'Number of guests', date_label: 'Select date', closed_msg: 'Monday is our day off — please select another date.', no_slots: 'No available times.', confirm: 'Confirm Reservation', policy: 'Your reservation is binding. In case of no-show we reserve the right to restrict future bookings.', success_title: 'Reservation Confirmed', success_text: 'You will receive a confirmation email shortly.', error_duplicate: 'This email already has a reservation for this time slot.', error_full: 'This time slot is fully booked. Please choose a different time.' },
-    it: { title: 'Prenotazione Tavolo', sub: 'Scegli la tua data preferita', step1: 'Data & Ospiti', step2: 'Orario', step3: 'I tuoi dati', guests_label: 'Numero di ospiti', date_label: 'Seleziona data', closed_msg: 'Lunedì siamo chiusi — scegli un altro giorno.', no_slots: 'Nessun orario disponibile.', confirm: 'Conferma prenotazione', policy: 'La prenotazione è vincolante. In caso di mancata presentazione ci riserviamo di limitare le future prenotazioni.', success_title: 'Prenotazione confermata', success_text: 'Riceverete a breve una conferma via email.', error_duplicate: 'Questa email ha già una prenotazione per questo orario.', error_full: 'Questo orario è al completo. Scegliete un orario diverso.' },
-  };
-  const c = C[lang] || C.de;
-
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center px-4 sm:px-5 pt-16 sm:pt-20 pb-24 sm:pb-16">
@@ -279,12 +279,12 @@ export default function Reserve() {
           <p className="text-stone-500 font-body text-sm mb-6">{c.success_text}</p>
           <p className="text-xs text-stone-400 font-body mb-6">Ref: <strong className="text-stone-600">{reservationRef}</strong></p>
           <div className="bg-stone-50 rounded-2xl p-5 text-sm font-body text-left space-y-3 mb-7 border border-stone-100">
-            <div className="flex justify-between"><span className="text-stone-400">{tr('reservation', 'date')}</span><span className="text-stone-700 font-medium">{date}</span></div>
-            <div className="flex justify-between"><span className="text-stone-400">{tr('reservation', 'time')}</span><span className="text-stone-700 font-medium">{time}</span></div>
-            <div className="flex justify-between"><span className="text-stone-400">{tr('reservation', 'guests')}</span><span className="text-stone-700 font-medium">{guests}</span></div>
+            <div className="flex justify-between"><span className="text-stone-400">{lang === 'de' ? 'Datum' : lang === 'en' ? 'Date' : 'Data'}</span><span className="text-stone-700 font-medium">{format(new Date(date), 'EEEE, d. MMMM yyyy', { locale: LOCALE_MAP[lang] || de })}</span></div>
+            <div className="flex justify-between"><span className="text-stone-400">{lang === 'de' ? 'Uhrzeit' : lang === 'en' ? 'Time' : 'Orario'}</span><span className="text-stone-700 font-medium">{time} Uhr</span></div>
+            <div className="flex justify-between"><span className="text-stone-400">{lang === 'de' ? 'Personen' : lang === 'en' ? 'Guests' : 'Ospiti'}</span><span className="text-stone-700 font-medium">{guests}</span></div>
           </div>
           <a href="/" className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#C9A96E] hover:bg-[#B8924A] text-white rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold transition-colors shadow-lg">
-            {tr('common', 'back')}
+            {lang === 'de' ? 'Zur Startseite' : lang === 'en' ? 'Back to Home' : 'Torna alla home'}
           </a>
         </div>
       </div>
@@ -361,7 +361,7 @@ export default function Reserve() {
                   </button>
                 </div>
                 {guests === 10 && (
-                  <p className="text-[#C9A96E] text-xs font-body text-center mt-3">{tr('reservation', 'max_party')}</p>
+                  <p className="text-[#C9A96E] text-xs font-body text-center mt-3">{lang === 'de' ? 'Für Gruppen > 10 bitte direkt anfragen.' : lang === 'en' ? 'For groups > 10 please contact us directly.' : 'Per gruppi > 10 contattateci.'}</p>
                 )}
               </div>
 
@@ -407,7 +407,7 @@ export default function Reserve() {
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
               <button onClick={() => setStep(1)} className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 text-xs font-body tracking-widest uppercase mb-6 transition-colors">
-                <ChevronLeft className="w-4 h-4" /> {tr('common', 'back')}
+                <ChevronLeft className="w-4 h-4" /> {lang === 'de' ? 'Zurück' : lang === 'en' ? 'Back' : 'Indietro'}
               </button>
 
               {/* Date + guests pill */}
@@ -437,7 +437,7 @@ export default function Reserve() {
           <div className="max-w-xl mx-auto">
             <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
               <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 text-xs font-body tracking-widest uppercase mb-6 transition-colors">
-                <ChevronLeft className="w-4 h-4" /> {tr('common', 'back')}
+                <ChevronLeft className="w-4 h-4" /> {lang === 'de' ? 'Zurück' : lang === 'en' ? 'Back' : 'Indietro'}
               </button>
 
               {/* Summary pill */}
@@ -459,24 +459,24 @@ export default function Reserve() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{tr('reservation', 'first_name')} *</label>
+                    <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Vorname' : lang === 'en' ? 'First Name' : 'Nome'} *</label>
                     <input type="text" autoComplete="given-name" required value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{tr('reservation', 'last_name')} *</label>
+                    <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Nachname' : lang === 'en' ? 'Last Name' : 'Cognome'} *</label>
                     <input type="text" autoComplete="family-name" required value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} className={inputClass} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{tr('reservation', 'email')} *</label>
+                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">E-Mail *</label>
                   <input type="email" autoComplete="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{tr('reservation', 'phone')}</label>
+                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Telefon' : lang === 'en' ? 'Phone' : 'Telefono'}</label>
                   <input type="tel" autoComplete="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{tr('reservation', 'requests')}</label>
+                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Sonderwünsche' : lang === 'en' ? 'Special Requests' : 'Richieste speciali'}</label>
                   <textarea rows={3} value={form.requests} onChange={e => setForm(f => ({ ...f, requests: e.target.value }))} className={`${inputClass} resize-none`} placeholder={lang === 'de' ? 'Allergien, Geburtstag, Hochzeit …' : lang === 'en' ? 'Allergies, birthday, anniversary …' : 'Allergie, compleanno, anniversario …'} />
                 </div>
 

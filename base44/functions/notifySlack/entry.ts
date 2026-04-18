@@ -122,22 +122,28 @@ Deno.serve(async (req) => {
 
     // Log Slack attempt
     const base44 = createClientFromRequest(req);
-    const channel = type === 'reservation' || type === 'reservation_cancelled' ? '#krone-reservations' : '#krone-ops-alerts';
-    const logStatus = slackRes.ok ? 'sent' : 'failed';
-    
+    const channel = (type === 'reservation' || type === 'reservation_cancelled') ? '#krone-reservations' : '#krone-ops-alerts';
+    const entityTypeMap = {
+      reservation: 'RestaurantReservation',
+      reservation_cancelled: 'RestaurantReservation',
+      contact: 'ContactInquiry',
+      guest_message: 'GuestMessage',
+      document_uploaded: 'GuestDocument',
+      booking_intent: 'HotelBookingIntent',
+      booking_returned: 'HotelBookingIntent',
+    };
+
     await base44.asServiceRole.entities.SlackLog.create({
       channel,
       message_type: type,
-      status: logStatus,
+      status: slackRes.ok ? 'sent' : 'failed',
       sent_at: new Date().toISOString(),
-      failure_reason: !slackRes.ok ? await slackRes.text() : null,
-      related_entity_type: type.includes('reservation') ? 'Reservation' : type === 'contact' ? 'ContactInquiry' : 'GuestMessage',
+      related_entity_type: entityTypeMap[type] || 'RestaurantReservation',
       related_ref: ref
     }).catch(() => {});
 
     if (!slackRes.ok) {
-      const text = await slackRes.text();
-      console.error(`Slack error: ${slackRes.status} ${text}`);
+      console.error(`Slack error: ${slackRes.status}`);
       return Response.json({ error: `Slack error: ${slackRes.status}` }, { status: 500 });
     }
 
