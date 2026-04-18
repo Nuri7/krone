@@ -82,9 +82,23 @@ export default function Story() {
 
       {/* Story text */}
       <section className="py-16 px-5">
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-3xl mx-auto space-y-8">
           <p className="font-body text-ivory/70 text-lg leading-relaxed">{cv.text1}</p>
           <p className="font-body text-ivory/55 leading-relaxed">{cv.text2}</p>
+          
+          {/* Additional context */}
+          <div className="pt-8 border-t border-[#C9A96E]/10 space-y-4">
+            <h3 className="font-display text-xl font-light text-ivory">
+              {lang === 'de' ? 'Inspiration & Handwerk' : lang === 'en' ? 'Inspiration & Craft' : 'Ispirazione & Mestiere'}
+            </h3>
+            <p className="text-ivory/45 text-sm leading-relaxed">
+              {lang === 'de'
+                ? 'Unsere Küche speist sich aus drei Quellen: den klassischen Techniken Süditaliens, der Frische des Hohenloher Marktes und der persönlichen Vision des Küchenchefs. Das Ergebnis sind Gerichte, die sich anfühlen wie die Heimat schmeckt — vertraut, warmherzig und unvergesslich.'
+                : lang === 'en'
+                ? 'Our cuisine draws from three sources: the classic techniques of Southern Italy, the freshness of the Hohenlohe market, and the personal vision of our chef. The result is cuisine that tastes like home feels — familiar, warm-hearted, and unforgettable.'
+                : 'La nostra cucina attinge da tre fonti: le tecniche classiche dell\'Italia meridionale, la freschezza del mercato di Hohenlohe e la visione personale dello chef. Il risultato sono piatti che profumano di casa — familiari, calorosi e indimenticabili.'}
+            </p>
+          </div>
         </div>
       </section>
 

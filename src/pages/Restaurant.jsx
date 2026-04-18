@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/useLang';
-import { ArrowRight, Clock, UtensilsCrossed, Star, MapPin } from 'lucide-react';
+import { ArrowRight, Clock, UtensilsCrossed, Star, MapPin, Leaf } from 'lucide-react';
 import { SITE_DEFAULTS } from '@/lib/siteData';
 
 const IMG_RESTAURANT = "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=85";
@@ -220,13 +220,52 @@ export default function Restaurant() {
         </div>
       </section>
 
+      {/* ── EXPERIENCE NOTES ─────────────────────────────────── */}
+      <section className="py-12 sm:py-16 px-4 sm:px-5">
+        <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="glass-card rounded-2xl p-6 border border-[#C9A96E]/10">
+            <h3 className="text-gold text-[10px] tracking-[0.3em] uppercase font-body font-semibold mb-3">
+              {lang === 'de' ? '⏰ Timing' : lang === 'en' ? '⏰ Timing' : '⏰ Orari'}
+            </h3>
+            <p className="text-ivory/60 text-sm font-body leading-relaxed">
+              {lang === 'de'
+                ? 'Lunchs sind intim und schnell. Abendessen: Take-your-time Erlebnisse. Sonntags öffnen wir früh und servieren bis spät — vollkommen entspannt.'
+                : lang === 'en'
+                ? 'Lunches are intimate and quick. Dinners are take-your-time experiences. Sundays we open early and serve late — completely relaxed.'
+                : 'I pranzi sono intimi e veloci. Le cene sono esperienze senza fretta. La domenica apriamo presto e serviamo fino a tardi — completamente rilassati.'}
+            </p>
+          </div>
+          <div className="glass-card rounded-2xl p-6 border border-[#C9A96E]/10">
+            <h3 className="text-gold text-[10px] tracking-[0.3em] uppercase font-body font-semibold mb-3">
+              {lang === 'de' ? '🥗 Diäten & Wünsche' : lang === 'en' ? '🥗 Diets & Wishes' : '🥗 Diete & Preferenze'}
+            </h3>
+            <p className="text-ivory/60 text-sm font-body leading-relaxed">
+              {lang === 'de'
+                ? 'Vegetarisch? Vegan? Allergien? Sagen Sie uns Bescheid — wir passen an und zaubern dir etwas Wunderschönes.'
+                : lang === 'en'
+                ? 'Vegetarian? Vegan? Allergies? Let us know — we adapt and create something beautiful for you.'
+                : 'Vegetariano? Vegano? Allergie? Facci sapere — ci adattiamo e creiamo qualcosa di bello per te.'}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── TRUST / FINAL CTA ────────────────────────────────── */}
-      <section className="bg-espresso py-12 sm:py-14 px-4 sm:px-5 text-center border-t border-[#C9A96E]/10">
-        <div className="flex justify-center gap-1 mb-4">
+      <section className="bg-espresso py-12 sm:py-16 px-4 sm:px-5 text-center border-t border-[#C9A96E]/10">
+        <div className="flex justify-center gap-1 mb-6">
           {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 sm:w-4 h-3.5 sm:h-4 fill-gold text-gold" />)}
         </div>
-        <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-ivory mb-5 sm:mb-6">{c.trust_title}</h2>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center max-w-sm sm:max-w-none mx-auto">
+        <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-ivory mb-3 leading-tight">
+          {lang === 'de' ? 'Wir freuen uns auf Sie.' : lang === 'en' ? 'We look forward to seeing you.' : 'Non vediamo l\'ora di vedervi.'}
+        </h2>
+        <p className="text-ivory/40 text-sm font-body mb-8">
+          {lang === 'de' 
+            ? 'Buchen Sie Ihren Tisch oder rufen Sie an — wir sind für Sie da.'
+            : lang === 'en'
+            ? 'Book your table or call us — we\'re here for you.'
+            : 'Prenota il tuo tavolo o chiamaci — siamo qui per te.'}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center max-w-sm sm:max-w-none mx-auto">
           <Link to="/reserve"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
             <UtensilsCrossed className="w-3.5 h-3.5" />

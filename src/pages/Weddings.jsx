@@ -187,7 +187,7 @@ export default function Weddings() {
       </section>
 
       {/* Gallery strip */}
-      <section className="px-5 pb-16">
+      <section className="px-5 pb-10">
         <div className="max-w-6xl mx-auto grid grid-cols-3 gap-4 h-56 md:h-72">
           {[IMAGES.table, IMAGES.dining, IMAGES.exterior].map((src, i) => (
             <div key={i} className={`relative rounded-2xl overflow-hidden ${i === 1 ? '' : 'opacity-70'}`}>
@@ -195,6 +195,61 @@ export default function Weddings() {
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Process / How It Works */}
+      <section className="py-14 sm:py-16 px-4 sm:px-5">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">
+              {lang === 'de' ? 'So funktioniert es' : lang === 'en' ? 'How it works' : 'Come funziona'}
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl font-light text-ivory">
+              {lang === 'de' ? 'Von der ersten Idee bis zum unvergesslichen Abend' : lang === 'en' ? 'From the first idea to the unforgettable evening' : 'Dalla prima idea alla serata indimenticabile'}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {[
+              {
+                step: '01',
+                de_t: 'Anfrage senden',
+                en_t: 'Send an Enquiry',
+                it_t: 'Invia una richiesta',
+                de: 'Erzählen Sie uns von Ihrem Event — Art, Datum, Gästezahl und Ihre Wünsche.',
+                en: 'Tell us about your event — type, date, guest count and your wishes.',
+                it: 'Raccontateci del vostro evento — tipo, data, numero di ospiti e i vostri desideri.',
+              },
+              {
+                step: '02',
+                de_t: 'Persönliches Gespräch',
+                en_t: 'Personal Consultation',
+                it_t: 'Consulenza personale',
+                de: 'Wir melden uns innerhalb von 24h und besprechen gemeinsam das ideale Konzept.',
+                en: 'We respond within 24h and discuss the ideal concept together.',
+                it: 'Vi rispondiamo entro 24h e discutiamo insieme il concetto ideale.',
+              },
+              {
+                step: '03',
+                de_t: 'Ihr unvergesslicher Tag',
+                en_t: 'Your Unforgettable Day',
+                it_t: 'Il vostro giorno indimenticabile',
+                de: 'Unser Team sorgt dafür, dass jedes Detail stimmt — vom Menü bis zur letzten Dekoration.',
+                en: 'Our team ensures every detail is perfect — from the menu to the last decoration.',
+                it: 'Il nostro team si assicura che ogni dettaglio sia perfetto — dal menù all\'ultima decorazione.',
+              },
+            ].map((item, i) => (
+              <div key={i} className="glass-card border border-[#C9A96E]/10 rounded-2xl p-6 relative">
+                <p className="font-display text-5xl font-light text-gold/20 mb-4">{item.step}</p>
+                <h3 className="font-display text-xl font-light text-ivory mb-3">
+                  {lang === 'de' ? item.de_t : lang === 'en' ? item.en_t : item.it_t}
+                </h3>
+                <p className="text-ivory/45 text-sm font-body leading-relaxed">
+                  {lang === 'de' ? item.de : lang === 'en' ? item.en : item.it}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

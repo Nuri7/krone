@@ -217,6 +217,60 @@ export default function Rooms() {
           </div>
         </div>
 
+        {/* What to expect section */}
+        <div className="mb-10 sm:mb-14 glass-card border border-[#C9A96E]/10 rounded-2xl p-6 sm:p-8">
+          <h2 className="font-display text-2xl md:text-3xl font-light text-ivory mb-5">
+            {lang === 'de' ? 'Warum direkt bei uns buchen?' : lang === 'en' ? 'Why book directly with us?' : 'Perché prenotare direttamente con noi?'}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[
+              {
+                de_t: '✦ Beste Preisgarantie',
+                en_t: '✦ Best Price Guarantee',
+                it_t: '✦ Garanzia miglior prezzo',
+                de: 'Direkt gebucht = günstigster Preis. Keine Drittanbieter-Gebühren, keine versteckten Kosten.',
+                en: 'Direct booking = best price. No third-party fees, no hidden costs.',
+                it: 'Prenotazione diretta = miglior prezzo. Nessuna commissione, nessun costo nascosto.',
+              },
+              {
+                de_t: '✦ Persönlicher Kontakt',
+                en_t: '✦ Personal Contact',
+                it_t: '✦ Contatto personale',
+                de: 'Sprechen Sie direkt mit unserem Team — für Sonderwünsche, Frühstück, Zimmerauswahl.',
+                en: 'Speak directly to our team — for special requests, breakfast, room selection.',
+                it: 'Parla direttamente con il nostro team — per richieste speciali, colazione, scelta camera.',
+              },
+              {
+                de_t: '✦ Historisches Ambiente',
+                en_t: '✦ Historic Atmosphere',
+                it_t: '✦ Atmosfera storica',
+                de: 'Schlafen Sie, wo Geschichte atmet — renoviert mit Respekt für das Original.',
+                en: 'Sleep where history breathes — renovated with respect for the original.',
+                it: 'Dormite dove respira la storia — ristrutturato nel rispetto dell\'originale.',
+              },
+              {
+                de_t: '✦ Restaurant vor der Tür',
+                en_t: '✦ Restaurant on your doorstep',
+                it_t: '✦ Ristorante sotto casa',
+                de: 'Wachen Sie auf und frühstücken Sie, wo Sie auch abends mediterran tafeln können.',
+                en: 'Wake up and breakfast where you can also dine Mediterranean in the evening.',
+                it: 'Svegliatevi e fate colazione dove cenerete anche la sera con cucina mediterranea.',
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-4">
+                <div>
+                  <p className="text-gold text-sm font-body font-semibold mb-1.5">
+                    {lang === 'de' ? item.de_t : lang === 'en' ? item.en_t : item.it_t}
+                  </p>
+                  <p className="text-ivory/50 text-sm font-body leading-relaxed">
+                    {lang === 'de' ? item.de : lang === 'en' ? item.en : item.it}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Room cards — premium layout */}
         <div className="space-y-8 mb-14">
           {ROOMS.map((r, idx) => {
@@ -329,6 +383,35 @@ export default function Rooms() {
           >
             {t.book_now} <ExternalLink className="w-4 h-4" />
           </button>
+        </div>
+
+        {/* Langenburg location section */}
+        <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10">
+          <h3 className="font-display text-2xl font-light text-ivory mb-3">
+            {lang === 'de' ? 'Langenburg & die Region Hohenlohe' : lang === 'en' ? 'Langenburg & the Hohenlohe Region' : 'Langenburg e la regione Hohenlohe'}
+          </h3>
+          <p className="text-ivory/50 text-sm font-body leading-relaxed mb-6">
+            {lang === 'de'
+              ? 'Langenburg ist eine der schönsten Kleinstädte Baden-Württembergs — gelegen im malerischen Jagsttal, geprägt von Schlössern, Weinbergen und der Weite des Hohenloher Landes. Die perfekte Basis für Ausflüge, Wanderungen und Entdeckungen.'
+              : lang === 'en'
+              ? 'Langenburg is one of the most beautiful small towns in Baden-Württemberg — set in the picturesque Jagst valley, shaped by castles, vineyards and the open Hohenlohe countryside. The perfect base for excursions, hikes and discoveries.'
+              : 'Langenburg è uno dei borghi più belli del Baden-Württemberg — situato nella pittoresca valle del Jagst, caratterizzata da castelli, vigneti e la vastità della campagna di Hohenlohe. La base perfetta per escursioni, passeggiate e scoperte.'}
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            {[
+              { emoji: '🏰', de: 'Schloss Langenburg', en: 'Langenburg Castle', it: 'Castello di Langenburg' },
+              { emoji: '🌊', de: 'Stausee Brettheim', en: 'Brettheim Reservoir', it: 'Lago di Brettheim' },
+              { emoji: '🥂', de: 'Hohenloher Wein', en: 'Hohenlohe Wine', it: 'Vini di Hohenlohe' },
+              { emoji: '🚶', de: 'Jagsttalweg', en: 'Jagst Valley Trail', it: 'Sentiero Jagst' },
+            ].map((item, i) => (
+              <div key={i} className="glass-card border border-[#C9A96E]/08 rounded-xl p-4">
+                <div className="text-2xl mb-2">{item.emoji}</div>
+                <p className="text-ivory/60 text-xs font-body">
+                  {lang === 'de' ? item.de : lang === 'en' ? item.en : item.it}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Wedding / Group */}

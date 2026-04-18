@@ -163,27 +163,41 @@ const SECTION_LABELS = {
 };
 
 export default function MenuPage() {
-  const { lang } = useLang();
-  const [tab, setTab] = useState('food');
-  const L = SECTION_LABELS[lang] || SECTION_LABELS.de;
+   const { lang } = useLang();
+   const [tab, setTab] = useState('food');
+   const L = SECTION_LABELS[lang] || SECTION_LABELS.de;
 
-  const tabLabel = (t) => {
-    if (t === 'food') return lang === 'de' ? 'Speisen' : lang === 'en' ? 'Food' : 'Cibo';
-    return lang === 'de' ? 'Getränke' : lang === 'en' ? 'Drinks' : 'Bevande';
-  };
+   const tabLabel = (t) => {
+     if (t === 'food') return lang === 'de' ? 'Speisen' : lang === 'en' ? 'Food' : 'Cibo';
+     return lang === 'de' ? 'Getränke' : lang === 'en' ? 'Drinks' : 'Bevande';
+   };
 
-  return (
-    <div className="min-h-screen bg-charcoal text-ivory pb-28 lg:pb-8">
-      {/* Header */}
-      <div className="bg-espresso pt-24 pb-10 px-5 text-center border-b border-[#C9A96E]/10">
-        <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body font-medium mb-2">Kulinarium by Ammesso</p>
-        <h1 className="font-display text-4xl md:text-5xl font-light text-ivory mb-2">
-          {lang === 'de' ? 'Speisekarte' : lang === 'en' ? 'Menu' : 'Menu'}
-        </h1>
-        <p className="text-ivory/40 text-sm font-body">
-          {lang === 'de' ? 'Unser Essen ist mit Liebe gemacht' : lang === 'en' ? 'Our food is made with love' : 'Il nostro cibo è fatto con amore'}
-        </p>
-      </div>
+   return (
+     <div className="min-h-screen bg-charcoal text-ivory pb-28 lg:pb-8">
+       {/* Hero section */}
+       <div className="bg-espresso pt-24 pb-16 px-5 border-b border-[#C9A96E]/10">
+         <div className="max-w-3xl mx-auto text-center">
+           <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body font-medium mb-4">Kulinarium by Ammesso</p>
+           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-light text-ivory mb-4">
+             {lang === 'de' ? 'Unsere Speisekarte' : lang === 'en' ? 'Our Menu' : 'Il nostro menu'}
+           </h1>
+           <div className="section-divider mb-6" />
+           <p className="text-ivory/60 font-body text-base md:text-lg leading-relaxed mb-2">
+             {lang === 'de' 
+               ? 'Mediterrane Küche mit Herz und Seele. Jedes Gericht erzählt eine Geschichte von frischen Zutaten, handgemachter Pasta und der Leidenschaft des Küchenchefs Omar Ammesso.'
+               : lang === 'en'
+               ? 'Mediterranean cuisine with heart and soul. Every dish tells a story of fresh ingredients, handmade pasta, and Chef Omar Ammesso\'s passion.'
+               : 'Cucina mediterranea con cuore e anima. Ogni piatto racconta una storia di ingredienti freschi, pasta fatta a mano e la passione dello chef Omar Ammesso.'}
+           </p>
+           <p className="text-ivory/40 text-sm font-body">
+             {lang === 'de'
+               ? 'Saisonal · Regional · Ehrlich'
+               : lang === 'en'
+               ? 'Seasonal · Regional · Honest'
+               : 'Stagionale · Regionale · Onesto'}
+           </p>
+         </div>
+       </div>
 
       {/* Sticky tabs */}
       <div className="sticky top-16 md:top-20 z-30 bg-[#0F0D0B]/95 backdrop-blur-md border-b border-[#C9A96E]/10">
@@ -218,8 +232,36 @@ export default function MenuPage() {
           </>
         )}
 
+        {/* Info cards */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div className="glass-card border border-[#C9A96E]/10 rounded-xl p-5 text-center">
+            <p className="text-gold text-sm font-body font-semibold mb-1">
+              {lang === 'de' ? '✓ Frische Zutaten' : lang === 'en' ? '✓ Fresh Ingredients' : '✓ Ingredienti freschi'}
+            </p>
+            <p className="text-ivory/40 text-xs font-body">
+              {lang === 'de' ? 'Täglich vom Markt' : lang === 'en' ? 'Fresh from market' : 'Freschi dal mercato'}
+            </p>
+          </div>
+          <div className="glass-card border border-[#C9A96E]/10 rounded-xl p-5 text-center">
+            <p className="text-gold text-sm font-body font-semibold mb-1">
+              {lang === 'de' ? '✓ Handgemacht' : lang === 'en' ? '✓ Handmade' : '✓ Fatto a mano'}
+            </p>
+            <p className="text-ivory/40 text-xs font-body">
+              {lang === 'de' ? 'Pasta täglich frisch' : lang === 'en' ? 'Pasta made fresh daily' : 'Pasta fresca ogni giorno'}
+            </p>
+          </div>
+          <div className="glass-card border border-[#C9A96E]/10 rounded-xl p-5 text-center">
+            <p className="text-gold text-sm font-body font-semibold mb-1">
+              {lang === 'de' ? '✓ Allergeninfo' : lang === 'en' ? '✓ Allergen Info' : '✓ Info allergie'}
+            </p>
+            <p className="text-ivory/40 text-xs font-body">
+              {lang === 'de' ? 'Personal informieren' : lang === 'en' ? 'Ask our staff' : 'Informa lo staff'}
+            </p>
+          </div>
+        </div>
+
         {/* Legal note */}
-        <div className="mt-8 glass-card border border-[#C9A96E]/08 rounded-xl p-5 text-xs text-ivory/30 text-center leading-relaxed space-y-1 font-body">
+        <div className="mt-6 glass-card border border-[#C9A96E]/08 rounded-xl p-5 text-xs text-ivory/30 text-center leading-relaxed space-y-1 font-body">
           <p>
             {lang === 'de' && 'Alle Preise inkl. MwSt. Bei Allergien oder Unverträglichkeiten sprechen Sie bitte unser Personal an.'}
             {lang === 'en' && 'All prices include VAT. Please inform our staff of any allergies or intolerances.'}
@@ -232,7 +274,15 @@ export default function MenuPage() {
           </p>
         </div>
 
-        <div className="mt-8 text-center">
+        {/* CTA section */}
+        <div className="mt-12 pt-10 border-t border-[#C9A96E]/10 text-center">
+          <p className="text-ivory/30 text-sm font-body mb-6">
+            {lang === 'de'
+              ? 'Lust auf diese Gerichte? Reservieren Sie jetzt Ihren Tisch!'
+              : lang === 'en'
+              ? 'Ready to taste these dishes? Reserve your table now!'
+              : 'Desiderate questi piatti? Prenotate il vostro tavolo ora!'}
+          </p>
           <Link to="/reserve"
             className="inline-flex items-center gap-2 px-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold shadow-gold-glow">
             <UtensilsCrossed className="w-3.5 h-3.5" />

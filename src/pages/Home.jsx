@@ -463,6 +463,28 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── FAQ TEASER ──────────────────────────────────── */}
+      <section className="py-10 sm:py-14 px-5 border-t border-[#C9A96E]/08">
+        <FadeUp>
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-2">
+                {lang === 'de' ? 'Häufige Fragen' : lang === 'en' ? 'Frequently Asked' : 'Domande frequenti'}
+              </p>
+              <h3 className="font-display text-2xl sm:text-3xl font-light text-ivory">
+                {lang === 'de' ? 'Noch Fragen?' : lang === 'en' ? 'Still have questions?' : 'Avete domande?'}
+              </h3>
+              <p className="text-ivory/40 text-sm font-body mt-1">
+                {lang === 'de' ? 'Reservierungen, Zimmer, Öffnungszeiten und Events.' : lang === 'en' ? 'Reservations, rooms, hours and events.' : 'Prenotazioni, camere, orari ed eventi.'}
+              </p>
+            </div>
+            <Link to="/faq" className="flex-shrink-0 flex items-center gap-2 px-7 py-3.5 btn-ghost-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold">
+              {lang === 'de' ? 'Zur FAQ' : lang === 'en' ? 'View FAQ' : 'Leggi FAQ'} <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </FadeUp>
+      </section>
+
       {/* ── FINAL CTA ───────────────────────────────────── */}
       <section className="py-16 sm:py-24 px-5 bg-espresso border-t border-[#C9A96E]/10">
         <FadeUp>
