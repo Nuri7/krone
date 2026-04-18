@@ -1,0 +1,85 @@
+{
+  "name": "ActivityLog",
+  "type": "object",
+  "properties": {
+    "actor_email": {
+      "type": "string",
+      "description": "Email of the user who performed the action"
+    },
+    "actor_role": {
+      "type": "string",
+      "description": "Role of the user at the time of action"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "reservation_created",
+        "reservation_confirmed",
+        "reservation_cancelled",
+        "reservation_completed",
+        "reservation_no_show",
+        "booking_intent_created",
+        "booking_intent_redirected",
+        "contact_inquiry_submitted",
+        "guest_message_sent",
+        "guest_document_uploaded",
+        "guest_document_reviewed",
+        "guest_profile_updated",
+        "admin_login",
+        "admin_status_change",
+        "admin_export",
+        "site_settings_changed",
+        "user_login",
+        "user_logout"
+      ],
+      "description": "Type of action performed"
+    },
+    "entity_type": {
+      "type": "string",
+      "description": "The entity this action was performed on (e.g. RestaurantReservation)"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID of the affected entity"
+    },
+    "entity_ref": {
+      "type": "string",
+      "description": "Human-readable reference (e.g. RES-XXXXXX)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable summary of what happened"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional context (old/new values, IP, etc.)",
+      "properties": {
+        "old_status": {
+          "type": "string"
+        },
+        "new_status": {
+          "type": "string"
+        },
+        "ip_address": {
+          "type": "string"
+        },
+        "user_agent": {
+          "type": "string"
+        },
+        "extra": {
+          "type": "string"
+        }
+      }
+    },
+    "performed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp of when the action occurred"
+    }
+  },
+  "required": [
+    "actor_email",
+    "action",
+    "performed_at"
+  ]
+}

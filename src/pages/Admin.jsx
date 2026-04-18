@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLang } from '@/lib/useLang';
-import { CheckCircle, Clock, XCircle, AlertTriangle, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText, Download } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, AlertTriangle, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText, Download, Activity } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 
 const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
@@ -101,6 +102,18 @@ export default function Admin() {
     if (status === 'confirmed') updates.confirmed_at = new Date().toISOString();
     if (status === 'cancelled') updates.cancelled_at = new Date().toISOString();
     await base44.entities.Reservation.update(id, updates);
+    // Log the status change
+    const target = reservations.find(res => res.id === id);
+    if (target) {
+      base44.functions.invoke('logActivity', {
+        action: 'admin_status_change',
+        description: `Reservierungsstatus geändert zu "${status}" — ${target.guest_first_name} ${target.guest_last_name}`,
+        entity_type: 'Reservation',
+        entity_id: id,
+        entity_ref: target.reservation_ref,
+        metadata: { new_status: status, old_status: target.status },
+      }).catch(() => {});
+    }
     const updated = reservations.map(r => r.id === id ? { ...r, ...updates } : r);
     setReservations(updated);
     if (selectedRes?.id === id) setSelectedRes(prev => ({ ...prev, ...updates }));
@@ -168,6 +181,10 @@ export default function Admin() {
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ivory">Dashboard</h1>
             <p className="text-ivory/30 text-xs font-body mt-1 truncate max-w-[180px] sm:max-w-none">{user?.email}</p>
           </div>
+          <Link to="/activity-log" className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors flex-shrink-0">
+            <Activity className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Activity Log</span>
+          </Link>
           <button onClick={loadAll} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-ivory text-xs font-body transition-colors flex-shrink-0">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Aktualisieren</span>
