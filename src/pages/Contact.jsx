@@ -180,6 +180,25 @@ export default function Contact() {
             )}
           </div>
         </div>
+
+        {/* Google Maps */}
+        <div className="mt-12 sm:mt-16">
+          <h2 className="font-display text-2xl font-light text-ivory mb-6 text-center">
+            {lang === 'de' ? 'Finden Sie uns' : lang === 'en' ? 'Find Us' : 'Trovaci'}
+          </h2>
+          <div className="rounded-2xl overflow-hidden border border-[#C9A96E]/10 h-[400px] sm:h-[500px]">
+            <iframe
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen=""
+              referrerPolicy="no-referrer-when-downgrade"
+              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyA-OPJc_4CvKv_S8YToDdmlS9hE7f1R1AU&q=${encodeURIComponent('Hauptstraße 24, 74595 Langenburg, Germany')}`}
+              title="Krone Langenburg Location"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

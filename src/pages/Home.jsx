@@ -38,22 +38,24 @@ function FadeUp({ children, delay = 0, className = '' }) {
   );
 }
 
-const REVIEWS = [
-  { name: 'Maria K.', stars: 5, de: 'Außergewöhnliches Erlebnis — das Essen war auf einem anderen Niveau. Wir kommen definitiv wieder.', en: 'An extraordinary experience — the food was on another level. We will definitely come back.', it: 'Un\'esperienza straordinaria — il cibo era a un altro livello. Torneremo sicuramente.' },
-  { name: 'Thomas B.', stars: 5, de: 'Das schönste Restaurant in der Region. Authentisch, herzlich, und jedes Gericht eine Offenbarung.', en: 'The most beautiful restaurant in the region. Authentic, warm, and every dish a revelation.', it: 'Il ristorante più bello della regione. Autentico, caloroso, ogni piatto una rivelazione.' },
-  { name: 'Sophie L.', stars: 5, de: 'Wir haben unsere Hochzeit hier gefeiert. Alles war perfekt — das Ambiente, das Essen, das Team.', en: 'We celebrated our wedding here. Everything was perfect — the atmosphere, the food, the team.', it: 'Abbiamo celebrato il nostro matrimonio qui. Tutto era perfetto.' },
-];
-
 export default function Home() {
   const { lang } = useLang();
   const s = SITE_DEFAULTS;
   const [heroLoaded, setHeroLoaded] = useState(false);
   const [activeReview, setActiveReview] = useState(0);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    const t = setInterval(() => setActiveReview(r => (r + 1) % REVIEWS.length), 5000);
-    return () => clearInterval(t);
+    base44.functions.invoke('getActiveReviews', {}).then(res => {
+      if (res.data?.reviews?.length > 0) setReviews(res.data.reviews);
+    }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (reviews.length === 0) return;
+    const t = setInterval(() => setActiveReview(r => (r + 1) % reviews.length), 5000);
+    return () => clearInterval(t);
+  }, [reviews.length]);
 
   const C = {
     de: {
@@ -423,21 +425,21 @@ export default function Home() {
           <FadeUp>
             <p className="text-gold text-[10px] tracking-[0.45em] uppercase font-body mb-8 sm:mb-10">{c.review_title}</p>
             <div className="relative min-h-[160px] sm:min-h-[140px]">
-              {REVIEWS.map((r, i) => (
+              {reviews.length > 0 && reviews.map((r, i) => (
                 <div key={i}
                   className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ${i === activeReview ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
                   <div className="flex gap-1 mb-4">
                     {[...Array(r.stars)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-gold text-gold" />)}
                   </div>
                   <p className="font-display text-lg sm:text-xl md:text-2xl font-light text-ivory/80 italic leading-relaxed mb-3 sm:mb-4 max-w-2xl px-2">
-                    &ldquo;{lang === 'de' ? r.de : lang === 'en' ? r.en : r.it}&rdquo;
+                    &ldquo;{lang === 'de' ? r.content_de : lang === 'en' ? r.content_en : r.content_it}&rdquo;
                   </p>
                   <p className="text-ivory/30 text-xs font-body tracking-widest uppercase">— {r.name}</p>
                 </div>
               ))}
             </div>
             <div className="flex justify-center gap-2.5 mt-8">
-              {REVIEWS.map((_, i) => (
+              {reviews.map((_, i) => (
                 <button key={i} onClick={() => setActiveReview(i)}
                   className={`w-8 h-1.5 rounded-full transition-all ${i === activeReview ? 'bg-gold' : 'bg-gold/20'}`} />
               ))}

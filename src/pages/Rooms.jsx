@@ -385,6 +385,25 @@ export default function Rooms() {
           </button>
         </div>
 
+        {/* Google Maps */}
+        <div className="mb-8 sm:mb-10">
+          <h3 className="font-display text-2xl font-light text-ivory mb-6 text-center">
+            {lang === 'de' ? 'Lage & Anreise' : lang === 'en' ? 'Location & Directions' : 'Posizione e Indicazioni'}
+          </h3>
+          <div className="rounded-2xl overflow-hidden border border-[#C9A96E]/10 h-[400px] sm:h-[500px]">
+            <iframe
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen=""
+              referrerPolicy="no-referrer-when-downgrade"
+              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyA-OPJc_4CvKv_S8YToDdmlS9hE7f1R1AU&q=${encodeURIComponent('Hauptstraße 24, 74595 Langenburg, Germany')}`}
+              title="Krone Langenburg Location"
+            />
+          </div>
+        </div>
+
         {/* Langenburg location section */}
         <div className="glass-card border border-[#C9A96E]/10 rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10">
           <h3 className="font-display text-2xl font-light text-ivory mb-3">
