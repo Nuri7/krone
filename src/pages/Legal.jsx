@@ -6,9 +6,9 @@ export default function Legal() {
   const s = SITE_DEFAULTS;
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-24 pb-24 lg:pb-16">
+    <div className="min-h-screen bg-charcoal text-ivory pt-20 sm:pt-24 pb-20 lg:pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-5">
-        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-ivory mb-8 sm:mb-10 mt-6 sm:mt-0">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-ivory mb-8 sm:mb-10">
           {lang === 'de' ? 'Impressum & Datenschutz' : lang === 'en' ? 'Legal & Privacy' : 'Note legali & Privacy'}
         </h1>
 
@@ -44,15 +44,33 @@ export default function Legal() {
           </div>
         </section>
 
-        <section>
+        <section className="mb-10">
           <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body mb-5">
             {lang === 'de' ? 'Reservierungsrichtlinie' : lang === 'en' ? 'Reservation Policy' : 'Politica di prenotazione'}
           </h2>
-          <div className="glass-card rounded-2xl p-7 border border-[#C9A96E]/10 text-ivory/60 text-sm font-body leading-relaxed">
+          <div className="glass-card rounded-2xl p-7 border border-[#C9A96E]/10 text-ivory/60 text-sm font-body leading-relaxed space-y-3">
             <p>
               {lang === 'de' && 'Reservierungen gelten ab Bestätigung als verbindlich. Bei Nichterscheinen ohne Stornierung behalten wir uns vor, zukünftige Reservierungen einzuschränken. Für Gruppen ab 10 Personen bitten wir um direkte Kontaktaufnahme.'}
               {lang === 'en' && 'Reservations are binding from confirmation. In case of no-show without cancellation we reserve the right to restrict future bookings. For groups of 10+ please contact us directly.'}
               {lang === 'it' && 'Le prenotazioni sono vincolanti dalla conferma. In caso di mancata presentazione senza cancellazione, ci riserviamo il diritto di limitare le prenotazioni future.'}
+            </p>
+            <p>
+              {lang === 'de' && 'Tischreservierungen können bis 24 Stunden vor dem Termin kostenfrei storniert werden. Zimmerreservierungen unterliegen den bei Buchung angezeigten Stornierungsbedingungen.'}
+              {lang === 'en' && 'Table reservations can be cancelled free of charge up to 24 hours before. Room reservations are subject to the cancellation terms displayed at time of booking.'}
+              {lang === 'it' && 'Le prenotazioni dei tavoli possono essere cancellate gratuitamente fino a 24 ore prima. Le prenotazioni delle camere sono soggette alle condizioni di cancellazione mostrate al momento della prenotazione.'}
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body mb-5">
+            {lang === 'de' ? 'Cookies & Tracking' : lang === 'en' ? 'Cookies & Tracking' : 'Cookie & Tracking'}
+          </h2>
+          <div className="glass-card rounded-2xl p-7 border border-[#C9A96E]/10 text-ivory/60 text-sm font-body leading-relaxed">
+            <p>
+              {lang === 'de' && 'Unsere Website verwendet technisch notwendige Cookies für den Betrieb der Anwendung (z.B. Spracheinstellungen). Es werden keine Tracking- oder Marketing-Cookies ohne Ihre ausdrückliche Zustimmung gesetzt. Ihre gespeicherten Präferenzen können Sie jederzeit durch Löschen des Browser-Speichers entfernen.'}
+              {lang === 'en' && 'Our website uses technically necessary cookies for application functionality (e.g. language preferences). No tracking or marketing cookies are set without your explicit consent. You can remove stored preferences at any time by clearing your browser storage.'}
+              {lang === 'it' && 'Il nostro sito utilizza cookie tecnicamente necessari per il funzionamento dell\'applicazione (ad es. preferenze di lingua). Non vengono impostati cookie di tracciamento o marketing senza il vostro consenso esplicito.'}
             </p>
           </div>
         </section>

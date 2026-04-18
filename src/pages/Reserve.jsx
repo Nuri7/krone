@@ -239,10 +239,11 @@ export default function Reserve() {
     });
     if (!res.data?.success) {
       const err = res.data?.error || 'error';
-      if (err === 'duplicate') setError(tr('reservation', 'error_duplicate'));
-      else if (err === 'full') setError(tr('reservation', 'error_full'));
-      else if (err.includes('wait')) setError(lang === 'de' ? 'Bitte kurz warten.' : lang === 'en' ? 'Please wait before submitting again.' : 'Attendere prima di inviare.');
-      else setError(err);
+      if (err === 'duplicate') setError(c.error_duplicate);
+      else if (err === 'full') setError(c.error_full);
+      else if (err.includes('wait') || res.status === 429) setError(lang === 'de' ? 'Bitte kurz warten und erneut versuchen.' : lang === 'en' ? 'Please wait a moment before trying again.' : 'Attendere un momento prima di riprovare.');
+      else if (err.includes('closed')) setError(lang === 'de' ? 'Das Restaurant ist an diesem Tag geschlossen.' : lang === 'en' ? 'The restaurant is closed on this day.' : 'Il ristorante è chiuso in questo giorno.');
+      else setError(lang === 'de' ? 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.' : lang === 'en' ? 'An error occurred. Please try again.' : 'Si è verificato un errore. Riprovare.');
       setSubmitting(false);
       return;
     }
@@ -260,9 +261,9 @@ export default function Reserve() {
   }
 
   const C = {
-    de: { title: 'Tischreservierung', sub: 'Wählen Sie Ihren Wunschtermin', step1: 'Datum & Gäste', step2: 'Uhrzeit', step3: 'Ihre Daten', guests_label: 'Anzahl der Gäste', date_label: 'Datum wählen', closed_msg: 'Montag ist unser Ruhetag – bitte wählen Sie einen anderen Tag.', no_slots: 'Keine verfügbaren Zeiten.', confirm: 'Verbindlich reservieren', policy: 'Ihre Reservierung ist verbindlich. Bei Nichterscheinen behalten wir uns vor, künftige Reservierungen einzuschränken.', success_title: 'Reservierung bestätigt', success_text: 'Sie erhalten in Kürze eine Bestätigung per E-Mail.' },
-    en: { title: 'Table Reservation', sub: 'Choose your preferred date', step1: 'Date & Guests', step2: 'Time', step3: 'Your Details', guests_label: 'Number of guests', date_label: 'Select date', closed_msg: 'Monday is our day off — please select another date.', no_slots: 'No available times.', confirm: 'Confirm Reservation', policy: 'Your reservation is binding. In case of no-show we reserve the right to restrict future bookings.', success_title: 'Reservation Confirmed', success_text: 'You will receive a confirmation email shortly.' },
-    it: { title: 'Prenotazione Tavolo', sub: 'Scegli la tua data preferita', step1: 'Data & Ospiti', step2: 'Orario', step3: 'I tuoi dati', guests_label: 'Numero di ospiti', date_label: 'Seleziona data', closed_msg: 'Lunedì siamo chiusi — scegli un altro giorno.', no_slots: 'Nessun orario disponibile.', confirm: 'Conferma prenotazione', policy: 'La prenotazione è vincolante. In caso di mancata presentazione ci riserviamo di limitare le future prenotazioni.', success_title: 'Prenotazione confermata', success_text: 'Riceverete a breve una conferma via email.' },
+    de: { title: 'Tischreservierung', sub: 'Wählen Sie Ihren Wunschtermin', step1: 'Datum & Gäste', step2: 'Uhrzeit', step3: 'Ihre Daten', guests_label: 'Anzahl der Gäste', date_label: 'Datum wählen', closed_msg: 'Montag ist unser Ruhetag – bitte wählen Sie einen anderen Tag.', no_slots: 'Keine verfügbaren Zeiten.', confirm: 'Verbindlich reservieren', policy: 'Ihre Reservierung ist verbindlich. Bei Nichterscheinen behalten wir uns vor, künftige Reservierungen einzuschränken.', success_title: 'Reservierung bestätigt', success_text: 'Sie erhalten in Kürze eine Bestätigung per E-Mail.', error_duplicate: 'Diese E-Mail-Adresse hat für diesen Zeitslot bereits eine Reservierung.', error_full: 'Dieser Zeitslot ist leider ausgebucht. Bitte wählen Sie eine andere Zeit.' },
+    en: { title: 'Table Reservation', sub: 'Choose your preferred date', step1: 'Date & Guests', step2: 'Time', step3: 'Your Details', guests_label: 'Number of guests', date_label: 'Select date', closed_msg: 'Monday is our day off — please select another date.', no_slots: 'No available times.', confirm: 'Confirm Reservation', policy: 'Your reservation is binding. In case of no-show we reserve the right to restrict future bookings.', success_title: 'Reservation Confirmed', success_text: 'You will receive a confirmation email shortly.', error_duplicate: 'This email already has a reservation for this time slot.', error_full: 'This time slot is fully booked. Please choose a different time.' },
+    it: { title: 'Prenotazione Tavolo', sub: 'Scegli la tua data preferita', step1: 'Data & Ospiti', step2: 'Orario', step3: 'I tuoi dati', guests_label: 'Numero di ospiti', date_label: 'Seleziona data', closed_msg: 'Lunedì siamo chiusi — scegli un altro giorno.', no_slots: 'Nessun orario disponibile.', confirm: 'Conferma prenotazione', policy: 'La prenotazione è vincolante. In caso di mancata presentazione ci riserviamo di limitare le future prenotazioni.', success_title: 'Prenotazione confermata', success_text: 'Riceverete a breve una conferma via email.', error_duplicate: 'Questa email ha già una prenotazione per questo orario.', error_full: 'Questo orario è al completo. Scegliete un orario diverso.' },
   };
   const c = C[lang] || C.de;
 

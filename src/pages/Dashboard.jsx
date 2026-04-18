@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useLang } from '@/lib/useLang';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Calendar, Users, MessageSquare, CheckCircle, Clock } from 'lucide-react';
+import { TrendingUp, Calendar, Users, MessageSquare, CheckCircle, Clock, Activity, LayoutDashboard } from 'lucide-react';
 import { format, subDays, startOfDay } from 'date-fns';
+
+const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
 
 export default function Dashboard() {
   const { lang } = useLang();
@@ -23,7 +26,12 @@ export default function Dashboard() {
     activityByDay: [],
   });
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
+    base44.auth.me().then(u => {
+      if (u && (ADMIN_EMAILS.includes(u.email) || u.role === 'admin')) setIsAdmin(true);
+    }).catch(() => {});
     loadDashboardData();
   }, []);
 
@@ -155,13 +163,25 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-28 lg:pb-10 px-4 sm:px-5">
+    <div className="min-h-screen bg-charcoal text-ivory pt-20 pb-20 px-5">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="font-display text-4xl md:text-5xl font-light text-ivory mb-2">{c.title}</h1>
-          <p className="text-ivory/40 font-body text-sm">{c.subtitle}</p>
+        <div className="flex items-start justify-between gap-4 mb-10 sm:mb-12 flex-wrap">
+          <div>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-ivory mb-2">{c.title}</h1>
+            <p className="text-ivory/40 font-body text-sm">{c.subtitle}</p>
+          </div>
+          {isAdmin && (
+            <div className="flex gap-2 flex-shrink-0">
+              <Link to="/admin" className="flex items-center gap-1.5 px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
+                <LayoutDashboard className="w-3.5 h-3.5" /> Admin
+              </Link>
+              <Link to="/activity-log" className="flex items-center gap-1.5 px-4 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
+                <Activity className="w-3.5 h-3.5" /> Log
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Metrics Grid */}
