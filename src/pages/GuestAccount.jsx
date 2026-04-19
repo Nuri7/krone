@@ -236,7 +236,7 @@ export default function GuestAccount() {
                   <Calendar className="w-4 h-4 text-gold/70 group-hover:text-gold transition-colors" />
                 </div>
                 <div>
-                  <p className="text-ivory/75 text-sm font-body font-medium">{c.res_title}</p>
+                  <p className="text-ivory/75 text-sm font-body font-medium">{lang === 'de' ? 'Meine Reservierungen' : lang === 'en' ? 'My Reservations' : 'Le mie prenotazioni'}</p>
                   <p className="text-ivory/30 text-xs font-body mt-0.5">{reservations.length} {lang === 'de' ? 'Reservierungen' : lang === 'en' ? 'reservations' : 'prenotazioni'}</p>
                 </div>
               </div>

@@ -35,10 +35,13 @@ Deno.serve(async (req) => {
       body: `<p><b>Art:</b> ${typeLabel}</p><p><b>Name:</b> ${first_name} ${last_name}</p><p><b>Email:</b> ${email}</p><p><b>Telefon:</b> ${phone || '—'}</p><p><b>Nachricht:</b></p><p>${message.replace(/\n/g, '<br/>')}</p>`,
     });
 
-    // Mark email_sent
-    const inquiries = await base44.asServiceRole.entities.ContactInquiry.filter({ email, status: 'new' });
+    // Mark email_notification_sent on the most recent matching inquiry
+    const inquiries = await base44.asServiceRole.entities.ContactInquiry.filter({ email });
     if (inquiries.length > 0) {
-      await base44.asServiceRole.entities.ContactInquiry.update(inquiries[0].id, { email_sent: true });
+      await base44.asServiceRole.entities.ContactInquiry.update(inquiries[0].id, {
+        email_notification_sent: true,
+        status: 'in_review',
+      });
     }
 
     return Response.json({ success: true });

@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
 
     let blocks = [];
 
-    if (type === 'reservation') {
+    if (type === 'reservation' || type === 'new_reservation') {
       blocks = [
         { type: 'header', text: { type: 'plain_text', text: '🍽️ Neue Tischreservierung', emoji: true } },
         {
@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
 
     // Log Slack attempt
     const base44 = createClientFromRequest(req);
-    const channel = (type === 'reservation' || type === 'reservation_cancelled') ? '#krone-reservations' : '#krone-ops-alerts';
+    const channel = (type === 'reservation' || type === 'new_reservation' || type === 'reservation_cancelled') ? '#krone-reservations' : '#krone-ops-alerts';
     const entityTypeMap = {
       reservation: 'RestaurantReservation',
       reservation_cancelled: 'RestaurantReservation',
@@ -148,7 +148,7 @@ Deno.serve(async (req) => {
     }
 
     // Update records after successful Slack send
-    if ((type === 'reservation' || type === 'reservation_cancelled') && ref) {
+    if ((type === 'reservation' || type === 'new_reservation' || type === 'reservation_cancelled') && ref) {
       const items = await base44.asServiceRole.entities.RestaurantReservation.filter({ reservation_ref: ref });
       if (items.length > 0) {
         await base44.asServiceRole.entities.RestaurantReservation.update(items[0].id, { slack_notified: true, slack_notified_at: new Date().toISOString() });

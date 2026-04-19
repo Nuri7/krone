@@ -6,7 +6,7 @@ Deno.serve(async (req) => {
     const reviews = await base44.asServiceRole.entities.Review.filter(
       { is_active: true },
       'sort_order',
-      50
+      20
     );
     return Response.json({ reviews });
   } catch (error) {

@@ -47,8 +47,8 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    base44.functions.invoke('getActiveReviews', {}).then(res => {
-      if (res.data?.reviews?.length > 0) setReviews(res.data.reviews);
+    base44.entities.Review.filter({ is_active: true }, 'sort_order', 20).then(data => {
+      if (data?.length > 0) setReviews(data);
     }).catch(() => {});
   }, []);
 
