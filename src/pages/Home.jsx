@@ -11,34 +11,34 @@ import { useIsMobile } from '@/hooks/useResponsive';
 // Hero images
 const HERO_IMAGES = [
   {
-    url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&q=80",
+    url: "/images/hero-restaurant.png",
     title: "Culinary Excellence",
     sub: "Mediterranean soul, German heart",
   },
   {
-    url: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1800&q=80",
+    url: "/images/hero-pasta.png",
     title: "Handcrafted with Love",
     sub: "Every dish tells a story",
   },
   {
-    url: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1800&q=80",
+    url: "/images/hero-exterior.png",
     title: "Historic Elegance",
     sub: "Rooms in the heart of Langenburg",
   },
   {
-    url: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1800&q=80",
+    url: "/images/hero-wedding.png",
     title: "Unforgettable Moments",
     sub: "Weddings, events & celebrations",
   },
 ];
 
 const GALLERY_STRIP = [
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80",
-  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&q=80",
-  "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&q=80",
-  "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=500&q=80",
-  "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=500&q=80",
-  "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=500&q=80",
+  "/images/hero-restaurant.png",
+  "/images/hero-pasta.png",
+  "/images/food-ingredients.png",
+  "/images/hero-exterior.png",
+  "/images/room-suite.png",
+  "/images/hero-wedding.png",
 ];
 
 const TRUST_PILLARS = [
@@ -192,7 +192,7 @@ export default function Home() {
             <FadeUp className="md:row-span-2">
               <div className="relative group rounded-2xl overflow-hidden aspect-[3/4] md:h-full">
                 <img
-                  src="https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=800&q=80"
+                  src="/images/hero-pasta.png"
                   alt="Fresh pasta"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
@@ -208,7 +208,7 @@ export default function Home() {
             <FadeUp delay={100}>
               <div className="relative group rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80"
+                  src="/images/food-ingredients.png"
                   alt="Mediterranean dishes"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
@@ -222,7 +222,7 @@ export default function Home() {
             <FadeUp delay={200}>
               <div className="relative group rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80"
+                  src="/images/hero-restaurant.png"
                   alt="Restaurant ambiance"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
@@ -395,7 +395,7 @@ export default function Home() {
       <section className="relative py-28 sm:py-36 px-5 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1400&q=80"
+            src="/images/hero-wedding.png"
             alt="Wedding setup"
             className="w-full h-full object-cover"
             loading="lazy"
