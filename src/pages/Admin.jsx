@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+
 import { base44 } from '@/api/base44Client';
 import { useLang } from '@/lib/useLang';
-import { CheckCircle, Clock, XCircle, AlertTriangle, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText, Download, Activity } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, AlertTriangle, UtensilsCrossed, Mail, RefreshCw, MessageSquare, BedDouble, Heart, FileText, Download, Activity, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
 const ADMIN_EMAILS = ['oammesso@gmail.com', 'omarouardaoui0@gmail.com', 'norevok@gmail.com'];
@@ -186,14 +187,26 @@ export default function Admin() {
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ivory">Dashboard</h1>
             <p className="text-ivory/30 text-xs font-body mt-1 truncate max-w-[140px] sm:max-w-xs">{user?.email}</p>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
+            <Link to="/admin/calendar" className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
+              <Calendar className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Kalender</span>
+            </Link>
+            <Link to="/admin/menu" className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
+              <BookOpen className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Speisekarte</span>
+            </Link>
+            <Link to="/admin/events" className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Events</span>
+            </Link>
             <Link to="/activity-log" className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-gold text-xs font-body transition-colors">
               <Activity className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Log</span>
             </Link>
             <button onClick={loadAll} className="flex items-center gap-1.5 px-3 py-2 glass-card border border-[#C9A96E]/10 rounded-xl text-ivory/40 hover:text-ivory text-xs font-body transition-colors">
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Aktualisieren</span>
+              <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
         </div>

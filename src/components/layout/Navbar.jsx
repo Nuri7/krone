@@ -42,9 +42,10 @@ export default function Navbar() {
     { to: '/weddings', label: tr('nav', 'weddings') },
     { to: '/contact', label: tr('nav', 'contact') },
   ];
-  // Mobile drawer gets all links including FAQ, Story, Gallery
+  // Mobile drawer gets all links including FAQ, Story, Gallery, Events
   const mobileLinks = [
     ...navLinks,
+    { to: '/events', label: lang === 'de' ? 'Events' : lang === 'en' ? 'Events' : 'Eventi' },
     { to: '/gallery', label: lang === 'de' ? 'Galerie' : lang === 'en' ? 'Gallery' : 'Galleria' },
     { to: '/story', label: tr('nav', 'story') },
     { to: '/faq', label: 'FAQ' },

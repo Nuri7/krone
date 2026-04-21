@@ -28,6 +28,10 @@ import GuestReservations from './pages/GuestReservations';
 import Gallery from './pages/Gallery';
 import Dashboard from './pages/Dashboard';
 import ActivityLogPage from './pages/ActivityLogPage';
+import AdminCalendar from './pages/AdminCalendar';
+import AdminMenu from './pages/AdminMenu';
+import AdminEvents from './pages/AdminEvents';
+import Events from './pages/Events';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -77,6 +81,10 @@ const AuthenticatedApp = () => {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/activity-log" element={<ActivityLogPage />} />
+        <Route path="/admin/calendar" element={<AdminCalendar />} />
+        <Route path="/admin/menu" element={<AdminMenu />} />
+        <Route path="/admin/events" element={<AdminEvents />} />
+        <Route path="/events" element={<Events />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

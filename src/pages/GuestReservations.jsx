@@ -128,9 +128,9 @@ export default function GuestReservations() {
                       </p>
                     )}
                   </div>
-                  <button onClick={() => console.log('Detail:', r)} className="text-gold/60 hover:text-gold text-xs font-body tracking-wider uppercase whitespace-nowrap flex-shrink-0">
+                  <a href={`mailto:info@krone-ammesso.de?subject=Anfrage zu Reservierung ${r.reservation_ref}`} className="text-gold/60 hover:text-gold text-xs font-body tracking-wider uppercase whitespace-nowrap flex-shrink-0 transition-colors">
                     {c.details} →
-                  </button>
+                  </a>
                 </div>
               </div>
             ))}
