@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ChevronLeft, ChevronRight, UtensilsCrossed, Calendar, RefreshCw, Plus, X, Check, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, UtensilsCrossed, Calendar, RefreshCw, Plus, X, Check, Users, Mail, AlertTriangle } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isToday, addDays } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -29,6 +29,8 @@ export default function AdminCalendar() {
   const [showNewForm, setShowNewForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
+  const [resendingId, setResendingId] = useState(null);
+  const [resendSuccess, setResendSuccess] = useState({});
   const [newForm, setNewForm] = useState({
     guest_first_name: '', guest_last_name: '', guest_email: '', guest_phone: '',
     reservation_date: format(new Date(), 'yyyy-MM-dd'), reservation_time: '19:00',
@@ -84,6 +86,16 @@ export default function AdminCalendar() {
     setNewForm({ guest_first_name: '', guest_last_name: '', guest_email: '', guest_phone: '', reservation_date: format(new Date(), 'yyyy-MM-dd'), reservation_time: '19:00', party_size: 2, notes: '', language: 'de', source: 'admin_manual' });
     setSaving(false);
     await loadMonth();
+  }
+
+  async function resendConfirmation(reservationId) {
+    setResendingId(reservationId);
+    const res = await base44.functions.invoke('resendConfirmationEmail', { reservation_id: reservationId });
+    if (res.data?.success) {
+      setResendSuccess(prev => ({ ...prev, [reservationId]: true }));
+      setTimeout(() => setResendSuccess(prev => ({ ...prev, [reservationId]: false })), 3000);
+    }
+    setResendingId(null);
   }
 
   async function updateStatus(id, status) {
@@ -241,16 +253,26 @@ export default function AdminCalendar() {
                       <span className={`text-xs font-body ${isToday(day) ? 'text-gold font-semibold' : 'text-ivory/60'}`}>
                         {format(day, 'd')}
                       </span>
-                      {activeRes.length > 0 && (
-                        <div className="mt-1 space-y-0.5">
-                          {activeRes.slice(0, 3).map((r, i) => (
-                            <div key={i} className={`h-1 rounded-full ${STATUS_COLORS[r.status] || 'bg-ivory/20'}`} />
-                          ))}
-                          {activeRes.length > 3 && (
-                            <p className="text-[9px] font-body text-ivory/30">+{activeRes.length - 3}</p>
-                          )}
-                        </div>
-                      )}
+                      {activeRes.length > 0 && (() => {
+                        const totalGuests = activeRes.reduce((s, r) => s + (r.party_size || 0), 0);
+                        const pct = totalGuests / 120;
+                        const isWarning = pct >= 0.8;
+                        return (
+                          <div className="mt-1 space-y-0.5">
+                            {activeRes.slice(0, 3).map((r, i) => (
+                              <div key={i} className={`h-1 rounded-full ${STATUS_COLORS[r.status] || 'bg-ivory/20'}`} />
+                            ))}
+                            {activeRes.length > 3 && (
+                              <p className="text-[9px] font-body text-ivory/30">+{activeRes.length - 3}</p>
+                            )}
+                            {isWarning && (
+                              <div className="absolute top-1 right-1">
+                                <AlertTriangle className="w-2.5 h-2.5 text-amber-400" />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </button>
                   );
                 })}
@@ -300,18 +322,32 @@ export default function AdminCalendar() {
                 ) : (
                   <div className="space-y-2">
                     {/* Summary */}
-                    <div className="flex gap-3 mb-4 text-xs font-body">
-                      <div className="glass-card border border-[#C9A96E]/08 rounded-xl px-3 py-2 text-center flex-1">
-                        <p className="font-display text-xl text-ivory">{selectedDayRes.filter(r => !['cancelled_by_guest','cancelled_by_staff','no_show','archived'].includes(r.status)).length}</p>
-                        <p className="text-ivory/30 text-[10px]">Aktiv</p>
-                      </div>
-                      <div className="glass-card border border-[#C9A96E]/08 rounded-xl px-3 py-2 text-center flex-1">
-                        <p className="font-display text-xl text-ivory">
-                          {selectedDayRes.filter(r => !['cancelled_by_guest','cancelled_by_staff','no_show','archived'].includes(r.status)).reduce((sum, r) => sum + (r.party_size || 0), 0)}
-                        </p>
-                        <p className="text-ivory/30 text-[10px]">Gäste</p>
-                      </div>
-                    </div>
+                    {(() => {
+                      const activeForDay = selectedDayRes.filter(r => !['cancelled_by_guest','cancelled_by_staff','no_show','archived'].includes(r.status));
+                      const totalGuests = activeForDay.reduce((sum, r) => sum + (r.party_size || 0), 0);
+                      const pct = Math.round((totalGuests / 120) * 100);
+                      const isWarning = pct >= 80;
+                      return (
+                        <>
+                          <div className="flex gap-3 mb-3 text-xs font-body">
+                            <div className="glass-card border border-[#C9A96E]/08 rounded-xl px-3 py-2 text-center flex-1">
+                              <p className="font-display text-xl text-ivory">{activeForDay.length}</p>
+                              <p className="text-ivory/30 text-[10px]">Aktiv</p>
+                            </div>
+                            <div className={`glass-card border rounded-xl px-3 py-2 text-center flex-1 ${isWarning ? 'border-amber-700/30 bg-amber-950/20' : 'border-[#C9A96E]/08'}`}>
+                              <p className={`font-display text-xl ${isWarning ? 'text-amber-400' : 'text-ivory'}`}>{totalGuests}</p>
+                              <p className={`text-[10px] ${isWarning ? 'text-amber-400/60' : 'text-ivory/30'}`}>/ 120 Plätze</p>
+                            </div>
+                          </div>
+                          {isWarning && (
+                            <div className="flex items-center gap-2 bg-amber-950/30 border border-amber-800/30 rounded-xl px-3 py-2 mb-3">
+                              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                              <p className="text-amber-400 text-[10px] font-body">{pct}% Auslastung — Kapazität fast erreicht</p>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
 
                     {selectedDayRes.map(r => (
                       <div key={r.id} className="glass-card border border-[#C9A96E]/08 rounded-xl p-3">
@@ -337,26 +373,46 @@ export default function AdminCalendar() {
                         {r.notes && <p className="text-ivory/30 text-[10px] font-body mb-2 line-clamp-1">{r.notes}</p>}
 
                         {/* Quick actions */}
-                        {!['cancelled_by_guest','cancelled_by_staff','no_show','archived','completed'].includes(r.status) && (
-                          <div className="flex gap-1.5 flex-wrap">
-                            {(r.status === 'new' || r.status === 'pending') && (
-                              <button onClick={() => updateStatus(r.id, 'confirmed')} disabled={updatingId === r.id}
-                                className="px-2.5 py-1 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body hover:bg-emerald-900/60 transition-colors">
-                                ✓ Bestätigen
+                        <div className="flex gap-1.5 flex-wrap">
+                          {!['cancelled_by_guest','cancelled_by_staff','no_show','archived','completed'].includes(r.status) && (
+                            <>
+                              {(r.status === 'new' || r.status === 'pending') && (
+                                <button onClick={() => updateStatus(r.id, 'confirmed')} disabled={updatingId === r.id}
+                                  className="px-2.5 py-1 bg-emerald-900/40 border border-emerald-700/30 text-emerald-400 text-[10px] rounded-lg font-body hover:bg-emerald-900/60 transition-colors">
+                                  ✓ Bestätigen
+                                </button>
+                              )}
+                              {r.status === 'confirmed' && (
+                                <button onClick={() => updateStatus(r.id, 'seated')} disabled={updatingId === r.id}
+                                  className="px-2.5 py-1 bg-blue-900/40 border border-blue-700/30 text-blue-400 text-[10px] rounded-lg font-body hover:bg-blue-900/60 transition-colors">
+                                  Sitzt
+                                </button>
+                              )}
+                              <button onClick={() => updateStatus(r.id, 'cancelled_by_staff')} disabled={updatingId === r.id}
+                                className="px-2.5 py-1 bg-red-950/40 border border-red-900/30 text-red-400 text-[10px] rounded-lg font-body hover:bg-red-950/60 transition-colors">
+                                ✕
                               </button>
-                            )}
-                            {r.status === 'confirmed' && (
-                              <button onClick={() => updateStatus(r.id, 'seated')} disabled={updatingId === r.id}
-                                className="px-2.5 py-1 bg-blue-900/40 border border-blue-700/30 text-blue-400 text-[10px] rounded-lg font-body hover:bg-blue-900/60 transition-colors">
-                                Sitzt
-                              </button>
-                            )}
-                            <button onClick={() => updateStatus(r.id, 'cancelled_by_staff')} disabled={updatingId === r.id}
-                              className="px-2.5 py-1 bg-red-950/40 border border-red-900/30 text-red-400 text-[10px] rounded-lg font-body hover:bg-red-950/60 transition-colors">
-                              ✕
-                            </button>
-                          </div>
-                        )}
+                            </>
+                          )}
+                          {/* Resend confirmation email */}
+                          <button
+                            onClick={() => resendConfirmation(r.id)}
+                            disabled={resendingId === r.id}
+                            title="Bestätigung erneut senden"
+                            className={`px-2.5 py-1 border text-[10px] rounded-lg font-body transition-colors flex items-center gap-1 ${
+                              resendSuccess[r.id]
+                                ? 'bg-emerald-900/30 border-emerald-700/30 text-emerald-400'
+                                : 'bg-ivory/5 border-ivory/10 text-ivory/30 hover:text-gold hover:border-gold/30'
+                            }`}
+                          >
+                            {resendingId === r.id
+                              ? <div className="w-2.5 h-2.5 border border-ivory/30 border-t-ivory rounded-full animate-spin" />
+                              : resendSuccess[r.id]
+                              ? '✓ E-Mail'
+                              : <><Mail className="w-2.5 h-2.5" /> E-Mail</>
+                            }
+                          </button>
+                        </div>
                       </div>
                     ))}
                     <button onClick={() => { setNewForm(f => ({ ...f, reservation_date: format(selectedDay, 'yyyy-MM-dd') })); setShowNewForm(true); }}

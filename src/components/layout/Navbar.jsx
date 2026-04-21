@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe, ChevronDown, LayoutDashboard, UserCircle } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, LayoutDashboard, UserCircle, UtensilsCrossed } from 'lucide-react';
 import { useLang } from '@/lib/useLang';
 import { base44 } from '@/api/base44Client';
 
@@ -121,6 +121,13 @@ export default function Navbar() {
                   <UserCircle className="w-4 h-4" />
                 </Link>
               )}
+
+              {/* Persistent Reserve CTA */}
+              <Link to="/reserve"
+                className="hidden lg:inline-flex items-center gap-1.5 px-5 py-2.5 btn-gold rounded-full text-xs tracking-widest uppercase font-body font-semibold shadow-gold-glow">
+                <UtensilsCrossed className="w-3.5 h-3.5" />
+                {lang === 'de' ? 'Reservieren' : lang === 'en' ? 'Reserve' : 'Prenota'}
+              </Link>
 
               {/* Mein Bereich CTA */}
               <Link to={isAdmin ? '/admin' : '/account'}

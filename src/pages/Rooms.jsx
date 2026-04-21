@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/useLang';
 import { base44 } from '@/api/base44Client';
 import { SITE_DEFAULTS, ROOMS } from '@/lib/siteData';
-import { Star, Coffee, ChevronRight, CheckCircle, AlertCircle, ExternalLink, Wifi, Bath, Wind, MapPin, ArrowRight, BedDouble, Users } from 'lucide-react';
+import { Star, Coffee, ChevronRight, CheckCircle, AlertCircle, ExternalLink, Wifi, Bath, Wind, MapPin, ArrowRight, BedDouble, Users, CalendarDays } from 'lucide-react';
 
 const AMENITIES = {
   de: ['Kostenloses WLAN', 'Klimaanlage', 'Eigenes Bad', 'Premium-Bettwäsche', 'Arbeitsbereich', 'Stadtblick'],
@@ -49,19 +49,31 @@ export default function Rooms() {
   const [showBooking, setShowBooking] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [savingIntent, setSavingIntent] = useState(false);
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [adults, setAdults] = useState(2);
   const params = new URLSearchParams(window.location.search);
   const returnState = params.get('return');
   const intentRef = params.get('ref');
 
   const beds24Base = SITE_DEFAULTS.beds24_booking_url;
 
+  // Min date = today
+  const today = new Date().toISOString().split('T')[0];
+  // Min checkout = day after checkin or tomorrow
+  const minCheckout = checkIn
+    ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split('T')[0]
+    : new Date(new Date().getTime() + 86400000).toISOString().split('T')[0];
+
   async function handleBookNow(roomId = null) {
     setSavingIntent(true);
     const ref = `INT-${Date.now().toString(36).toUpperCase()}`;
     const p = new URLSearchParams();
     if (lang !== 'de') p.set('lang', lang);
+    if (checkIn) p.set('checkin', checkIn);
+    if (checkOut) p.set('checkout', checkOut);
+    if (adults) p.set('adults', adults);
     const beds24Url = `${beds24Base}&${p.toString()}`;
-    // Save booking intent before redirect — non-blocking
     base44.entities.BookingIntent.create({
       intent_ref: ref,
       status: 'redirected',
@@ -75,16 +87,16 @@ export default function Rooms() {
       type: 'booking_intent',
       ref,
       name: '',
-      check_in: '',
-      check_out: '',
-      guests: '',
+      check_in: checkIn,
+      check_out: checkOut,
+      guests: String(adults),
     }).catch(() => {});
     setSavingIntent(false);
     setShowBooking(true);
     setSelectedRoom(roomId);
   }
 
-  const beds24EmbedUrl = `${beds24Base}&lang=${lang}&iframe=1`;
+  const beds24EmbedUrl = `${beds24Base}&lang=${lang}&iframe=1${checkIn ? `&checkin=${checkIn}` : ''}${checkOut ? `&checkout=${checkOut}` : ''}&adults=${adults}`;
 
   const C = {
     de: {
@@ -215,6 +227,75 @@ export default function Rooms() {
           <div className="flex items-center justify-center sm:justify-end gap-2 text-ivory/40 text-xs font-body">
             <MapPin className="w-3.5 h-3.5 text-gold/50" /> Langenburg, Baden-Württemberg
           </div>
+        </div>
+
+        {/* ── Date / Guest Selector ── */}
+        <div className="mb-8 sm:mb-12 glass-card border border-gold/20 bg-gold/5 rounded-2xl p-5 sm:p-7">
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDays className="w-4 h-4 text-gold/70" />
+            <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body font-semibold">
+              {lang === 'de' ? 'Ihr Aufenthalt' : lang === 'en' ? 'Your Stay' : 'Il vostro soggiorno'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">
+                {lang === 'de' ? 'Anreise' : lang === 'en' ? 'Check-in' : 'Arrivo'}
+              </label>
+              <input
+                type="date"
+                min={today}
+                value={checkIn}
+                onChange={e => { setCheckIn(e.target.value); if (checkOut && e.target.value >= checkOut) setCheckOut(''); }}
+                className="w-full bg-[#0F0D0B] border border-[#C9A96E]/20 rounded-xl px-4 py-3 text-sm text-ivory font-body focus:outline-none focus:border-gold/40 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">
+                {lang === 'de' ? 'Abreise' : lang === 'en' ? 'Check-out' : 'Partenza'}
+              </label>
+              <input
+                type="date"
+                min={minCheckout}
+                value={checkOut}
+                onChange={e => setCheckOut(e.target.value)}
+                className="w-full bg-[#0F0D0B] border border-[#C9A96E]/20 rounded-xl px-4 py-3 text-sm text-ivory font-body focus:outline-none focus:border-gold/40 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">
+                {lang === 'de' ? 'Erwachsene' : lang === 'en' ? 'Adults' : 'Adulti'}
+              </label>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setAdults(a => Math.max(1, a - 1))}
+                  className="w-10 h-10 rounded-full border border-[#C9A96E]/20 text-ivory/60 hover:text-gold hover:border-gold/40 transition-colors text-lg flex items-center justify-center flex-shrink-0">
+                  −
+                </button>
+                <span className="flex-1 text-center font-display text-2xl font-light text-ivory">{adults}</span>
+                <button onClick={() => setAdults(a => Math.min(8, a + 1))}
+                  className="w-10 h-10 rounded-full border border-[#C9A96E]/20 text-ivory/60 hover:text-gold hover:border-gold/40 transition-colors text-lg flex items-center justify-center flex-shrink-0">
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+          {checkIn && checkOut && (
+            <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-ivory/40 text-xs font-body">
+                {Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000)}{' '}
+                {lang === 'de' ? 'Nächte' : lang === 'en' ? 'nights' : 'notti'} · {adults}{' '}
+                {lang === 'de' ? 'Erw.' : lang === 'en' ? 'adults' : 'adulti'}
+              </p>
+              <button
+                onClick={() => handleBookNow(null)}
+                disabled={savingIntent}
+                className="px-6 py-2.5 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold disabled:opacity-50 flex items-center gap-2"
+              >
+                {lang === 'de' ? 'Verfügbarkeit prüfen' : lang === 'en' ? 'Check Availability' : 'Verifica disponibilità'}
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* What to expect section */}
