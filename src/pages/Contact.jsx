@@ -1,205 +1,130 @@
 import { useState } from 'react';
-import { useLang } from '@/lib/useLang';
-import { base44 } from '@/api/base44Client';
-import { SITE_DEFAULTS } from '@/lib/siteData';
-import { MapPin, Phone, Mail, CheckCircle, Instagram, Facebook, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, Loader2, Check, ExternalLink } from 'lucide-react';
+import { SITE, INQUIRY_TYPES } from '@/lib/siteData';
+import { FadeUp } from '@/components/shared/Animations';
+import { supabase, isSupabaseConfigured } from '@/api/supabaseClient';
+import { toast } from 'sonner';
 
 export default function Contact() {
-  const { lang } = useLang();
-  const s = SITE_DEFAULTS;
-  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', message: '', inquiry_type: 'general' });
+  const [form, setForm] = useState({ name:'', email:'', phone:'', type:'general', message:'' });
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-
-  const TYPES = [
-    { id: 'general', de: 'Allgemeine Anfrage', en: 'General Enquiry', it: 'Richiesta generale' },
-    { id: 'wedding', de: 'Hochzeit & Events', en: 'Wedding & Events', it: 'Matrimoni & eventi' },
-    { id: 'group', de: 'Gruppenanfrage', en: 'Group Booking', it: 'Prenotazione di gruppo' },
-    { id: 'business', de: 'Geschäftsreise', en: 'Business Travel', it: "Viaggio d'affari" },
-  ];
+  const [sent, setSent] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
-    await base44.entities.ContactInquiry.create({ ...form, language: lang, source: 'website' });
-    base44.functions.invoke('sendContactEmail', { ...form, lang }).catch(() => {});
-    base44.functions.invoke('logActivity', {
-      action: 'contact_inquiry_submitted',
-      description: `Kontaktanfrage von ${form.first_name} ${form.last_name} (${form.inquiry_type})`,
-      entity_type: 'ContactInquiry',
-      metadata: { inquiry_type: form.inquiry_type, email: form.email },
-    }).catch(() => {});
-    base44.functions.invoke('notifySlack', {
-      type: 'contact', name: `${form.first_name} ${form.last_name}`,
-      email: form.email, inquiry_type: form.inquiry_type, message: form.message.slice(0, 200),
-    }).catch(() => {});
-    setDone(true);
-    setSubmitting(false);
+    try {
+      if (isSupabaseConfigured()) {
+        await supabase.from('contact_inquiries').insert(form);
+      }
+      setSent(true);
+      toast.success('Message sent!');
+    } catch { toast.error('Something went wrong.'); }
+    finally { setSubmitting(false); }
   }
 
-  const c = {
-    de: { title: 'Kontakt', sub: 'Wir freuen uns von Ihnen zu hören', addr_title: 'Anschrift', hours_title: 'Öffnungszeiten', directions: 'Route planen', send: 'Nachricht senden', success: 'Vielen Dank! Wir melden uns bald.', inquiry_type: 'Art der Anfrage', first: 'Vorname', last: 'Nachname', email: 'E-Mail', phone: 'Telefon', message: 'Nachricht' },
-    en: { title: 'Contact', sub: 'We look forward to hearing from you', addr_title: 'Address', hours_title: 'Opening Hours', directions: 'Get Directions', send: 'Send Message', success: 'Thank you! We will be in touch soon.', inquiry_type: 'Type of Enquiry', first: 'First Name', last: 'Last Name', email: 'Email', phone: 'Phone', message: 'Message' },
-    it: { title: 'Contatti', sub: 'Siamo felici di sentirvi', addr_title: 'Indirizzo', hours_title: 'Orari di apertura', directions: 'Come raggiungerci', send: 'Invia messaggio', success: 'Grazie! Vi risponderemo presto.', inquiry_type: 'Tipo di richiesta', first: 'Nome', last: 'Cognome', email: 'Email', phone: 'Telefono', message: 'Messaggio' },
-  };
-  const t = c[lang] || c.de;
-
-  const inputClass = "w-full bg-[#1A1410] border border-[#C9A96E]/15 rounded-xl px-4 py-3 text-sm text-ivory placeholder-ivory/20 focus:outline-none focus:border-gold/40 transition-colors font-body";
-
   return (
-    <div className="min-h-screen bg-charcoal text-ivory pt-16 sm:pt-20 pb-24">
-      <div className="max-w-6xl mx-auto px-4 sm:px-5">
-        {/* Header */}
-        <div className="text-center py-10 sm:py-14">
-          <p className="text-gold text-[10px] tracking-[0.4em] uppercase font-body mb-3">Krone Langenburg by Ammesso</p>
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-light text-ivory mb-2 sm:mb-3">{t.title}</h1>
-          <p className="text-ivory/40 font-body text-sm sm:text-base">{t.sub}</p>
-          {/* WhatsApp CTA - prominent on mobile */}
-          <a href={`https://wa.me/4979054177`} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-5 px-6 py-3 bg-[#25D366] text-[#0F0D0B] rounded-full text-xs font-body font-semibold tracking-widest uppercase shadow-md">
-            💬 {lang === 'de' ? 'Direkt auf WhatsApp schreiben' : lang === 'en' ? 'Message us on WhatsApp' : 'Scrivici su WhatsApp'}
-          </a>
-          <p className="text-ivory/25 text-[10px] font-body mt-2">
-            {lang === 'de' ? '· Antwort meist in unter 2 Stunden ·' : lang === 'en' ? '· Usually responds within 2 hours ·' : '· Di solito risponde entro 2 ore ·'}
+    <div className="bg-charcoal pt-24 sm:pt-28 pb-20">
+      <section className="px-5 mb-14">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="font-display text-5xl sm:text-6xl font-light text-ivory mb-4">Get in Touch</h1>
+          <p className="text-ivory/40 font-body text-base max-w-lg mx-auto">
+            Questions, reservations, or just want to say hello? We'd love to hear from you.
           </p>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-10">
-          {/* Info */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-            <div className="glass-card rounded-2xl p-5 sm:p-6 border border-[#C9A96E]/10">
-              <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body mb-5">{t.addr_title}</h2>
-              <ul className="space-y-4 text-sm font-body">
-                <li className="flex gap-3 text-ivory/60">
-                  <MapPin className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
-                  <span>{s.address_street}<br />{s.address_zip} {s.address_city}<br />{s.address_country}</span>
-                </li>
-                <li className="flex gap-3">
-                  <Phone className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
-                  <a href={`tel:${s.phone}`} className="text-ivory/60 hover:text-gold transition-colors">{s.phone}</a>
-                </li>
-                <li className="flex gap-3">
-                  <Mail className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
-                  <a href={`mailto:${s.email_info}`} className="text-ivory/60 hover:text-gold transition-colors">{s.email_info}</a>
-                </li>
-              </ul>
-              <a href="https://www.google.com/maps/dir/?api=1&destination=Hauptstra%C3%9Fe+24%2C+74595+Langenburg"
-                target="_blank" rel="noopener noreferrer"
-                className="mt-5 block text-center py-3 border border-[#C9A96E]/20 text-gold text-xs tracking-[0.2em] uppercase font-body rounded-xl hover:bg-gold/5 transition-colors">
-                {t.directions}
-              </a>
+      {/* WhatsApp CTA */}
+      <section className="px-5 mb-12">
+        <div className="max-w-2xl mx-auto">
+          <a href={`https://wa.me/${SITE.whatsapp.replace(/[^0-9]/g,'')}`} target="_blank" rel="noopener noreferrer"
+            className="glass-card rounded-2xl p-6 flex items-center gap-4 hover-lift group block">
+            <div className="w-12 h-12 rounded-xl bg-[#25D366]/10 flex items-center justify-center text-xl flex-shrink-0">💬</div>
+            <div>
+              <h3 className="text-ivory font-body font-medium group-hover:text-[#25D366] transition-colors">Chat on WhatsApp</h3>
+              <p className="text-ivory/30 text-sm font-body">Quick questions? We usually respond within 2 hours.</p>
             </div>
+          </a>
+        </div>
+      </section>
 
-            <div className="glass-card rounded-2xl p-6 border border-[#C9A96E]/10">
-              <div className="flex items-center gap-2 mb-5">
-                <Clock className="w-3.5 h-3.5 text-gold/60" />
-                <h2 className="text-ivory/30 text-[10px] tracking-[0.3em] uppercase font-body">{t.hours_title}</h2>
+      <section className="px-5">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Contact Info Sidebar */}
+          <div className="lg:col-span-2 space-y-4">
+            {[
+              { icon: MapPin, label: "Address", value: SITE.address.full, href: SITE.maps_url },
+              { icon: Phone, label: "Phone", value: SITE.phone, href: `tel:${SITE.phone}` },
+              { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}` },
+            ].map((item, i) => (
+              <a key={i} href={item.href} target={item.icon === MapPin ? '_blank' : undefined}
+                className="glass-card rounded-xl p-4 flex items-start gap-3 hover-lift group block">
+                <item.icon className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-ivory/30 text-xs font-body mb-0.5">{item.label}</p>
+                  <p className="text-ivory/60 text-sm font-body group-hover:text-ivory transition-colors">{item.value}</p>
+                </div>
+              </a>
+            ))}
+            <div className="glass-card rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Clock className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" />
+                <div className="text-sm font-body space-y-1">
+                  <p className="text-ivory/30 text-xs mb-1">Opening Hours</p>
+                  <p className="text-ivory/20">Monday — Closed</p>
+                  <p className="text-ivory/50">Tue–Sat: 12:00–14:30 · 17:30–22:00</p>
+                  <p className="text-ivory/50">Sunday: 12:00–20:00</p>
+                </div>
               </div>
-              <ul className="space-y-3 text-sm font-body">
-                <li className="flex justify-between text-ivory/30">
-                  <span>{lang === 'de' ? 'Montag' : lang === 'en' ? 'Monday' : 'Lunedì'}</span>
-                  <span>{lang === 'de' ? 'Ruhetag' : lang === 'en' ? 'Closed' : 'Chiuso'}</span>
-                </li>
-                <li>
-                  <div className="text-ivory/60">{lang === 'de' ? 'Di – Sa' : lang === 'en' ? 'Tue – Sat' : 'Mar – Sab'}</div>
-                  <div className="text-ivory/35 text-xs mt-0.5">12:00 – 14:30 · 17:30 – 22:00</div>
-                </li>
-                <li>
-                  <div className="text-ivory/60">{lang === 'de' ? 'Sonntag' : lang === 'en' ? 'Sunday' : 'Domenica'}</div>
-                  <div className="text-ivory/35 text-xs mt-0.5">12:00 – 20:00</div>
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex gap-3">
-              <a href={s.social_instagram} target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 glass-card rounded-xl text-ivory/40 hover:text-gold border border-[#C9A96E]/10 hover:border-[#C9A96E]/30 transition-all text-xs font-body tracking-widest uppercase">
-                <Instagram className="w-4 h-4" /> Instagram
-              </a>
-              <a href={s.social_facebook} target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 glass-card rounded-xl text-ivory/40 hover:text-gold border border-[#C9A96E]/10 hover:border-[#C9A96E]/30 transition-all text-xs font-body tracking-widest uppercase">
-                <Facebook className="w-4 h-4" /> Facebook
-              </a>
             </div>
           </div>
 
           {/* Form */}
           <div className="lg:col-span-3">
-            {done ? (
-              <div className="glass-card rounded-2xl p-8 sm:p-12 text-center border border-[#C9A96E]/10 h-full flex flex-col items-center justify-center">
-                <CheckCircle className="w-12 h-12 text-gold mb-4" />
-                <h2 className="font-display text-2xl font-light text-ivory mb-2">{t.success}</h2>
-                <p className="text-ivory/40 text-sm font-body">{s.email_info}</p>
+            {sent ? (
+              <div className="glass-card rounded-2xl p-8 text-center">
+                <Check className="w-10 h-10 text-gold mx-auto mb-4" />
+                <h3 className="font-display text-2xl text-ivory mb-2">Message Sent!</h3>
+                <p className="text-ivory/40 font-body text-sm">We'll get back to you soon.</p>
               </div>
             ) : (
-              <div className="glass-card rounded-2xl p-5 sm:p-7 border border-[#C9A96E]/10">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-2">{t.inquiry_type}</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {TYPES.map(tp => (
-                        <button key={tp.id} type="button"
-                          onClick={() => setForm(f => ({ ...f, inquiry_type: tp.id }))}
-                          className={`px-3 py-2.5 rounded-xl text-xs font-body text-left border transition-all ${
-                            form.inquiry_type === tp.id ? 'border-gold bg-gold/10 text-gold' : 'border-[#C9A96E]/10 text-ivory/40 hover:border-[#C9A96E]/30'
-                          }`}>
-                          {lang === 'de' ? tp.de : lang === 'en' ? tp.en : tp.it}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.first} *</label>
-                      <input type="text" required value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} className={inputClass} />
-                    </div>
-                    <div>
-                      <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.last} *</label>
-                      <input type="text" required value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} className={inputClass} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.email} *</label>
-                    <input type="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={inputClass} />
-                  </div>
-                  <div>
-                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.phone}</label>
-                    <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className={inputClass} />
-                  </div>
-                  <div>
-                    <label className="block text-ivory/40 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{t.message} *</label>
-                    <textarea rows={5} required value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                      className={`${inputClass} resize-none`} />
-                  </div>
-                  <button type="submit" disabled={submitting}
-                    className="w-full py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold disabled:opacity-50 transition-all">
-                    {submitting ? '...' : t.send}
-                  </button>
-                </form>
-              </div>
+              <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
+                <h2 className="font-display text-2xl text-ivory mb-2">Send a Message</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div><label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Name *</label>
+                    <input type="text" required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} className="input-dark" /></div>
+                  <div><label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Email *</label>
+                    <input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="input-dark" /></div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div><label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Phone</label>
+                    <input type="tel" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className="input-dark" /></div>
+                  <div><label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Regarding</label>
+                    <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})} className="input-dark">
+                      {INQUIRY_TYPES.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}
+                    </select></div>
+                </div>
+                <div><label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Message *</label>
+                  <textarea required value={form.message} onChange={e=>setForm({...form,message:e.target.value})}
+                    className="input-dark min-h-[120px] resize-none" placeholder="How can we help?" /></div>
+                <button type="submit" disabled={submitting}
+                  className="w-full py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold flex items-center justify-center gap-2">
+                  {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <><Send className="w-3.5 h-3.5" /> Send Message</>}
+                </button>
+              </form>
             )}
           </div>
         </div>
+      </section>
 
-        {/* Google Maps */}
-        <div className="mt-12 sm:mt-16">
-          <h2 className="font-display text-2xl font-light text-ivory mb-6 text-center">
-            {lang === 'de' ? 'Finden Sie uns' : lang === 'en' ? 'Find Us' : 'Trovaci'}
-          </h2>
-          <div className="rounded-2xl overflow-hidden border border-[#C9A96E]/10 h-[400px] sm:h-[500px]">
-            <iframe
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              loading="lazy"
-              allowFullScreen=""
-              referrerPolicy="no-referrer-when-downgrade"
-              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyA-OPJc_4CvKv_S8YToDdmlS9hE7f1R1AU&q=${encodeURIComponent('Hauptstraße 24, 74595 Langenburg, Germany')}`}
-              title="Krone Langenburg Location"
-            />
-          </div>
+      {/* Map */}
+      <section className="px-5 mt-14">
+        <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden aspect-[2/1]">
+          <iframe
+            src={`https://www.google.com/maps/embed/v1/place?key=${SITE.maps_embed_key}&q=Hauptstra%C3%9Fe+24%2C+74595+Langenburg`}
+            className="w-full h-full border-0" allowFullScreen loading="lazy" title="Location" />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

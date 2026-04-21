@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
 @layer base {
   :root {
@@ -43,18 +43,20 @@
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
+  * { @apply border-border; }
   
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     background-color: #0F0D0B;
     color: #F5EFE3;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -63,9 +65,11 @@
 }
 
 @layer utilities {
+  /* Typography */
   .font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
-  .font-body { font-family: 'Inter', sans-serif; }
+  .font-body { font-family: 'Inter', system-ui, sans-serif; }
 
+  /* Brand colors */
   .text-gold { color: var(--gold); }
   .text-ivory { color: var(--ivory); }
   .text-ivory-muted { color: var(--ivory-muted); }
@@ -73,13 +77,15 @@
   .bg-espresso { background-color: var(--espresso); }
   .bg-gold { background-color: var(--gold); }
 
+  /* Glass card */
   .glass-card {
     background: var(--glass);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
+  /* Gold utilities */
   .gold-border { border-color: var(--gold); }
   .gold-gradient { background: linear-gradient(135deg, #C9A96E 0%, #E8D5A3 50%, #C9A96E 100%); }
   .gold-text-gradient {
@@ -89,18 +95,20 @@
     background-clip: text;
   }
 
+  /* Section divider */
   .section-divider {
-    width: 40px;
+    width: 48px;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
     margin: 0 auto;
   }
 
-  .premium-shadow { box-shadow: 0 32px 64px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4); }
-  .card-shadow { box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3); }
-  .gold-glow { box-shadow: 0 0 24px rgba(201,169,110,0.2), 0 0 48px rgba(201,169,110,0.08); }
+  /* Shadows */
+  .shadow-premium { box-shadow: 0 32px 64px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4); }
+  .shadow-card { box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3); }
+  .shadow-gold-glow { box-shadow: 0 0 24px rgba(201,169,110,0.2), 0 0 48px rgba(201,169,110,0.08); }
 
-  /* Subtle texture overlay */
+  /* Texture overlay */
   .texture-overlay::before {
     content: '';
     position: absolute;
@@ -110,7 +118,7 @@
     z-index: 1;
   }
 
-  /* Cinematic fade-in */
+  /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
@@ -123,9 +131,19 @@
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
   }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.3); }
+    50% { box-shadow: 0 0 20px 4px rgba(201,169,110,0.15); }
+  }
 
   .animate-fade-up { animation: fadeUp 0.8s ease forwards; }
   .animate-fade-in { animation: fadeIn 0.6s ease forwards; }
+  .animate-float { animation: float 4s ease-in-out infinite; }
+  .animate-pulse-gold { animation: pulse-gold 3s ease-in-out infinite; }
 
   .shimmer-text {
     background: linear-gradient(90deg, #C9A96E 0%, #F5EFE3 50%, #C9A96E 100%);
@@ -137,8 +155,13 @@
   }
 
   /* Hover lift */
-  .hover-lift { transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease; }
-  .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3); }
+  .hover-lift {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3);
+  }
 
   /* Gold CTA button */
   .btn-gold {
@@ -151,14 +174,14 @@
   }
   .btn-gold:hover {
     background-position: right center;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(201,169,110,0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(201,169,110,0.4);
   }
   .btn-gold:active { transform: translateY(0); }
 
   /* Ghost button */
   .btn-ghost-gold {
-    border: 1px solid rgba(201,169,110,0.4);
+    border: 1px solid rgba(201,169,110,0.35);
     color: var(--gold);
     background: transparent;
     transition: all 0.3s ease;
@@ -166,7 +189,26 @@
   .btn-ghost-gold:hover {
     border-color: var(--gold);
     background: rgba(201,169,110,0.08);
-    box-shadow: 0 0 20px rgba(201,169,110,0.1);
+    box-shadow: 0 0 24px rgba(201,169,110,0.12);
+  }
+
+  /* Input styling */
+  .input-dark {
+    @apply w-full bg-[#0F0D0B] border border-[#C9A96E]/15 rounded-xl px-4 py-3.5 text-sm text-ivory placeholder-ivory/20 focus:outline-none focus:border-gold/40 transition-colors font-body;
+  }
+  .input-light {
+    @apply w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3.5 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#C9A96E]/60 focus:ring-2 focus:ring-[#C9A96E]/10 transition-all font-body;
+  }
+
+  /* Scroll progress bar */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #C9A96E, #E8D5A3);
+    z-index: 9999;
+    transition: width 0.1s linear;
   }
 }
 
@@ -182,3 +224,14 @@
 
 /* Selection */
 ::selection { background: rgba(201,169,110,0.3); color: #F5EFE3; }
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}

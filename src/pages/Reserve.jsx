@@ -1,511 +1,375 @@
-import { useState } from 'react';
-import { useLang } from '@/lib/useLang';
-import { base44 } from '@/api/base44Client';
-import { SITE_DEFAULTS, TIME_SLOTS_LUNCH, TIME_SLOTS_DINNER, TIME_SLOTS_SUNDAY } from '@/lib/siteData';
-import { CheckCircle, AlertCircle, Clock, Users, ChevronLeft, ChevronRight, UtensilsCrossed } from 'lucide-react';
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isBefore, isAfter, isSameDay, getDay, addMonths, subMonths } from 'date-fns';
-import { de, enUS, it } from 'date-fns/locale';
+import { useState, useMemo } from 'react';
+import { CalendarDays, Users, Clock, ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react';
+import { format, addDays, isBefore, isToday, startOfDay, getDay, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
+import { SITE, TIME_SLOTS } from '@/lib/siteData';
+import { FadeUp } from '@/components/shared/Animations';
+import { supabase, isSupabaseConfigured } from '@/api/supabaseClient';
+import { toast } from 'sonner';
 
-const MAX_CAPACITY = SITE_DEFAULTS.restaurant_capacity;
-const CLOSED_DAYS = SITE_DEFAULTS.restaurant_closed_days;
-
-const LOCALE_MAP = { de, en: enUS, it };
-
-function getDaySlots(date) {
-  const day = getDay(new Date(date));
-  if (CLOSED_DAYS.includes(day)) return [];
-  if (day === 0) return TIME_SLOTS_SUNDAY;
-  return [...TIME_SLOTS_LUNCH, ...TIME_SLOTS_DINNER];
-}
-
-function MiniCalendar({ selected, onSelect, lang }) {
-   const [viewDate, setViewDate] = useState(new Date());
-   const locale = LOCALE_MAP[lang] || de;
-   const today = new Date();
-   const maxDate = addDays(today, 90);
-
-   const monthStart = startOfMonth(viewDate);
-   const monthEnd = endOfMonth(viewDate);
-   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-   // pad to start on Monday
-   const startPad = (getDay(monthStart) + 6) % 7;
-   const padDays = Array(startPad).fill(null);
-
-   const isDisabled = (d) =>
-     isBefore(d, today) ||
-     isAfter(d, maxDate) ||
-     CLOSED_DAYS.includes(getDay(d));
-
-   const dayLabels = lang === 'de'
-     ? ['Mo','Di','Mi','Do','Fr','Sa','So']
-     : lang === 'it'
-     ? ['Lu','Ma','Me','Gi','Ve','Sa','Do']
-     : ['Mo','Tu','We','Th','Fr','Sa','Su'];
-
-   return (
-     <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-full">
-      {/* Month navigation */}
-      <div className="flex items-center justify-between mb-4 gap-2">
-        <button
-          onClick={() => setViewDate(d => subMonths(d, 1))}
-          disabled={isBefore(startOfMonth(subMonths(viewDate, 1)), startOfMonth(today))}
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
-        >
-          <ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5" />
-        </button>
-        <h3 className="font-display text-sm sm:text-lg font-medium text-stone-800 capitalize text-center flex-1">
-          {format(viewDate, 'MMM yyyy', { locale })}
-        </h3>
-        <button
-          onClick={() => setViewDate(d => addMonths(d, 1))}
-          disabled={isAfter(startOfMonth(addMonths(viewDate, 1)), startOfMonth(addDays(today, 90)))}
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
-        >
-          <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5" />
-        </button>
-      </div>
-
-      {/* Day labels */}
-      <div className="grid grid-cols-7 mb-1 gap-0.5">
-        {dayLabels.map(d => (
-          <div key={d} className="text-center text-[9px] sm:text-[10px] font-body font-semibold text-stone-400 uppercase tracking-wider py-0.5">
-            {d}
-          </div>
-        ))}
-      </div>
-
-      {/* Days grid */}
-      <div className="grid grid-cols-7 gap-0.5 sm:gap-y-1">
-        {padDays.map((_, i) => <div key={`pad-${i}`} />)}
-        {days.map(day => {
-           const disabled = isDisabled(day);
-           const isSelected = selected && isSameDay(day, new Date(selected));
-           const isToday = isSameDay(day, today);
-           const isClosed = CLOSED_DAYS.includes(getDay(day));
-
-           return (
-             <button
-               key={day.toISOString()}
-               onClick={() => !disabled && onSelect(format(day, 'yyyy-MM-dd'))}
-               disabled={disabled}
-               className={`
-                 relative w-full aspect-square flex items-center justify-center rounded-full text-xs sm:text-sm font-body transition-all
-                 ${isSelected
-                   ? 'bg-[#C9A96E] text-white font-semibold shadow-md'
-                   : disabled
-                   ? isClosed
-                     ? 'text-stone-200 cursor-not-allowed'
-                     : 'text-stone-300 cursor-not-allowed'
-                   : 'text-stone-700 hover:bg-[#C9A96E]/10 hover:text-[#8B6914] cursor-pointer'
-                 }
-                 ${isToday && !isSelected ? 'ring-1 ring-[#C9A96E]/40 ring-offset-1' : ''}
-               `}
-             >
-               {format(day, 'd')}
-               {isClosed && !disabled && (
-                 <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-stone-300 rounded-full" />
-               )}
-             </button>
-           );
-         })}
-      </div>
-
-      <div className="mt-3 pt-3 border-t border-stone-100 flex flex-wrap gap-2 sm:gap-4 text-[9px] sm:text-[10px] font-body text-stone-400">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#C9A96E] inline-block" />
-          {lang === 'de' ? 'Ausgewählt' : lang === 'en' ? 'Selected' : 'Selezionato'}
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ring-1 ring-[#C9A96E]/40 inline-block" />
-          {lang === 'de' ? 'Heute' : lang === 'en' ? 'Today' : 'Oggi'}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function TimeGrid({ slots, usedCapacity, guests, selected, onSelect, lang }) {
-  const lunchSlots = slots.filter(s => TIME_SLOTS_LUNCH.includes(s));
-  const dinnerSlots = slots.filter(s => TIME_SLOTS_DINNER.includes(s));
-  const sundaySlots = slots.filter(s => !TIME_SLOTS_LUNCH.includes(s) && !TIME_SLOTS_DINNER.includes(s));
-  const isFull = (t) => (MAX_CAPACITY - (usedCapacity[t] || 0)) < guests;
-
-  const SlotBtn = ({ slot }) => {
-    const full = isFull(slot);
-    const isSelected = selected === slot;
-    return (
-      <button
-        onClick={() => !full && onSelect(slot)}
-        disabled={full}
-        className={`
-          py-3 px-2 rounded-xl text-xs font-body font-medium transition-all border
-          ${isSelected
-            ? 'bg-[#C9A96E] border-[#C9A96E] text-white shadow-md'
-            : full
-            ? 'border-stone-100 text-stone-300 bg-stone-50 cursor-not-allowed line-through'
-            : 'border-stone-200 text-stone-600 hover:border-[#C9A96E]/50 hover:text-[#8B6914] hover:bg-[#C9A96E]/5 bg-white'
-          }
-        `}
-      >
-        {slot}
-      </button>
-    );
-  };
-
-  return (
-    <div className="space-y-5">
-      {lunchSlots.length > 0 && (
-        <div>
-          <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
-            {lang === 'de' ? '🌞 Mittagessen · 12:00–14:30' : lang === 'en' ? '🌞 Lunch · 12:00–14:30' : '🌞 Pranzo · 12:00–14:30'}
-          </p>
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
-              {lunchSlots.map(s => <SlotBtn key={s} slot={s} />)}
-            </div>
-          </div>
-          )}
-          {dinnerSlots.length > 0 && (
-          <div>
-            <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
-              {lang === 'de' ? '🌙 Abendessen · 17:30–22:00' : lang === 'en' ? '🌙 Dinner · 17:30–22:00' : '🌙 Cena · 17:30–22:00'}
-            </p>
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
-              {dinnerSlots.map(s => <SlotBtn key={s} slot={s} />)}
-            </div>
-          </div>
-          )}
-          {sundaySlots.length > 0 && (
-          <div>
-            <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">
-              {lang === 'de' ? '☀️ Sonntag · 12:00–20:00' : lang === 'en' ? '☀️ Sunday · 12:00–20:00' : '☀️ Domenica · 12:00–20:00'}
-            </p>
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
-              {sundaySlots.map(s => <SlotBtn key={s} slot={s} />)}
-            </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-const inputClass = "w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3.5 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#C9A96E]/60 focus:ring-2 focus:ring-[#C9A96E]/10 transition-all font-body";
-
-const COPY = {
-  de: { title: 'Tischreservierung', sub: 'Wählen Sie Ihren Wunschtermin', step1: 'Datum & Gäste', step2: 'Uhrzeit', step3: 'Ihre Daten', guests_label: 'Anzahl der Gäste', date_label: 'Datum wählen', closed_msg: 'Montag ist unser Ruhetag – bitte wählen Sie einen anderen Tag.', no_slots: 'Keine verfügbaren Zeiten.', confirm: 'Verbindlich reservieren', policy: 'Ihre Reservierung ist verbindlich. Bei Nichterscheinen behalten wir uns vor, künftige Reservierungen einzuschränken.', success_title: 'Reservierung bestätigt', success_text: 'Sie erhalten in Kürze eine Bestätigung per E-Mail.', error_duplicate: 'Diese E-Mail-Adresse hat für diesen Zeitslot bereits eine Reservierung.', error_full: 'Dieser Zeitslot ist leider ausgebucht. Bitte wählen Sie eine andere Zeit.' },
-  en: { title: 'Table Reservation', sub: 'Choose your preferred date', step1: 'Date & Guests', step2: 'Time', step3: 'Your Details', guests_label: 'Number of guests', date_label: 'Select date', closed_msg: 'Monday is our day off — please select another date.', no_slots: 'No available times.', confirm: 'Confirm Reservation', policy: 'Your reservation is binding. In case of no-show we reserve the right to restrict future bookings.', success_title: 'Reservation Confirmed', success_text: 'You will receive a confirmation email shortly.', error_duplicate: 'This email already has a reservation for this time slot.', error_full: 'This time slot is fully booked. Please choose a different time.' },
-  it: { title: 'Prenotazione Tavolo', sub: 'Scegli la tua data preferita', step1: 'Data & Ospiti', step2: 'Orario', step3: 'I tuoi dati', guests_label: 'Numero di ospiti', date_label: 'Seleziona data', closed_msg: 'Lunedì siamo chiusi — scegli un altro giorno.', no_slots: 'Nessun orario disponibile.', confirm: 'Conferma prenotazione', policy: 'La prenotazione è vincolante. In caso di mancata presentazione ci riserviamo di limitare le future prenotazioni.', success_title: 'Prenotazione confermata', success_text: 'Riceverete a breve una conferma via email.', error_duplicate: 'Questa email ha già una prenotazione per questo orario.', error_full: 'Questo orario è al completo. Scegliete un orario diverso.' },
-};
+const GUEST_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function Reserve() {
-  const { lang } = useLang();
-  const c = COPY[lang] || COPY.de;
   const [step, setStep] = useState(1);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
   const [guests, setGuests] = useState(2);
-  const [slots, setSlots] = useState([]);
-  const [usedCapacity, setUsedCapacity] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [calMonth, setCalMonth] = useState(new Date());
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', requests: '' });
-  const [reservationRef, setReservationRef] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [done, setDone] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' });
 
-  async function handleDateSelect(d) {
-    setDate(d);
-    setTime('');
-    setLoading(true);
-    setError('');
-    const daySlots = getDaySlots(d);
-    if (daySlots.length === 0) {
-      setSlots([]);
-      setUsedCapacity({});
-      setLoading(false);
-      return;
-    }
-    const existing = await base44.entities.RestaurantReservation.filter({ reservation_date: d });
-    const activeStatuses = ['new', 'pending', 'confirmed', 'seated'];
-    const cap = {};
-    daySlots.forEach(s => { cap[s] = 0; });
-    existing
-      .filter(r => activeStatuses.includes(r.status))
-      .forEach(r => { if (cap[r.reservation_time] !== undefined) cap[r.reservation_time] += (r.party_size || 0); });
-    setUsedCapacity(cap);
-    setSlots(daySlots);
-    setLoading(false);
-  }
+  // Calendar
+  const today = startOfDay(new Date());
+  const monthStart = startOfMonth(calMonth);
+  const monthEnd = endOfMonth(calMonth);
+  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const startPad = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1; // Mon=0
+
+  const isClosedDay = (d) => SITE.closed_days.includes(getDay(d)); // Monday
+  const isPast = (d) => isBefore(d, today) && !isToday(d);
+
+  // Time slots for selected date
+  const availableSlots = useMemo(() => {
+    if (!selectedDate) return [];
+    const dow = getDay(selectedDate);
+    if (dow === 0) return TIME_SLOTS.sunday;
+    return { lunch: TIME_SLOTS.lunch, dinner: TIME_SLOTS.dinner };
+  }, [selectedDate]);
+
+  const isSunday = selectedDate && getDay(selectedDate) === 0;
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.first_name || !form.last_name || !form.email) return;
-    setSubmitting(true);
-    setError('');
-    const res = await base44.functions.invoke('createReservation', {
-      first_name: form.first_name, last_name: form.last_name,
-      email: form.email, phone: form.phone,
-      date, time, guests, requests: form.requests, lang,
-    });
-    if (!res.data?.success) {
-      const err = res.data?.error || 'error';
-      if (err === 'duplicate') setError(c.error_duplicate);
-      else if (err === 'full') setError(c.error_full);
-      else if (err.includes('wait') || res.status === 429) setError(lang === 'de' ? 'Bitte kurz warten und erneut versuchen.' : lang === 'en' ? 'Please wait a moment before trying again.' : 'Attendere un momento prima di riprovare.');
-      else if (err.includes('closed')) setError(lang === 'de' ? 'Das Restaurant ist an diesem Tag geschlossen.' : lang === 'en' ? 'The restaurant is closed on this day.' : 'Il ristorante è chiuso in questo giorno.');
-      else setError(lang === 'de' ? 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.' : lang === 'en' ? 'An error occurred. Please try again.' : 'Si è verificato un errore. Riprovare.');
-      setSubmitting(false);
+    if (!form.name || !form.email) {
+      toast.error('Please fill in your name and email');
       return;
     }
-    setReservationRef(res.data.ref);
-    setSuccess(true);
-    setSubmitting(false);
-    // Log the activity (non-blocking)
-    base44.functions.invoke('logActivity', {
-      action: 'reservation_created',
-      description: `Tischreservierung erstellt: ${date} ${time} für ${guests} Personen`,
-      entity_type: 'Reservation',
-      entity_ref: res.data.ref,
-      metadata: { date, time, guests: String(guests), lang },
-    }).catch(() => {});
+    setSubmitting(true);
+    try {
+      if (isSupabaseConfigured()) {
+        await supabase.from('reservations').insert({
+          date: format(selectedDate, 'yyyy-MM-dd'),
+          time: selectedTime,
+          guests,
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          notes: form.notes,
+          status: 'confirmed',
+        });
+      }
+      setDone(true);
+      toast.success('Reservation confirmed!');
+    } catch (err) {
+      toast.error('Something went wrong. Please try again or call us.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  if (success) {
+  if (done) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center px-4 sm:px-5 pt-16 sm:pt-20 pb-24 sm:pb-16">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-10 text-center">
-          <div className="w-20 h-20 bg-[#C9A96E]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-[#C9A96E]" />
+      <div className="bg-charcoal min-h-screen pt-32 px-5">
+        <div className="max-w-md mx-auto text-center">
+          <div className="w-16 h-16 mx-auto rounded-full bg-gold/10 flex items-center justify-center mb-6">
+            <Check className="w-7 h-7 text-gold" />
           </div>
-          <p className="text-[#C9A96E] text-[10px] tracking-[0.4em] uppercase font-body mb-3">Krone Langenburg</p>
-          <h1 className="font-display text-3xl font-light text-stone-800 mb-3">{c.success_title}</h1>
-          <p className="text-stone-500 font-body text-sm mb-6">{c.success_text}</p>
-          <p className="text-xs text-stone-400 font-body mb-6">Ref: <strong className="text-stone-600">{reservationRef}</strong></p>
-          <div className="bg-stone-50 rounded-2xl p-5 text-sm font-body text-left space-y-3 mb-7 border border-stone-100">
-            <div className="flex justify-between"><span className="text-stone-400">{lang === 'de' ? 'Datum' : lang === 'en' ? 'Date' : 'Data'}</span><span className="text-stone-700 font-medium">{format(new Date(date), 'EEEE, d. MMMM yyyy', { locale: LOCALE_MAP[lang] || de })}</span></div>
-            <div className="flex justify-between"><span className="text-stone-400">{lang === 'de' ? 'Uhrzeit' : lang === 'en' ? 'Time' : 'Orario'}</span><span className="text-stone-700 font-medium">{time} Uhr</span></div>
-            <div className="flex justify-between"><span className="text-stone-400">{lang === 'de' ? 'Personen' : lang === 'en' ? 'Guests' : 'Ospiti'}</span><span className="text-stone-700 font-medium">{guests}</span></div>
-          </div>
-          <a href="/" className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#C9A96E] hover:bg-[#B8924A] text-white rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold transition-colors shadow-lg">
-            {lang === 'de' ? 'Zur Startseite' : lang === 'en' ? 'Back to Home' : 'Torna alla home'}
+          <h1 className="font-display text-4xl text-ivory mb-3">Reservation Confirmed!</h1>
+          <p className="text-ivory/40 font-body text-sm mb-2">
+            {format(selectedDate, 'EEEE, MMMM d, yyyy')} at {selectedTime} for {guests} {guests === 1 ? 'guest' : 'guests'}
+          </p>
+          <p className="text-ivory/30 font-body text-xs mb-8">
+            A confirmation has been sent to <span className="text-ivory/50">{form.email}</span>
+          </p>
+          <a href={`tel:${SITE.phone}`} className="text-gold font-body text-sm hover:underline">
+            Need to change? Call us: {SITE.phone}
           </a>
         </div>
       </div>
     );
   }
 
-  const steps = [c.step1, c.step2, c.step3];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-800 pt-12 pb-24 lg:pb-10 lg:pt-16">
+    <div className="bg-charcoal min-h-screen pt-24 sm:pt-28 pb-20">
+      <section className="px-5">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <span className="text-gold text-[10px] tracking-[0.35em] uppercase font-body font-semibold">
+              Kulinarium by Ammesso
+            </span>
+            <h1 className="font-display text-4xl sm:text-5xl font-light text-ivory mt-2">
+              Reserve a Table
+            </h1>
+          </div>
 
-      {/* Hero header */}
-      <div className="relative overflow-hidden w-full">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1A1410] to-[#0F0D0B]" />
-        <img
-          src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=80"
-          alt="Restaurant"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        />
-        <div className="relative z-10 text-center py-8 lg:py-14 px-5">
-          <p className="text-[#C9A96E] text-[9px] sm:text-[10px] tracking-[0.5em] uppercase font-body mb-2 lg:mb-3">Krone Langenburg by Ammesso</p>
-          <h1 className="font-display text-2xl sm:text-3xl md:text-6xl font-light text-white mb-2 lg:mb-3">{c.title}</h1>
-          <p className="text-white/50 font-body text-xs sm:text-sm tracking-wider">{c.sub}</p>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-5 -mt-2 lg:-mt-4">
-
-        {/* Step indicator */}
-        <div className="flex items-center justify-center gap-0 mb-8 sm:mb-10 mt-6 sm:mt-8">
-          {steps.map((label, i) => {
-            const s = i + 1;
-            const active = step === s;
-            const done = step > s;
-            return (
-              <div key={s} className="flex items-center">
-                <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-semibold font-body border-2 transition-all ${done ? 'bg-[#C9A96E] border-[#C9A96E] text-white' : active ? 'bg-white border-[#C9A96E] text-[#8B6914] shadow-md' : 'bg-white border-stone-200 text-stone-400'}`}>
-                    {done ? '✓' : s}
-                  </div>
-                  <span className={`text-[9px] sm:text-[10px] font-body mt-1 sm:mt-1.5 tracking-wider uppercase max-w-[60px] text-center leading-tight ${active ? 'text-[#8B6914] font-semibold' : 'text-stone-400'}`}>{label}</span>
+          {/* Step Indicator */}
+          <div className="flex items-center justify-center gap-2 mb-10">
+            {[1, 2, 3].map(s => (
+              <div key={s} className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-body font-semibold transition-all ${
+                  step >= s ? 'bg-gold text-charcoal' : 'bg-[#C9A96E]/10 text-ivory/30'
+                }`}>
+                  {step > s ? <Check className="w-3.5 h-3.5" /> : s}
                 </div>
-                {i < steps.length - 1 && <div className={`w-10 sm:w-16 md:w-24 h-px mx-1.5 sm:mx-2 mb-5 sm:mb-6 ${done ? 'bg-[#C9A96E]' : 'bg-stone-200'}`} />}
+                {s < 3 && <div className={`w-10 h-px ${step > s ? 'bg-gold' : 'bg-ivory/10'}`} />}
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
 
-        {/* ── STEP 1: Date + Guests ── */}
-        {step === 1 && (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
-            {/* Calendar */}
-            <div className="lg:col-span-3">
-              <MiniCalendar selected={date} onSelect={handleDateSelect} lang={lang} />
-            </div>
+          {/* Step 1: Date & Guests */}
+          {step === 1 && (
+            <FadeUp>
+              <div className="glass-card rounded-2xl p-6 sm:p-8">
+                <h2 className="font-display text-2xl text-ivory mb-6 flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-gold" /> Choose Date & Guests
+                </h2>
 
-            {/* Right panel: guests + date summary */}
-            <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
-              {/* Guest count */}
-              <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6">
-                <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-4 sm:mb-5">{c.guests_label}</p>
-                <div className="flex items-center justify-between gap-4">
-                  <button onClick={() => setGuests(g => Math.max(1, g - 1))}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-stone-200 text-stone-500 hover:border-[#C9A96E]/50 hover:text-[#8B6914] transition-all text-2xl font-light flex items-center justify-center flex-shrink-0">
-                    −
-                  </button>
-                  <div className="text-center">
-                    <span className="font-display text-5xl sm:text-6xl font-light text-stone-800">{guests}</span>
-                    <p className="text-stone-400 text-xs font-body mt-1">{lang === 'de' ? 'Personen' : lang === 'en' ? 'Persons' : 'Persone'}</p>
+                {/* Guest selector */}
+                <div className="mb-8">
+                  <label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-3 block">
+                    <Users className="w-3 h-3 inline mr-1" /> Number of Guests
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {GUEST_OPTIONS.map(n => (
+                      <button
+                        key={n}
+                        onClick={() => setGuests(n)}
+                        className={`w-11 h-11 rounded-xl text-sm font-body font-medium transition-all ${
+                          guests === n
+                            ? 'bg-gold text-charcoal shadow-gold-glow'
+                            : 'bg-[#C9A96E]/08 text-ivory/40 hover:bg-[#C9A96E]/15 hover:text-ivory/60'
+                        }`}
+                      >
+                        {n}
+                      </button>
+                    ))}
                   </div>
-                  <button onClick={() => setGuests(g => Math.min(10, g + 1))}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-stone-200 text-stone-500 hover:border-[#C9A96E]/50 hover:text-[#8B6914] transition-all text-2xl font-light flex items-center justify-center flex-shrink-0">
-                    +
-                  </button>
-                </div>
-                {guests === 10 && (
-                  <p className="text-[#C9A96E] text-xs font-body text-center mt-3">{lang === 'de' ? 'Für Gruppen > 10 bitte direkt anfragen.' : lang === 'en' ? 'For groups > 10 please contact us directly.' : 'Per gruppi > 10 contattateci.'}</p>
-                )}
-              </div>
-
-              {/* Selected date summary */}
-              {date && (
-                <div className="bg-white rounded-2xl shadow-xl p-6">
-                  <p className="text-[10px] font-body font-semibold tracking-[0.25em] uppercase text-stone-400 mb-3">{c.date_label}</p>
-                  {loading ? (
-                    <div className="flex items-center gap-2 text-stone-400">
-                      <div className="w-4 h-4 border-2 border-stone-300 border-t-[#C9A96E] rounded-full animate-spin" />
-                      <span className="text-sm font-body">…</span>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="font-display text-xl text-stone-700">
-                        {format(new Date(date), 'EEEE, d. MMMM yyyy', { locale: LOCALE_MAP[lang] || de })}
-                      </p>
-                      {slots.length === 0 ? (
-                        <div className="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-700 font-body">{c.closed_msg}</div>
-                      ) : (
-                        <p className="text-stone-400 text-sm font-body mt-1">{slots.length} {lang === 'de' ? 'Zeiten verfügbar' : lang === 'en' ? 'times available' : 'orari disponibili'}</p>
-                      )}
-                    </>
+                  {guests >= 7 && (
+                    <p className="text-gold/60 text-xs font-body mt-2">
+                      For groups of 8+, please <a href={`tel:${SITE.phone}`} className="underline">call us</a>.
+                    </p>
                   )}
                 </div>
-              )}
 
-              {/* CTA to next step */}
-              <button
-                onClick={() => setStep(2)}
-                disabled={!date || slots.length === 0 || loading}
-                className="w-full py-4 bg-[#C9A96E] hover:bg-[#B8924A] disabled:bg-stone-200 disabled:text-stone-400 text-white rounded-2xl text-sm font-body font-semibold tracking-wider transition-all shadow-lg disabled:shadow-none flex items-center justify-center gap-2"
-              >
-                {lang === 'de' ? 'Uhrzeit wählen' : lang === 'en' ? 'Choose Time' : 'Scegli orario'}
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
+                {/* Calendar */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <button onClick={() => setCalMonth(addMonths(calMonth, -1))}
+                      className="w-8 h-8 rounded-lg bg-ivory/5 flex items-center justify-center text-ivory/40 hover:text-ivory">
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <h3 className="font-display text-lg text-ivory">
+                      {format(calMonth, 'MMMM yyyy')}
+                    </h3>
+                    <button onClick={() => setCalMonth(addMonths(calMonth, 1))}
+                      className="w-8 h-8 rounded-lg bg-ivory/5 flex items-center justify-center text-ivory/40 hover:text-ivory">
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
 
-        {/* ── STEP 2: Time ── */}
-        {step === 2 && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
-              <button onClick={() => setStep(1)} className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 text-xs font-body tracking-widest uppercase mb-6 transition-colors">
-                <ChevronLeft className="w-4 h-4" /> {lang === 'de' ? 'Zurück' : lang === 'en' ? 'Back' : 'Indietro'}
-              </button>
+                  {/* Day headers */}
+                  <div className="grid grid-cols-7 gap-1 mb-2">
+                    {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => (
+                      <div key={d} className="text-center text-ivory/20 text-xs font-body py-1">{d}</div>
+                    ))}
+                  </div>
 
-              {/* Date + guests pill */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                <span className="inline-flex items-center gap-1.5 bg-[#C9A96E]/10 text-[#8B6914] text-xs font-body font-medium px-4 py-2 rounded-full border border-[#C9A96E]/20">
-                  📅 {format(new Date(date), 'EEEE, d. MMMM', { locale: LOCALE_MAP[lang] || de })}
-                </span>
-                <span className="inline-flex items-center gap-1.5 bg-stone-100 text-stone-600 text-xs font-body font-medium px-4 py-2 rounded-full">
-                  <Users className="w-3.5 h-3.5" /> {guests} {lang === 'de' ? 'Personen' : lang === 'en' ? 'Persons' : 'Persone'}
-                </span>
+                  {/* Days grid */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: startPad }, (_, i) => (
+                      <div key={`pad-${i}`} />
+                    ))}
+                    {days.map(day => {
+                      const closed = isClosedDay(day);
+                      const past = isPast(day);
+                      const selected = selectedDate && isSameDay(day, selectedDate);
+                      const disabled = closed || past;
+
+                      return (
+                        <button
+                          key={day.toISOString()}
+                          onClick={() => !disabled && setSelectedDate(day)}
+                          disabled={disabled}
+                          className={`h-10 rounded-lg text-sm font-body transition-all ${
+                            selected
+                              ? 'bg-gold text-charcoal font-semibold shadow-gold-glow'
+                              : disabled
+                                ? 'text-ivory/10 cursor-not-allowed'
+                                : isToday(day)
+                                  ? 'text-gold border border-gold/30 hover:bg-gold/10'
+                                  : 'text-ivory/50 hover:bg-ivory/5 hover:text-ivory'
+                          }`}
+                        >
+                          {format(day, 'd')}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex gap-4 mt-4 text-xs font-body text-ivory/20">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-ivory/10" /> Closed
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full border border-gold/40" /> Today
+                    </span>
+                  </div>
+                </div>
+
+                {/* Next button */}
+                <button
+                  onClick={() => selectedDate && setStep(2)}
+                  disabled={!selectedDate}
+                  className={`w-full mt-8 py-4 rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold transition-all ${
+                    selectedDate ? 'btn-gold' : 'bg-ivory/5 text-ivory/20 cursor-not-allowed'
+                  }`}
+                >
+                  {selectedDate ? `Continue — ${format(selectedDate, 'EEE, MMM d')}` : 'Select a date'}
+                </button>
               </div>
+            </FadeUp>
+          )}
 
-              {slots.length === 0 ? (
-                <div className="text-center py-10">
-                  <AlertCircle className="w-8 h-8 mx-auto mb-3 text-stone-300" />
-                  <p className="text-stone-400 font-body text-sm">{c.no_slots}</p>
-                </div>
-              ) : (
-                <TimeGrid slots={slots} usedCapacity={usedCapacity} guests={guests} selected={time} onSelect={(t) => { setTime(t); setStep(3); }} lang={lang} />
-              )}
-            </div>
-          </div>
-        )}
+          {/* Step 2: Time */}
+          {step === 2 && (
+            <FadeUp>
+              <div className="glass-card rounded-2xl p-6 sm:p-8">
+                <button onClick={() => setStep(1)} className="flex items-center gap-1 text-ivory/30 text-xs font-body mb-4 hover:text-ivory/50">
+                  <ChevronLeft className="w-3 h-3" /> Back
+                </button>
+                <h2 className="font-display text-2xl text-ivory mb-2 flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gold" /> Choose Time
+                </h2>
+                <p className="text-ivory/30 font-body text-sm mb-6">
+                  {format(selectedDate, 'EEEE, MMMM d, yyyy')} · {guests} {guests === 1 ? 'guest' : 'guests'}
+                </p>
 
-        {/* ── STEP 3: Form ── */}
-        {step === 3 && (
-          <div className="max-w-xl mx-auto">
-            <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
-              <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 text-xs font-body tracking-widest uppercase mb-6 transition-colors">
-                <ChevronLeft className="w-4 h-4" /> {lang === 'de' ? 'Zurück' : lang === 'en' ? 'Back' : 'Indietro'}
-              </button>
-
-              {/* Summary pill */}
-              <div className="bg-[#C9A96E]/8 border border-[#C9A96E]/20 rounded-2xl p-4 mb-7 flex flex-wrap gap-3">
-                <div className="flex items-center gap-2 text-sm font-body text-stone-700">
-                  <UtensilsCrossed className="w-4 h-4 text-[#C9A96E]" />
-                  <span className="font-medium">{format(new Date(date), 'EEEE, d. MMMM yyyy', { locale: LOCALE_MAP[lang] || de })}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm font-body text-stone-700">
-                  <Clock className="w-4 h-4 text-[#C9A96E]" />
-                  <span className="font-medium">{time} Uhr</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm font-body text-stone-700">
-                  <Users className="w-4 h-4 text-[#C9A96E]" />
-                  <span className="font-medium">{guests} {lang === 'de' ? 'Personen' : lang === 'en' ? 'Persons' : 'Persone'}</span>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                {isSunday ? (
                   <div>
-                    <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Vorname' : lang === 'en' ? 'First Name' : 'Nome'} *</label>
-                    <input type="text" autoComplete="given-name" required value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} className={inputClass} />
+                    <h3 className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-3">All Day (12:00 – 20:00)</h3>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {TIME_SLOTS.sunday.map(t => (
+                        <button
+                          key={t}
+                          onClick={() => setSelectedTime(t)}
+                          className={`py-2.5 rounded-lg text-sm font-body transition-all ${
+                            selectedTime === t
+                              ? 'bg-gold text-charcoal font-semibold'
+                              : 'bg-[#C9A96E]/08 text-ivory/40 hover:bg-[#C9A96E]/15'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Nachname' : lang === 'en' ? 'Last Name' : 'Cognome'} *</label>
-                    <input type="text" autoComplete="family-name" required value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} className={inputClass} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">E-Mail *</label>
-                  <input type="email" autoComplete="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className={inputClass} />
-                </div>
-                <div>
-                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Telefon' : lang === 'en' ? 'Phone' : 'Telefono'}</label>
-                  <input type="tel" autoComplete="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className={inputClass} />
-                </div>
-                <div>
-                  <label className="block text-stone-500 text-[10px] tracking-[0.25em] uppercase font-body mb-1.5">{lang === 'de' ? 'Sonderwünsche' : lang === 'en' ? 'Special Requests' : 'Richieste speciali'}</label>
-                  <textarea rows={3} value={form.requests} onChange={e => setForm(f => ({ ...f, requests: e.target.value }))} className={`${inputClass} resize-none`} placeholder={lang === 'de' ? 'Allergien, Geburtstag, Hochzeit …' : lang === 'en' ? 'Allergies, birthday, anniversary …' : 'Allergie, compleanno, anniversario …'} />
-                </div>
-
-                {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex gap-2 text-sm text-red-600 font-body">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" /> {error}
-                  </div>
+                ) : (
+                  <>
+                    <div className="mb-6">
+                      <h3 className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-3">Lunch (12:00 – 14:30)</h3>
+                      <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                        {TIME_SLOTS.lunch.map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setSelectedTime(t)}
+                            className={`py-2.5 rounded-lg text-sm font-body transition-all ${
+                              selectedTime === t
+                                ? 'bg-gold text-charcoal font-semibold'
+                                : 'bg-[#C9A96E]/08 text-ivory/40 hover:bg-[#C9A96E]/15'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-3">Dinner (17:30 – 22:00)</h3>
+                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                        {TIME_SLOTS.dinner.map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setSelectedTime(t)}
+                            className={`py-2.5 rounded-lg text-sm font-body transition-all ${
+                              selectedTime === t
+                                ? 'bg-gold text-charcoal font-semibold'
+                                : 'bg-[#C9A96E]/08 text-ivory/40 hover:bg-[#C9A96E]/15'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
 
-                <p className="text-xs text-stone-400 font-body leading-relaxed">{c.policy}</p>
-
-                <button type="submit" disabled={submitting}
-                  className="w-full py-4 bg-[#C9A96E] hover:bg-[#B8924A] text-white rounded-2xl text-sm font-body font-semibold tracking-wider transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
-                  {submitting
-                    ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    : <><UtensilsCrossed className="w-4 h-4" /> {c.confirm}</>
-                  }
+                <button
+                  onClick={() => selectedTime && setStep(3)}
+                  disabled={!selectedTime}
+                  className={`w-full mt-8 py-4 rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold transition-all ${
+                    selectedTime ? 'btn-gold' : 'bg-ivory/5 text-ivory/20 cursor-not-allowed'
+                  }`}
+                >
+                  {selectedTime ? `Continue — ${selectedTime}` : 'Select a time'}
                 </button>
-                <div className="flex items-center justify-center gap-4 text-[10px] font-body text-stone-400">
-                  <span className="flex items-center gap-1">✓ {lang === 'de' ? 'Sofortige Bestätigung per E-Mail' : lang === 'en' ? 'Instant email confirmation' : 'Conferma immediata via email'}</span>
+              </div>
+            </FadeUp>
+          )}
+
+          {/* Step 3: Contact Details */}
+          {step === 3 && (
+            <FadeUp>
+              <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 sm:p-8">
+                <button type="button" onClick={() => setStep(2)} className="flex items-center gap-1 text-ivory/30 text-xs font-body mb-4 hover:text-ivory/50">
+                  <ChevronLeft className="w-3 h-3" /> Back
+                </button>
+                <h2 className="font-display text-2xl text-ivory mb-2">Your Details</h2>
+                <p className="text-ivory/30 font-body text-sm mb-6">
+                  {format(selectedDate, 'EEE, MMM d')} at {selectedTime} · {guests} {guests === 1 ? 'guest' : 'guests'}
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Name *</label>
+                    <input type="text" required value={form.name} onChange={e => setForm({...form, name: e.target.value})}
+                      className="input-dark" placeholder="Your full name" />
+                  </div>
+                  <div>
+                    <label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Email *</label>
+                    <input type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})}
+                      className="input-dark" placeholder="your@email.com" />
+                  </div>
+                  <div>
+                    <label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Phone</label>
+                    <input type="tel" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
+                      className="input-dark" placeholder="+49 ..." />
+                  </div>
+                  <div>
+                    <label className="text-ivory/40 text-xs font-body tracking-wider uppercase mb-1.5 block">Special Requests</label>
+                    <textarea value={form.notes} onChange={e => setForm({...form, notes: e.target.value})}
+                      className="input-dark min-h-[80px] resize-none" placeholder="Allergies, celebrations, seating preferences..." />
+                  </div>
                 </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full mt-8 py-4 btn-gold rounded-full text-xs tracking-[0.15em] uppercase font-body font-semibold flex items-center justify-center gap-2"
+                >
+                  {submitting ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Confirming...</>
+                  ) : (
+                    <><Check className="w-3.5 h-3.5" /> Confirm Reservation</>
+                  )}
+                </button>
               </form>
-            </div>
-          </div>
-        )}
-      </div>
+            </FadeUp>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
