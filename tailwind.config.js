@@ -58,11 +58,11 @@ module.exports = {
         'card': '0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3)',
         'gold-glow': '0 0 24px rgba(201,169,110,0.2), 0 0 48px rgba(201,169,110,0.08)',
       },
-      safelist: [
-        'text-gold', 'text-ivory', 'bg-charcoal', 'bg-espresso', 'bg-gold',
-        'glass-card', 'gold-gradient', 'btn-gold', 'btn-ghost-gold',
-      ]
-    }
+    },
   },
+  safelist: [
+    'text-gold', 'text-ivory', 'bg-charcoal', 'bg-espresso', 'bg-gold',
+    'glass-card', 'gold-gradient', 'btn-gold', 'btn-ghost-gold',
+  ],
   plugins: [require("tailwindcss-animate")],
 }

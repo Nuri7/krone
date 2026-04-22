@@ -5,7 +5,7 @@ export default function StickyMobileCTA() {
   const location = useLocation();
   
   // Hide on pages that have their own CTAs or admin pages
-  const hidden = ['/reserve', '/rooms', '/booking-return', '/admin', '/dashboard', '/activity-log'].some(
+  const hidden = ['/reserve', '/rooms', '/booking-return', '/admin'].some(
     p => location.pathname.startsWith(p)
   );
   const isAccount = location.pathname.startsWith('/account');

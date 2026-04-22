@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+// No React hooks needed — simple presentational component
 import { useSearchParams, Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 

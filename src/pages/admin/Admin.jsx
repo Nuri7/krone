@@ -7,8 +7,8 @@ const ADMIN_LINKS = [
   { path: '/admin/calendar', icon: CalendarDays, title: 'Reservation Calendar', desc: 'View and manage all bookings' },
   { path: '/admin/menu', icon: UtensilsCrossed, title: 'Menu Management', desc: 'Edit dishes, prices and categories' },
   { path: '/admin/events', icon: CalendarPlus, title: 'Events', desc: 'Create and manage events' },
-  { path: '/dashboard', icon: BarChart3, title: 'Dashboard', desc: 'Analytics and business overview' },
-  { path: '/activity-log', icon: Activity, title: 'Activity Log', desc: 'System activity and audit trail' },
+  { path: '/admin/dashboard', icon: BarChart3, title: 'Dashboard', desc: 'Analytics and business overview' },
+  { path: '/admin/activity-log', icon: Activity, title: 'Activity Log', desc: 'System activity and audit trail' },
 ];
 
 export default function Admin() {

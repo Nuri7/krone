@@ -15,7 +15,7 @@ export default function Story() {
       {/* Hero */}
       <section className="relative h-[55vh] sm:h-[65vh] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1800&q=80"
+          src="/images/hero-restaurant.png"
           alt="Restaurant interior"
           className="w-full h-full object-cover"
         />

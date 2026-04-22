@@ -12,7 +12,7 @@ export default function Rooms() {
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[60vh] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1800&q=80"
+          src="/images/room-suite.png"
           alt="Hotel room"
           className="w-full h-full object-cover"
         />

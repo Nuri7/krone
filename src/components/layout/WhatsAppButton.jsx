@@ -8,7 +8,7 @@ export default function WhatsAppButton() {
   const waUrl = `https://wa.me/${SITE.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello Krone Langenburg!')}`;
 
   return (
-    <div className="fixed bottom-20 lg:bottom-6 right-4 z-30">
+    <div className="fixed bottom-20 lg:bottom-6 right-4 z-[45]">
       {/* Expanded tooltip */}
       {expanded && (
         <div className="absolute bottom-14 right-0 bg-white rounded-2xl shadow-2xl p-4 w-64 animate-fade-in">

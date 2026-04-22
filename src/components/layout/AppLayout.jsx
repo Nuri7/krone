@@ -16,7 +16,7 @@ export default function AppLayout() {
   }, [location.pathname]);
 
   // Hide footer on admin pages
-  const isAdmin = location.pathname.startsWith('/admin') || location.pathname === '/dashboard' || location.pathname === '/activity-log';
+  const isAdmin = location.pathname.startsWith('/admin');
 
   return (
     <>

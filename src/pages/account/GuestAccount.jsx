@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { User, FileText, MessageSquare, CalendarDays, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { FadeUp } from '@/components/shared/Animations';
@@ -12,12 +12,8 @@ const ACCOUNT_LINKS = [
 
 export default function GuestAccount() {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
+  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="bg-charcoal min-h-screen pt-24 sm:pt-28 pb-20 px-5">

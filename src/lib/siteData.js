@@ -32,7 +32,7 @@ export const SITE = {
     tripadvisor: "https://www.tripadvisor.de/Restaurant_Review-g198538-d26012517-Reviews-Hallisches_Kulinarium_by_Ammesso-Schwabisch_Hall_Baden_Wurttemberg.html",
   },
   maps_url: "https://www.google.com/maps/dir/?api=1&destination=Hauptstra%C3%9Fe+24%2C+74595+Langenburg",
-  maps_embed_key: "AIzaSyA-OPJc_4CvKv_S8YToDdmlS9hE7f1R1AU",
+  maps_embed_key: import.meta.env.VITE_MAPS_API_KEY || "AIzaSyA-OPJc_4CvKv_S8YToDdmlS9hE7f1R1AU",
 };
 
 export const CHEF = {
@@ -42,6 +42,7 @@ export const CHEF = {
   quote: "I don't cook for the Michelin star. I cook so you come back tomorrow.",
   bio: "Omar Ammesso, born Omar Ouardaoui, is not only the founder of Kulinarium but also its creative core. His passion for cooking started early — inspired by the aromas of his childhood and a deep love for Mediterranean cuisine. Trained in various European kitchens, he quickly developed his own style: powerful, personal and full of emotion. For Ammesso, cooking is not a profession — it is language, identity, and a daily declaration of love for life.",
   image: "https://static.wixstatic.com/media/e6b39b_b2703a4b8aa7481b9e9ec3a3a9eb6892~mv2.webp/v1/fill/w_324,h_434,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ammesso-6512-1bfcdeba.webp",
+  image_alt: "Chef Omar Ammesso, founder of Kulinarium by Ammesso",
 };
 
 export const ROOMS = [
@@ -52,7 +53,7 @@ export const ROOMS = [
     size_m2: 18,
     max_guests: 1,
     bed: "Single bed",
-    image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
+    image: "/images/room-single.png",
     features: ["Quiet location", "Modern bathroom", "Work desk", "City view", "Mini fridge"],
   },
   {
@@ -62,7 +63,7 @@ export const ROOMS = [
     size_m2: 26,
     max_guests: 2,
     bed: "Double bed (180×200)",
-    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80",
+    image: "/images/room-double.png",
     features: ["Panoramic window", "Rain shower", "Work desk", "Langenburg view", "Minibar"],
   },
   {
@@ -72,7 +73,7 @@ export const ROOMS = [
     size_m2: 42,
     max_guests: 2,
     bed: "King-size bed (200×200)",
-    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80",
+    image: "/images/room-suite.png",
     features: ["Separate living area", "Freestanding bathtub", "Premium minibar", "Lounge area", "Exclusive view"],
   },
 ];

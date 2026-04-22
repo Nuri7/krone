@@ -34,7 +34,7 @@ export default function Weddings() {
   return (
     <div className="bg-charcoal">
       <section className="relative h-[60vh] overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1800&q=80" alt="Wedding" className="w-full h-full object-cover" />
+        <img src="/images/hero-wedding.png" alt="Wedding" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-charcoal/30 to-charcoal" />
         <div className="absolute inset-0 flex items-end pb-16 px-5">
           <div className="max-w-7xl mx-auto w-full">

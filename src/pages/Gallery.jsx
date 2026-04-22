@@ -1,27 +1,23 @@
 import { useState } from 'react';
-import { Grid3X3, Rows3, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FadeUp } from '@/components/shared/Animations';
 
 const CATEGORIES = ['All', 'Restaurant', 'Food', 'Rooms', 'Events', 'Langenburg'];
 
 const PHOTOS = [
-  { src: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80", cat: "Food", alt: "Fine dining" },
-  { src: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80", cat: "Restaurant", alt: "Dining room" },
-  { src: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80", cat: "Rooms", alt: "Single room" },
-  { src: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80", cat: "Food", alt: "Appetiser" },
-  { src: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80", cat: "Events", alt: "Wedding" },
-  { src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80", cat: "Restaurant", alt: "Bar" },
-  { src: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80", cat: "Rooms", alt: "Double room" },
-  { src: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80", cat: "Food", alt: "Mediterranean" },
-  { src: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80", cat: "Rooms", alt: "Suite" },
-  { src: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80", cat: "Food", alt: "Meat dish" },
-  { src: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80", cat: "Food", alt: "Pasta" },
-  { src: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80", cat: "Langenburg", alt: "Town view" },
-  { src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80", cat: "Food", alt: "Cooking" },
-  { src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80", cat: "Events", alt: "Reception" },
-  { src: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800&q=80", cat: "Langenburg", alt: "Historic" },
-  { src: "https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=800&q=80", cat: "Food", alt: "Fresh pasta" },
+  { src: "/images/hero-pasta.png", cat: "Food", alt: "Fresh handmade pasta" },
+  { src: "/images/hero-restaurant.png", cat: "Restaurant", alt: "Dining room interior" },
+  { src: "/images/room-single.png", cat: "Rooms", alt: "Deluxe single room" },
+  { src: "/images/food-ingredients.png", cat: "Food", alt: "Fresh Mediterranean ingredients" },
+  { src: "/images/hero-wedding.png", cat: "Events", alt: "Wedding reception setup" },
+  { src: "/images/hero-exterior.png", cat: "Langenburg", alt: "Historic hotel exterior" },
+  { src: "/images/room-double.png", cat: "Rooms", alt: "Deluxe double room" },
+  { src: "/images/hero-restaurant.png", cat: "Restaurant", alt: "Warm restaurant ambiance" },
+  { src: "/images/room-suite.png", cat: "Rooms", alt: "King suite" },
+  { src: "/images/langenburg-town.png", cat: "Langenburg", alt: "Langenburg hilltop town" },
+  { src: "/images/hero-pasta.png", cat: "Food", alt: "Italian pasta dish" },
+  { src: "/images/hero-wedding.png", cat: "Events", alt: "Event dining setup" },
 ];
 
 export default function Gallery() {

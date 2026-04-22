@@ -9,7 +9,7 @@ export default function Restaurant() {
       {/* Hero */}
       <section className="relative h-[60vh] sm:h-[70vh] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1800&q=80"
+          src="/images/hero-restaurant.png"
           alt="Kulinarium dining room"
           className="w-full h-full object-cover"
         />
@@ -69,9 +69,9 @@ export default function Restaurant() {
       <section className="py-20 sm:py-28 px-5">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { src: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=80", alt: "Fine dining plate" },
-            { src: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&q=80", alt: "Mediterranean spread" },
-            { src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=700&q=80", alt: "Pasta being prepared" },
+            { src: "/images/hero-pasta.png", alt: "Fine dining plate" },
+            { src: "/images/food-ingredients.png", alt: "Mediterranean spread" },
+            { src: "/images/hero-restaurant.png", alt: "Restaurant interior" },
           ].map((img, i) => (
             <FadeUp key={i} delay={i * 80}>
               <div className="rounded-2xl overflow-hidden aspect-[4/3] group">
