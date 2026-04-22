@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BedDouble, Wifi, Wind, Bath, Star, MapPin, Check, ExternalLink, Users, Ruler } from 'lucide-react';
 import { SITE, ROOMS, AMENITIES } from '@/lib/siteData';
 import { FadeUp } from '@/components/shared/Animations';
+import { asset } from '@/lib/assets';
 
 export default function Rooms() {
   const [showBooking, setShowBooking] = useState(false);
@@ -12,7 +13,7 @@ export default function Rooms() {
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[60vh] overflow-hidden">
         <img
-          src="/images/room-suite.png"
+          src={asset("/images/room-suite.png")}
           alt="Hotel room"
           className="w-full h-full object-cover"
         />

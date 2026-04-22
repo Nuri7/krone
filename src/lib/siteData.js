@@ -1,4 +1,5 @@
 // Canonical site data — single source of truth (English only)
+import { asset } from '@/lib/assets';
 
 export const SITE = {
   name: "Krone Langenburg by Ammesso",
@@ -53,7 +54,7 @@ export const ROOMS = [
     size_m2: 18,
     max_guests: 1,
     bed: "Single bed",
-    image: "/images/room-single.png",
+    image: asset("/images/room-single.png"),
     features: ["Quiet location", "Modern bathroom", "Work desk", "City view", "Mini fridge"],
   },
   {
@@ -63,7 +64,7 @@ export const ROOMS = [
     size_m2: 26,
     max_guests: 2,
     bed: "Double bed (180×200)",
-    image: "/images/room-double.png",
+    image: asset("/images/room-double.png"),
     features: ["Panoramic window", "Rain shower", "Work desk", "Langenburg view", "Minibar"],
   },
   {
@@ -73,7 +74,7 @@ export const ROOMS = [
     size_m2: 42,
     max_guests: 2,
     bed: "King-size bed (200×200)",
-    image: "/images/room-suite.png",
+    image: asset("/images/room-suite.png"),
     features: ["Separate living area", "Freestanding bathtub", "Premium minibar", "Lounge area", "Exclusive view"],
   },
 ];

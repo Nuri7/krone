@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heart, Flame, Users, Quote, ArrowRight } from 'lucide-react';
 import { CHEF } from '@/lib/siteData';
 import { FadeUp } from '@/components/shared/Animations';
+import { asset } from '@/lib/assets';
 
 const VALUES = [
   { icon: Flame, title: "Passion", desc: "Cooking is not a job — it's a calling. Every dish carries the fire that drives us." },
@@ -15,7 +16,7 @@ export default function Story() {
       {/* Hero */}
       <section className="relative h-[55vh] sm:h-[65vh] overflow-hidden">
         <img
-          src="/images/hero-restaurant.png"
+          src={asset("/images/hero-restaurant.png")}
           alt="Restaurant interior"
           className="w-full h-full object-cover"
         />

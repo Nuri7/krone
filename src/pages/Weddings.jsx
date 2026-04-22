@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, Users, Briefcase, UtensilsCrossed, Send, Loader2, Check } from 'lucide-react';
 import { SITE, EVENT_TYPES } from '@/lib/siteData';
 import { FadeUp } from '@/components/shared/Animations';
+import { asset } from '@/lib/assets';
 import { supabase, isSupabaseConfigured } from '@/api/supabaseClient';
 import { toast } from 'sonner';
 
@@ -34,7 +35,7 @@ export default function Weddings() {
   return (
     <div className="bg-charcoal">
       <section className="relative h-[60vh] overflow-hidden">
-        <img src="/images/hero-wedding.png" alt="Wedding" className="w-full h-full object-cover" />
+        <img src={asset("/images/hero-wedding.png")} alt="Wedding" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-charcoal/30 to-charcoal" />
         <div className="absolute inset-0 flex items-end pb-16 px-5">
           <div className="max-w-7xl mx-auto w-full">

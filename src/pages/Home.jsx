@@ -7,38 +7,39 @@ import {
 import { SITE, CHEF, ROOMS } from '@/lib/siteData';
 import { FadeUp, StaggerChildren } from '@/components/shared/Animations';
 import { useIsMobile } from '@/hooks/useResponsive';
+import { asset } from '@/lib/assets';
 
 // Hero images
 const HERO_IMAGES = [
   {
-    url: "/images/hero-restaurant.png",
+    url: asset("/images/hero-restaurant.png"),
     title: "Culinary Excellence",
     sub: "Mediterranean soul, German heart",
   },
   {
-    url: "/images/hero-pasta.png",
+    url: asset("/images/hero-pasta.png"),
     title: "Handcrafted with Love",
     sub: "Every dish tells a story",
   },
   {
-    url: "/images/hero-exterior.png",
+    url: asset("/images/hero-exterior.png"),
     title: "Historic Elegance",
     sub: "Rooms in the heart of Langenburg",
   },
   {
-    url: "/images/hero-wedding.png",
+    url: asset("/images/hero-wedding.png"),
     title: "Unforgettable Moments",
     sub: "Weddings, events & celebrations",
   },
 ];
 
 const GALLERY_STRIP = [
-  "/images/hero-restaurant.png",
-  "/images/hero-pasta.png",
-  "/images/food-ingredients.png",
-  "/images/hero-exterior.png",
-  "/images/room-suite.png",
-  "/images/hero-wedding.png",
+  asset("/images/hero-restaurant.png"),
+  asset("/images/hero-pasta.png"),
+  asset("/images/food-ingredients.png"),
+  asset("/images/hero-exterior.png"),
+  asset("/images/room-suite.png"),
+  asset("/images/hero-wedding.png"),
 ];
 
 const TRUST_PILLARS = [
@@ -192,7 +193,7 @@ export default function Home() {
             <FadeUp className="md:row-span-2">
               <div className="relative group rounded-2xl overflow-hidden aspect-[3/4] md:h-full">
                 <img
-                  src="/images/hero-pasta.png"
+                  src={asset("/images/hero-pasta.png")}
                   alt="Fresh pasta"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
@@ -208,7 +209,7 @@ export default function Home() {
             <FadeUp delay={100}>
               <div className="relative group rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="/images/food-ingredients.png"
+                  src={asset("/images/food-ingredients.png")}
                   alt="Mediterranean dishes"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
@@ -222,7 +223,7 @@ export default function Home() {
             <FadeUp delay={200}>
               <div className="relative group rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="/images/hero-restaurant.png"
+                  src={asset("/images/hero-restaurant.png")}
                   alt="Restaurant ambiance"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
@@ -395,7 +396,7 @@ export default function Home() {
       <section className="relative py-28 sm:py-36 px-5 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/hero-wedding.png"
+            src={asset("/images/hero-wedding.png")}
             alt="Wedding setup"
             className="w-full h-full object-cover"
             loading="lazy"

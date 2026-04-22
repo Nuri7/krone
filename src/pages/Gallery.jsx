@@ -2,22 +2,23 @@ import { useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FadeUp } from '@/components/shared/Animations';
+import { asset } from '@/lib/assets';
 
 const CATEGORIES = ['All', 'Restaurant', 'Food', 'Rooms', 'Events', 'Langenburg'];
 
 const PHOTOS = [
-  { src: "/images/hero-pasta.png", cat: "Food", alt: "Fresh handmade pasta" },
-  { src: "/images/hero-restaurant.png", cat: "Restaurant", alt: "Dining room interior" },
-  { src: "/images/room-single.png", cat: "Rooms", alt: "Deluxe single room" },
-  { src: "/images/food-ingredients.png", cat: "Food", alt: "Fresh Mediterranean ingredients" },
-  { src: "/images/hero-wedding.png", cat: "Events", alt: "Wedding reception setup" },
-  { src: "/images/hero-exterior.png", cat: "Langenburg", alt: "Historic hotel exterior" },
-  { src: "/images/room-double.png", cat: "Rooms", alt: "Deluxe double room" },
-  { src: "/images/hero-restaurant.png", cat: "Restaurant", alt: "Warm restaurant ambiance" },
-  { src: "/images/room-suite.png", cat: "Rooms", alt: "King suite" },
-  { src: "/images/langenburg-town.png", cat: "Langenburg", alt: "Langenburg hilltop town" },
-  { src: "/images/hero-pasta.png", cat: "Food", alt: "Italian pasta dish" },
-  { src: "/images/hero-wedding.png", cat: "Events", alt: "Event dining setup" },
+  { src: asset("/images/hero-pasta.png"), cat: "Food", alt: "Fresh handmade pasta" },
+  { src: asset("/images/hero-restaurant.png"), cat: "Restaurant", alt: "Dining room interior" },
+  { src: asset("/images/room-single.png"), cat: "Rooms", alt: "Deluxe single room" },
+  { src: asset("/images/food-ingredients.png"), cat: "Food", alt: "Fresh Mediterranean ingredients" },
+  { src: asset("/images/hero-wedding.png"), cat: "Events", alt: "Wedding reception setup" },
+  { src: asset("/images/hero-exterior.png"), cat: "Langenburg", alt: "Historic hotel exterior" },
+  { src: asset("/images/room-double.png"), cat: "Rooms", alt: "Deluxe double room" },
+  { src: asset("/images/hero-restaurant.png"), cat: "Restaurant", alt: "Warm restaurant ambiance" },
+  { src: asset("/images/room-suite.png"), cat: "Rooms", alt: "King suite" },
+  { src: asset("/images/langenburg-town.png"), cat: "Langenburg", alt: "Langenburg hilltop town" },
+  { src: asset("/images/hero-pasta.png"), cat: "Food", alt: "Italian pasta dish" },
+  { src: asset("/images/hero-wedding.png"), cat: "Events", alt: "Event dining setup" },
 ];
 
 export default function Gallery() {

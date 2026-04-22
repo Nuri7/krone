@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Clock, Leaf, UtensilsCrossed, Quote, ArrowRight, ChefHat, AlertCircle } from 'lucide-react';
 import { SITE, CHEF } from '@/lib/siteData';
 import { FadeUp } from '@/components/shared/Animations';
+import { asset } from '@/lib/assets';
 
 export default function Restaurant() {
   return (
@@ -9,7 +10,7 @@ export default function Restaurant() {
       {/* Hero */}
       <section className="relative h-[60vh] sm:h-[70vh] overflow-hidden">
         <img
-          src="/images/hero-restaurant.png"
+          src={asset("/images/hero-restaurant.png")}
           alt="Kulinarium dining room"
           className="w-full h-full object-cover"
         />
@@ -69,9 +70,9 @@ export default function Restaurant() {
       <section className="py-20 sm:py-28 px-5">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { src: "/images/hero-pasta.png", alt: "Fine dining plate" },
-            { src: "/images/food-ingredients.png", alt: "Mediterranean spread" },
-            { src: "/images/hero-restaurant.png", alt: "Restaurant interior" },
+            { src: asset("/images/hero-pasta.png"), alt: "Fine dining plate" },
+            { src: asset("/images/food-ingredients.png"), alt: "Mediterranean spread" },
+            { src: asset("/images/hero-restaurant.png"), alt: "Restaurant interior" },
           ].map((img, i) => (
             <FadeUp key={i} delay={i * 80}>
               <div className="rounded-2xl overflow-hidden aspect-[4/3] group">
